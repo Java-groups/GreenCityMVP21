@@ -24,6 +24,7 @@ import org.testcontainers.shaded.com.fasterxml.jackson.databind.ObjectMapper;
 import java.security.Principal;
 import java.time.LocalDate;
 import java.util.List;
+import java.util.Locale;
 
 import static greencity.ModelUtils.getPrincipal;
 import static greencity.ModelUtils.getUserVO;
@@ -274,6 +275,18 @@ public class HabitAssignControllerTest {
                 .andExpect(status().isOk());
 
         verify(habitAssignService).getUserShoppingAndCustomShoppingLists(null, 1L, "en");
+    }
+
+    @Test
+    @DisplayName("Test retrieve lists for users by user ID, habit ID, and locale")
+    void getUserAndCustomListByUserIdAndHabitIdAndLocale_EndpointResponse_StatusOk() throws Exception {
+        mockMvc.perform(get(habitAssignControllerLink + "/{habitAssignId}/allUserAndCustomList", 1L)
+                        .locale(Locale.forLanguageTag("ua"))
+                        .principal(principal)
+                        .contentType(MediaType.APPLICATION_JSON))
+                .andExpect(status().isOk());
+
+        verify(habitAssignService).getUserShoppingAndCustomShoppingLists(null, 1L, "ua");
     }
 
     @Test
