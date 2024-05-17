@@ -2,6 +2,7 @@ package greencity;
 
 import greencity.constant.AppConstant;
 import greencity.dto.PageableAdvancedDto;
+import greencity.dto.category.CategoryDto;
 import greencity.dto.econews.*;
 import greencity.dto.econewscomment.*;
 import greencity.dto.habit.*;
@@ -377,6 +378,14 @@ public class ModelUtils {
         return new URL(TestConst.SITE);
     }
 
+    public static Habit getCustomHabit() {
+        return Habit.builder()
+                .image("imagePath")
+                .complexity(2)
+                .defaultDuration(7)
+                .isCustomHabit(true)
+                .build();
+    }
     public static EcoNewsAuthorDto getEcoNewsAuthorDto() {
         return new EcoNewsAuthorDto(1L, TestConst.NAME);
     }
@@ -667,5 +676,13 @@ public class ModelUtils {
             .text("item")
             .status(ShoppingListItemStatus.INPROGRESS)
             .build();
+    }
+
+    public static CategoryDto getCategoryWithUaNameAndWithParentCategory(){
+        return CategoryDto.builder()
+                .name("Test Category")
+                .nameUa("Тестова Категорія")
+                .parentCategoryId(5L)
+                .build();
     }
 }
