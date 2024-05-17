@@ -14,7 +14,6 @@ import org.junit.jupiter.api.extension.ExtendWith;
 import org.mockito.InjectMocks;
 import org.mockito.Mock;
 import org.mockito.junit.jupiter.MockitoExtension;
-import org.springframework.data.web.PageableHandlerMethodArgumentResolver;
 import org.springframework.http.MediaType;
 import org.springframework.test.web.servlet.MockMvc;
 
@@ -44,7 +43,7 @@ public class HabitAssignControllerTest {
     @Mock
     HabitAssignService habitAssignService;
 
-    ObjectMapper objectMapper;
+    final ObjectMapper objectMapper = new ObjectMapper();
 
     final Principal principal = getPrincipal();
     final Long HABIT_ID = 1L;
@@ -52,10 +51,7 @@ public class HabitAssignControllerTest {
     @BeforeEach
     void setup() {
         this.mockMvc = MockMvcBuilders.standaloneSetup(habitAssignController)
-                .setCustomArgumentResolvers(new PageableHandlerMethodArgumentResolver())
                 .build();
-
-        objectMapper = new ObjectMapper();
     }
 
     @Test
