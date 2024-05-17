@@ -12,6 +12,7 @@ import greencity.dto.econewscomment.EcoNewsCommentDto;
 import greencity.dto.habit.*;
 import greencity.dto.habitfact.*;
 import greencity.dto.habitstatistic.AddHabitStatisticDto;
+import greencity.dto.habitstatistic.UpdateHabitStatisticDto;
 import greencity.dto.habittranslation.HabitTranslationDto;
 import greencity.dto.language.LanguageDTO;
 import greencity.dto.language.LanguageTranslationDTO;
@@ -126,6 +127,13 @@ public class ModelUtils {
             .habitRate(HabitRate.DEFAULT)
             .createDate(ZonedDateTime.now())
             .build();
+    }
+
+    public static UpdateHabitStatisticDto getUpdateHabitStatisticDto() {
+        return UpdateHabitStatisticDto.builder()
+                .amountOfItems(5)
+                .habitRate(HabitRate.DEFAULT)
+                .build();
     }
 
     public static HabitStatistic getHabitStatistic() {
