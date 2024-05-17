@@ -33,19 +33,19 @@ import static org.springframework.test.web.servlet.request.MockMvcRequestBuilder
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.status;
 
 @ExtendWith(MockitoExtension.class)
-public class CustomShoppingListControllerTest {
-    private static final String customShoppingListItemsLink = "/custom/shopping-list-items";
-    private static final Long USER_ID = 1L;
-    private static final Long HABIT_ID = 1L;
-    private static final Long ITEM_ID = 1L;
-    private static final String ITEM_STATUS = "DONE";
-    private MockMvc mockMvc;
+public class CustomShoppingListItemControllerTest {
+    static final String customShoppingListItemsLink = "/custom/shopping-list-items";
+    static final Long USER_ID = 1L;
+    static final Long HABIT_ID = 1L;
+    static final Long ITEM_ID = 1L;
+    static final String ITEM_STATUS = "DONE";
+    MockMvc mockMvc;
     @Mock
     CustomShoppingListItemService customShoppingListItemService;
     @InjectMocks
     CustomShoppingListItemController customShoppingListItemController;
     CustomShoppingListItemResponseDto responseDto;
-    ObjectMapper objectMapper;
+    final ObjectMapper objectMapper = new ObjectMapper();
     Principal principal = getPrincipal();
 
     @BeforeEach
@@ -54,7 +54,6 @@ public class CustomShoppingListControllerTest {
                 .setCustomArgumentResolvers(new PageableHandlerMethodArgumentResolver())
                 .build();
         responseDto = new CustomShoppingListItemResponseDto(3L, "test", ShoppingListItemStatus.ACTIVE);
-        objectMapper = new ObjectMapper();
     }
 
     @AfterEach
