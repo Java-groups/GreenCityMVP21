@@ -2,16 +2,13 @@ package greencity.controller;
 
 import greencity.dto.shoppinglistitem.BulkSaveCustomShoppingListItemDto;
 import greencity.dto.shoppinglistitem.CustomShoppingListItemResponseDto;
-import greencity.enums.ShoppingListItemStatus;
 import greencity.service.CustomShoppingListItemService;
-import org.junit.jupiter.api.AfterEach;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;
 import org.mockito.InjectMocks;
 import org.mockito.Mock;
-import org.mockito.Mockito;
 import org.mockito.junit.jupiter.MockitoExtension;
 import org.springframework.data.web.PageableHandlerMethodArgumentResolver;
 import org.springframework.http.MediaType;
@@ -24,6 +21,7 @@ import java.util.List;
 import java.util.Objects;
 
 import static greencity.ModelUtils.getPrincipal;
+import static greencity.ModelUtils.getCustomShoppingListItemResponseDto;
 import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.mockito.ArgumentMatchers.anyLong;
 import static org.mockito.ArgumentMatchers.anyString;
@@ -53,17 +51,12 @@ public class CustomShoppingListItemControllerTest {
         this.mockMvc = MockMvcBuilders.standaloneSetup(customShoppingListItemController)
                 .setCustomArgumentResolvers(new PageableHandlerMethodArgumentResolver())
                 .build();
-        responseDto = new CustomShoppingListItemResponseDto(3L, "test", ShoppingListItemStatus.ACTIVE);
-    }
-
-    @AfterEach
-    void tearDown() {
-        Mockito.reset(customShoppingListItemService);
     }
 
     @Test
     @DisplayName("Get all available custom shopping-list-items with authenticated user")
     void getAllAvailableCustomShoppingListItems_WithAuthenticatedUser_ReturnsOk() throws Exception {
+        responseDto = getCustomShoppingListItemResponseDto();
         mockMvc.perform(get(customShoppingListItemsLink + "/{userId}/{habitId}", USER_ID, HABIT_ID)
                         .principal(principal))
                 .andExpect(status().isOk());
@@ -77,10 +70,11 @@ public class CustomShoppingListItemControllerTest {
     @Test
     @DisplayName("Get all custom shopping items by status for a specific user")
     void getAllCustomShoppingItemsByStatus_ForSpecificUser_ReturnsOk() throws Exception {
+        responseDto = getCustomShoppingListItemResponseDto();
         mockMvc.perform(get(customShoppingListItemsLink + "/{userId}/custom-shopping-list-items", USER_ID)
                         .principal(principal))
                 .andExpect(status().isOk());
-        when(customShoppingListItemService.findAllUsersCustomShoppingListItemsByStatus(anyLong(),anyString()))
+        when(customShoppingListItemService.findAllUsersCustomShoppingListItemsByStatus(anyLong(), anyString()))
                 .thenReturn(List.of(responseDto));
         assertEquals(responseDto, customShoppingListItemController.getAllCustomShoppingItemsByStatus(USER_ID, "ACTIVE")
                 .getBody().getFirst());
@@ -89,6 +83,7 @@ public class CustomShoppingListItemControllerTest {
     @Test
     @DisplayName("Save one or multiple custom shopping list items for a specific user")
     void saveCustomShoppingListItems_ForSpecificUser_ReturnsCreated() throws Exception {
+        responseDto = getCustomShoppingListItemResponseDto();
         BulkSaveCustomShoppingListItemDto bulkSaveDto = new BulkSaveCustomShoppingListItemDto();
         String content = objectMapper.writeValueAsString(bulkSaveDto);
         mockMvc.perform(post(customShoppingListItemsLink + "/{userId}/{habitAssignId}/custom-shopping-list-items", USER_ID, HABIT_ID)
