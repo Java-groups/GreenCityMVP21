@@ -32,7 +32,7 @@ import static org.springframework.test.web.servlet.request.MockMvcRequestBuilder
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.status;
 
 @ExtendWith(MockitoExtension.class)
-public class HabitAssignControllerTest {
+class HabitAssignControllerTest {
     static final String habitAssignControllerLink = "/habit/assign";
 
     MockMvc mockMvc;
@@ -47,6 +47,7 @@ public class HabitAssignControllerTest {
 
     final Principal principal = getPrincipal();
     final Long HABIT_ID = 1L;
+    final Long USER_ID = 1L;
 
     @BeforeEach
     void setup() {
@@ -69,11 +70,12 @@ public class HabitAssignControllerTest {
     @DisplayName("Test retrieve a habit assignment")
     void getHabitAssign_EndpointResponse_StatusOk() throws Exception {
         mockMvc.perform(get(habitAssignControllerLink + "/{habitAssignId}", HABIT_ID)
+                        .param("id", String.valueOf(USER_ID))
                         .principal(principal)
                         .contentType(MediaType.APPLICATION_JSON))
                 .andExpect(status().isOk());
 
-        verify(habitAssignService).getByHabitAssignIdAndUserId(HABIT_ID, null, "en");
+        verify(habitAssignService).getByHabitAssignIdAndUserId(HABIT_ID, USER_ID, "en");
     }
 
     @Test
@@ -95,12 +97,13 @@ public class HabitAssignControllerTest {
     @DisplayName("Test update habit assignment duration")
     void updateHabitAssignDuration_EndpointResponse_StatusOk() throws Exception {
         mockMvc.perform(put(habitAssignControllerLink + "/{habitAssignId}/update-habit-duration", HABIT_ID)
+                        .param("id", String.valueOf(USER_ID))
                         .principal(principal)
                         .param("duration", "7")
                         .contentType(MediaType.APPLICATION_JSON))
                 .andExpect(status().isOk());
 
-        verify(habitAssignService).updateUserHabitInfoDuration(HABIT_ID, null, 7);
+        verify(habitAssignService).updateUserHabitInfoDuration(HABIT_ID, USER_ID, 7);
     }
 
     @Test
@@ -109,11 +112,12 @@ public class HabitAssignControllerTest {
         LocalDate date = LocalDate.now();
 
         mockMvc.perform(post(habitAssignControllerLink + "/{habitAssignId}/enroll/{date}", HABIT_ID, date)
+                        .param("id", String.valueOf(USER_ID))
                         .principal(principal)
                         .contentType(MediaType.APPLICATION_JSON))
                 .andExpect(status().isOk());
 
-        verify(habitAssignService).enrollHabit(HABIT_ID, null, date, "en");
+        verify(habitAssignService).enrollHabit(HABIT_ID, USER_ID, date, "en");
     }
 
     @Test
@@ -122,11 +126,12 @@ public class HabitAssignControllerTest {
         LocalDate date = LocalDate.now();
 
         mockMvc.perform(post(habitAssignControllerLink + "/{habitAssignId}/unenroll/{date}", HABIT_ID, date)
+                        .param("id", String.valueOf(USER_ID))
                         .principal(principal)
                         .contentType(MediaType.APPLICATION_JSON))
                 .andExpect(status().isOk());
 
-        verify(habitAssignService).unenrollHabit(HABIT_ID, null, date);
+        verify(habitAssignService).unenrollHabit(HABIT_ID, USER_ID, date);
     }
 
     @Test
@@ -136,55 +141,60 @@ public class HabitAssignControllerTest {
         LocalDate toDate = LocalDate.now().plusDays(1);
 
         mockMvc.perform(get(habitAssignControllerLink + "/activity/{from}/to/{to}", fromDate, toDate)
+                        .param("id", String.valueOf(USER_ID))
                         .principal(principal)
                         .contentType(MediaType.APPLICATION_JSON))
                 .andExpect(status().isOk());
 
-        verify(habitAssignService).findHabitAssignsBetweenDates(null, fromDate, toDate, "en");
+        verify(habitAssignService).findHabitAssignsBetweenDates(USER_ID, fromDate, toDate, "en");
     }
 
     @Test
     @DisplayName("Test cancel a habit assignment")
     void cancelHabitAssign_EndpointResponse_StatusOk() throws Exception {
         mockMvc.perform(patch(habitAssignControllerLink + "/cancel/{habitId}", HABIT_ID)
+                        .param("id", String.valueOf(USER_ID))
                         .principal(principal)
                         .contentType(MediaType.APPLICATION_JSON))
                 .andExpect(status().isOk());
 
-        verify(habitAssignService).cancelHabitAssign(HABIT_ID, null);
+        verify(habitAssignService).cancelHabitAssign(HABIT_ID, USER_ID);
     }
 
     @Test
     @DisplayName("Test retrieve habit assignment by habit ID")
     void getHabitAssignByHabitId_EndpointResponse_StatusOk() throws Exception {
         mockMvc.perform(get(habitAssignControllerLink + "/{habitId}/active", HABIT_ID)
+                        .param("id", String.valueOf(USER_ID))
                         .principal(principal)
                         .contentType(MediaType.APPLICATION_JSON))
                 .andExpect(status().isOk());
 
-        verify(habitAssignService).findHabitAssignByUserIdAndHabitId(null, HABIT_ID, "en");
+        verify(habitAssignService).findHabitAssignByUserIdAndHabitId(USER_ID, HABIT_ID, "en");
     }
 
     @Test
     @DisplayName("Test get current user habit assignments")
     void getCurrentUserHabitAssignsByIdAndAcquired_EndpointResponse_StatusOk() throws Exception {
         mockMvc.perform(get(habitAssignControllerLink + "/allForCurrentUser")
+                        .param("id", String.valueOf(USER_ID))
                         .principal(principal)
                         .contentType(MediaType.APPLICATION_JSON))
                 .andExpect(status().isOk());
 
-        verify(habitAssignService).getAllHabitAssignsByUserIdAndStatusNotCancelled(null, "en");
+        verify(habitAssignService).getAllHabitAssignsByUserIdAndStatusNotCancelled(USER_ID, "en");
     }
 
     @Test
     @DisplayName("Test delete a habit assignment")
     void deleteHabitAssign_EndpointResponse_StatusOk() throws Exception {
         mockMvc.perform(delete(habitAssignControllerLink + "/delete/{habitAssignId}", HABIT_ID)
+                        .param("id", String.valueOf(USER_ID))
                         .principal(principal)
                         .contentType(MediaType.APPLICATION_JSON))
                 .andExpect(status().isOk());
 
-        verify(habitAssignService).deleteHabitAssign(HABIT_ID, null);
+        verify(habitAssignService).deleteHabitAssign(HABIT_ID, USER_ID);
     }
 
     @Test
@@ -243,56 +253,61 @@ public class HabitAssignControllerTest {
     @DisplayName("Test get in-progress habit assignments on a specific date")
     void getInprogressHabitAssignOnDate_EndpointResponse_StatusOk() throws Exception {
         mockMvc.perform(get(habitAssignControllerLink + "/active/{date}", LocalDate.now())
+                        .param("id", String.valueOf(USER_ID))
                         .principal(principal)
                         .contentType(MediaType.APPLICATION_JSON))
                 .andExpect(status().isOk());
 
-        verify(habitAssignService).findInprogressHabitAssignsOnDate(null, LocalDate.now(), "en");
+        verify(habitAssignService).findInprogressHabitAssignsOnDate(USER_ID, LocalDate.now(), "en");
     }
 
     @Test
     @DisplayName("Test get users' habits by habit ID")
     void getUsersHabitByHabitId_EndpointResponse_StatusOk() throws Exception {
         mockMvc.perform(get(habitAssignControllerLink + "/{habitAssignId}/more", HABIT_ID)
+                        .param("id", String.valueOf(USER_ID))
                         .principal(principal)
                         .contentType(MediaType.APPLICATION_JSON))
                 .andExpect(status().isOk());
 
-        verify(habitAssignService).findHabitByUserIdAndHabitAssignId(null, HABIT_ID, "en");
+        verify(habitAssignService).findHabitByUserIdAndHabitAssignId(USER_ID, HABIT_ID, "en");
     }
 
     @Test
     @DisplayName("Test retrieve lists for users by user ID and habit ID")
     void getUserAndCustomListByUserIdAndHabitId_EndpointResponse_StatusOk() throws Exception {
         mockMvc.perform(get(habitAssignControllerLink + "/{habitAssignId}/allUserAndCustomList", HABIT_ID)
+                        .param("id", String.valueOf(USER_ID))
                         .principal(principal)
                         .contentType(MediaType.APPLICATION_JSON))
                 .andExpect(status().isOk());
 
-        verify(habitAssignService).getUserShoppingAndCustomShoppingLists(null, HABIT_ID, "en");
+        verify(habitAssignService).getUserShoppingAndCustomShoppingLists(USER_ID, HABIT_ID, "en");
     }
 
     @Test
     @DisplayName("Test retrieve lists for users by user ID, habit ID, and locale")
     void getUserAndCustomListByUserIdAndHabitIdAndLocale_EndpointResponse_StatusOk() throws Exception {
         mockMvc.perform(get(habitAssignControllerLink + "/{habitAssignId}/allUserAndCustomList", HABIT_ID)
+                        .param("id", String.valueOf(USER_ID))
                         .locale(Locale.forLanguageTag("ua"))
                         .principal(principal)
                         .contentType(MediaType.APPLICATION_JSON))
                 .andExpect(status().isOk());
 
-        verify(habitAssignService).getUserShoppingAndCustomShoppingLists(null, HABIT_ID, "ua");
+        verify(habitAssignService).getUserShoppingAndCustomShoppingLists(USER_ID, HABIT_ID, "ua");
     }
 
     @Test
     @DisplayName("Test get lists of user and custom shopping items in progress")
     void getListOfUserAndCustomShoppingListsInprogress_EndpointResponse_StatusOk() throws Exception {
         mockMvc.perform(get(habitAssignControllerLink + "/allUserAndCustomShoppingListsInprogress")
+                        .param("id", String.valueOf(USER_ID))
                         .principal(principal)
                         .contentType(MediaType.APPLICATION_JSON))
                 .andExpect(status().isOk());
 
-        verify(habitAssignService).getListOfUserAndCustomShoppingListsWithStatusInprogress(null, "en");
+        verify(habitAssignService).getListOfUserAndCustomShoppingListsWithStatusInprogress(USER_ID, "en");
     }
 
     @Test
@@ -314,22 +329,24 @@ public class HabitAssignControllerTest {
                 .build();
 
         mockMvc.perform(put(habitAssignControllerLink + "/{habitAssignId}/allUserAndCustomList", HABIT_ID)
+                        .param("id", String.valueOf(USER_ID))
                         .principal(principal)
                         .contentType(MediaType.APPLICATION_JSON)
                         .content(objectMapper.writeValueAsString(userShoppingAndCustomShoppingListsDto)))
                 .andExpect(status().isOk());
 
-        verify(habitAssignService).fullUpdateUserAndCustomShoppingLists(null, HABIT_ID, userShoppingAndCustomShoppingListsDto, "en");
+        verify(habitAssignService).fullUpdateUserAndCustomShoppingLists(USER_ID, HABIT_ID, userShoppingAndCustomShoppingListsDto, "en");
     }
 
     @Test
     @DisplayName("Test update the status of displayed progress notifications")
     void updateProgressNotificationHasDisplayed_EndpointResponse_StatusOk() throws Exception {
         mockMvc.perform(put(habitAssignControllerLink + "/{habitAssignId}/updateProgressNotificationHasDisplayed", HABIT_ID)
+                        .param("id", String.valueOf(USER_ID))
                         .principal(principal)
                         .contentType(MediaType.APPLICATION_JSON))
                 .andExpect(status().isOk());
 
-        verify(habitAssignService).updateProgressNotificationHasDisplayed(HABIT_ID, null);
+        verify(habitAssignService).updateProgressNotificationHasDisplayed(HABIT_ID, USER_ID);
     }
 }
