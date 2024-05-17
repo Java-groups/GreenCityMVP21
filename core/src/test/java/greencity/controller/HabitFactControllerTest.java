@@ -7,7 +7,7 @@ import greencity.dto.habitfact.HabitFactPostDto;
 import greencity.dto.habitfact.HabitFactUpdateDto;
 import greencity.exception.exceptions.NotDeletedException;
 import greencity.exception.handler.CustomExceptionHandler;
-import greencity.service.HabitFactServiceImpl;
+import greencity.service.HabitFactService;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;
@@ -35,7 +35,7 @@ class HabitFactControllerTest {
     MockMvc mockMvc;
 
     @Mock
-    HabitFactServiceImpl habitFactService;
+    HabitFactService habitFactService;
 
     @Mock
     ModelMapper modelMapper;
@@ -46,8 +46,7 @@ class HabitFactControllerTest {
     @InjectMocks
     HabitFactController habitFactController;
 
-    @Mock
-    ObjectMapper objectMapper;
+    ObjectMapper objectMapper = new ObjectMapper();
 
     ErrorAttributes errorAttributes = new DefaultErrorAttributes();
 
@@ -87,7 +86,7 @@ class HabitFactControllerTest {
 
         mockMvc.perform(post(habitFactLink)
                         .contentType(MediaType.APPLICATION_JSON)
-                        .content(new ObjectMapper().writeValueAsString(habitFactPostDto)))
+                        .content(objectMapper.writeValueAsString(habitFactPostDto)))
                 .andExpect(status().isCreated());
         verify(habitFactService).save(habitFactPostDto);
     }
@@ -98,7 +97,7 @@ class HabitFactControllerTest {
 
         mockMvc.perform(put(habitFactLink + "/{id}", 1)
                         .contentType(MediaType.APPLICATION_JSON)
-                        .content(new ObjectMapper().writeValueAsString(habitFactUpdateDto)))
+                        .content(objectMapper.writeValueAsString(habitFactUpdateDto)))
                 .andExpect(status().isOk());
         verify(habitFactService).update(habitFactUpdateDto, 1L);
     }
