@@ -1,14 +1,10 @@
 package greencity.controller;
 
 import com.fasterxml.jackson.databind.ObjectMapper;
+import greencity.ModelUtils;
 import greencity.constant.ErrorMessage;
 import greencity.dto.habitfact.HabitFactPostDto;
-import greencity.dto.habitfact.HabitFactTranslationUpdateDto;
 import greencity.dto.habitfact.HabitFactUpdateDto;
-import greencity.dto.language.LanguageDTO;
-import greencity.dto.language.LanguageTranslationDTO;
-import greencity.dto.user.HabitIdRequestDto;
-import greencity.enums.FactOfDayStatus;
 import greencity.exception.exceptions.NotDeletedException;
 import greencity.exception.handler.CustomExceptionHandler;
 import greencity.service.HabitFactServiceImpl;
@@ -28,8 +24,6 @@ import org.springframework.test.web.servlet.MockMvc;
 import org.springframework.test.web.servlet.setup.MockMvcBuilders;
 import org.springframework.validation.Validator;
 
-import java.util.List;
-
 import static org.mockito.Mockito.verify;
 import static org.mockito.Mockito.when;
 import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.*;
@@ -37,25 +31,25 @@ import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.
 
 @ExtendWith(MockitoExtension.class)
 class HabitFactControllerTest {
-    private static final String habitFactLink = "/facts";
-    private MockMvc mockMvc;
+    static final String habitFactLink = "/facts";
+    MockMvc mockMvc;
 
     @Mock
-    private HabitFactServiceImpl habitFactService;
+    HabitFactServiceImpl habitFactService;
 
     @Mock
-    private ModelMapper modelMapper;
+    ModelMapper modelMapper;
 
     @Mock
-    private Validator mockValidator;
+    Validator mockValidator;
 
     @InjectMocks
-    private HabitFactController habitFactController;
+    HabitFactController habitFactController;
 
     @Mock
-    private ObjectMapper objectMapper;
+    ObjectMapper objectMapper;
 
-    private ErrorAttributes errorAttributes = new DefaultErrorAttributes();
+    ErrorAttributes errorAttributes = new DefaultErrorAttributes();
 
     @BeforeEach
     void setup() {
@@ -89,34 +83,7 @@ class HabitFactControllerTest {
 
     @Test
     void saveTest() throws Exception {
-        HabitFactPostDto habitFactPostDto = HabitFactPostDto.builder()
-                .translations(
-                        List.of(LanguageTranslationDTO.builder()
-                                        .language(LanguageDTO.builder()
-                                                .id(1L)
-                                                .code("ua")
-                                                .build())
-                                        .content("ДУУУЖЕ цікавий факт")
-                                        .build(),
-                                LanguageTranslationDTO.builder()
-                                        .language(LanguageDTO.builder()
-                                                .id(2L)
-                                                .code("en")
-                                                .build())
-                                        .content("VEEERY interesting fact")
-                                        .build(),
-                                LanguageTranslationDTO.builder()
-                                        .language(LanguageDTO.builder()
-                                                .id(3L)
-                                                .code("ru")
-                                                .build())
-                                        .content("ОООЧЕНЬ интересный факт")
-                                        .build()
-                        ))
-                .habit(HabitIdRequestDto.builder()
-                        .id(1L)
-                        .build())
-                .build();
+        HabitFactPostDto habitFactPostDto = ModelUtils.getHabitFactPostDto();
 
         mockMvc.perform(post(habitFactLink)
                         .contentType(MediaType.APPLICATION_JSON)
@@ -127,37 +94,7 @@ class HabitFactControllerTest {
 
     @Test
     void updateTest() throws Exception {
-        HabitFactUpdateDto habitFactUpdateDto = HabitFactUpdateDto.builder()
-                .translations(
-                        List.of(HabitFactTranslationUpdateDto.builder()
-                                        .factOfDayStatus(FactOfDayStatus.CURRENT)
-                                        .language(LanguageDTO.builder()
-                                                .id(1L)
-                                                .code("ua")
-                                                .build())
-                                        .content("ДУУУЖЕ цікавий факт")
-                                        .build(),
-                                HabitFactTranslationUpdateDto.builder()
-                                        .factOfDayStatus(FactOfDayStatus.CURRENT)
-                                        .language(LanguageDTO.builder()
-                                                .id(2L)
-                                                .code("en")
-                                                .build())
-                                        .content("VEEERY interesting fact")
-                                        .build(),
-                                HabitFactTranslationUpdateDto.builder()
-                                        .factOfDayStatus(FactOfDayStatus.CURRENT)
-                                        .language(LanguageDTO.builder()
-                                                .id(3L)
-                                                .code("ru")
-                                                .build())
-                                        .content("ОООЧЕНЬ интересный факт")
-                                        .build()
-                        ))
-                .habit(HabitIdRequestDto.builder()
-                        .id(1L)
-                        .build())
-                .build();
+        HabitFactUpdateDto habitFactUpdateDto = ModelUtils.getHabitFactUpdateDto();
 
         mockMvc.perform(put(habitFactLink + "/{id}", 1)
                         .contentType(MediaType.APPLICATION_JSON)
