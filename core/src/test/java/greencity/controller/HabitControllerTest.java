@@ -147,6 +147,8 @@ class HabitControllerTest {
                 .andExpect(status().isOk())
                 .andExpect(content().contentType(APPLICATION_JSON))
                 .andExpect(jsonPath("$[0].text").value("Example text"));
+
+        verify(habitService).getShoppingListForHabit(1L, "en");
     }
 
     @Test
@@ -197,6 +199,8 @@ class HabitControllerTest {
                 .andExpect(status().isOk())
                 .andExpect(content().contentType(APPLICATION_JSON))
                 .andExpect(jsonPath("$.totalElements").value(1));
+
+        verify(habitService).getAllByDifferentParameters(eq(userVO), any(), any(), any(), any(), eq("en"));
     }
 
     @Test
@@ -234,6 +238,8 @@ class HabitControllerTest {
                 .andExpect(content().contentType(APPLICATION_JSON))
                 .andExpect(jsonPath("$[0]").value("Recycling"))
                 .andExpect(jsonPath("$[1]").value("Conservation"));
+
+        verify(tagsService).findAllHabitsTags(eq("en"));
     }
 
     @Test
@@ -277,10 +283,8 @@ class HabitControllerTest {
         UserProfilePictureDto pic2 = new UserProfilePictureDto(2L, "url2", "Description 2");
         List<UserProfilePictureDto> pictures = List.of(pic1, pic2);
 
-        HandlerMethodArgumentResolver userVoResolver = mock(HandlerMethodArgumentResolver.class);
+        HandlerMethodArgumentResolver userVoResolver = new UserVoResolver(userVO);
 
-        when(userVoResolver.supportsParameter(any())).thenReturn(true);
-        when(userVoResolver.resolveArgument(any(), any(), any(), any())).thenReturn(userVO);
         when(habitService.getFriendsAssignedToHabitProfilePictures(habitId, userVO.getId())).thenReturn(pictures);
 
         mockMvc = MockMvcBuilders.standaloneSetup(new HabitController(habitService, tagsService))
@@ -293,6 +297,8 @@ class HabitControllerTest {
                 .andExpect(content().contentType(APPLICATION_JSON))
                 .andExpect(jsonPath("$[0].name").value("url1"))
                 .andExpect(jsonPath("$[1].name").value("url2"));
+
+        verify(habitService).getFriendsAssignedToHabitProfilePictures(habitId, userVO.getId());
     }
 
     private Authentication createAuth(UserVO user) {
