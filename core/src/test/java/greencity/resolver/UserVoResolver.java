@@ -1,4 +1,4 @@
-package greencity.reslver;
+package greencity.resolver;
 
 import greencity.dto.user.UserVO;
 import org.springframework.core.MethodParameter;
