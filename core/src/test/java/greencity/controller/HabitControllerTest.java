@@ -1,17 +1,16 @@
 package greencity.controller;
 
+import static org.junit.Assert.assertEquals;
+import static org.junit.jupiter.api.Assertions.assertInstanceOf;
 import static org.mockito.ArgumentMatchers.*;
 import static org.mockito.Mockito.*;
 import static org.springframework.http.MediaType.APPLICATION_JSON;
 import static org.springframework.security.test.web.servlet.request.SecurityMockMvcRequestPostProcessors.authentication;
 import static org.springframework.security.test.web.servlet.request.SecurityMockMvcRequestPostProcessors.csrf;
-import static org.springframework.security.test.web.servlet.setup.SecurityMockMvcConfigurers.springSecurity;
 import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.*;
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.*;
 
 import greencity.GreenCityApplication;
-import greencity.config.SecurityConfig;
-import greencity.config.WebMvcConfig;
 import greencity.dto.PageableDto;
 import greencity.dto.habit.AddCustomHabitDtoRequest;
 import greencity.dto.habit.AddCustomHabitDtoResponse;
@@ -20,37 +19,36 @@ import greencity.dto.shoppinglistitem.ShoppingListItemDto;
 import greencity.dto.user.UserProfilePictureDto;
 import greencity.dto.user.UserVO;
 import greencity.exception.exceptions.BadRequestException;
-import greencity.security.jwt.JwtTool;
+import greencity.reslver.PageableResolver;
+import greencity.reslver.UserVoResolver;
 import greencity.service.HabitService;
 import greencity.service.LanguageService;
 import greencity.service.TagsService;
 import greencity.service.UserService;
-import org.junit.jupiter.api.Assertions;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import org.modelmapper.ModelMapper;
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.boot.test.autoconfigure.web.servlet.AutoConfigureMockMvc;
 import org.springframework.boot.test.autoconfigure.web.servlet.WebMvcTest;
 import org.springframework.boot.test.mock.mockito.MockBean;
 import org.springframework.data.domain.Pageable;
 import org.springframework.http.MediaType;
-import org.springframework.security.test.context.support.WithMockUser;
-import org.springframework.web.method.support.HandlerMethodArgumentResolver;
 import org.springframework.mock.web.MockMultipartFile;
 import org.springframework.security.authentication.UsernamePasswordAuthenticationToken;
 import org.springframework.security.core.Authentication;
 import org.springframework.security.core.authority.SimpleGrantedAuthority;
+import org.springframework.security.test.context.support.WithMockUser;
 import org.springframework.test.context.ContextConfiguration;
 import org.springframework.test.web.servlet.MockMvc;
 import org.springframework.test.web.servlet.setup.MockMvcBuilders;
+import org.springframework.web.method.support.HandlerMethodArgumentResolver;
 import org.springframework.web.multipart.MultipartFile;
 import org.testcontainers.shaded.com.fasterxml.jackson.databind.ObjectMapper;
 
 import java.util.*;
 
 @WebMvcTest(HabitController.class)
-@WithMockUser(username = "user", roles = {"USER"})
+@WithMockUser(username = "user")
 @ContextConfiguration(classes = {GreenCityApplication.class})
 class HabitControllerTest {
 
@@ -58,7 +56,7 @@ class HabitControllerTest {
     private MockMvc mockMvc;
 
     @MockBean
-    ModelMapper modelMapper;
+    private ModelMapper modelMapper;
 
     @MockBean
     private LanguageService languageService;
@@ -210,17 +208,16 @@ class HabitControllerTest {
                 eq(Optional.empty()),
                 eq(Optional.empty()),
                 eq("en")
-        ))
-                .thenThrow(new BadRequestException("You should enter at least one parameter"));
+        )).thenThrow(new BadRequestException("You should enter at least one parameter"));
 
         mockMvc.perform(get("/habit/search")
                         .locale(Locale.ENGLISH))
                 .andExpect(status().isBadRequest())
-                .andExpect(result -> Assertions.assertInstanceOf(
+                .andExpect(result -> assertInstanceOf(
                         BadRequestException.class,
                         result.getResolvedException()
                 ))
-                .andExpect(result -> Assertions.assertEquals(
+                .andExpect(result -> assertEquals(
                         "You should enter at least one parameter",
                         Objects.requireNonNull(result.getResolvedException()).getMessage()
                 ));
@@ -242,8 +239,8 @@ class HabitControllerTest {
     @Test
     void addCustomHabitTest() throws Exception {
         ObjectMapper objectMapper = new ObjectMapper();
-        AddCustomHabitDtoRequest request = new AddCustomHabitDtoRequest().builder().complexity(1).build();
-        AddCustomHabitDtoResponse response = new AddCustomHabitDtoResponse().builder().id(1L).complexity(1).build();
+        AddCustomHabitDtoRequest request = AddCustomHabitDtoRequest.builder().complexity(1).build();
+        AddCustomHabitDtoResponse response = AddCustomHabitDtoResponse.builder().id(1L).complexity(1).build();
         String requestJson = objectMapper.writeValueAsString(request);
         MockMultipartFile jsonFile = new MockMultipartFile(
                 "request",
@@ -257,7 +254,6 @@ class HabitControllerTest {
                 "image/jpeg",
                 "test image content".getBytes()
         );
-
 
         when(habitService.addCustomHabit(any(AddCustomHabitDtoRequest.class), any(MultipartFile.class), eq("user")))
                 .thenReturn(response);
