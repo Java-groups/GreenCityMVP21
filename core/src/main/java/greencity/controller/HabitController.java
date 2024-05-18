@@ -37,7 +37,7 @@ import java.util.Optional;
 @Validated
 @AllArgsConstructor
 @RestController
-@RequestMapping("/habit")
+@RequestMapping(value = "/habit", produces = MediaType.APPLICATION_JSON_VALUE)
 public class HabitController {
     private final HabitService habitService;
     private final TagsService tagsService;
@@ -158,9 +158,8 @@ public class HabitController {
         @RequestParam(required = false, name = "complexities") Optional<List<Integer>> complexities,
         @Parameter(hidden = true) Pageable pageable) throws BadRequestException {
         if (isValid(tags, isCustomHabit, complexities)) {
-            return ResponseEntity.status(HttpStatus.OK).body(
-                habitService.getAllByDifferentParameters(userVO, pageable, tags,
-                    isCustomHabit, complexities, locale.getLanguage()));
+            return ResponseEntity.status(HttpStatus.OK).contentType(MediaType.APPLICATION_JSON).body(
+                habitService.getAllByDifferentParameters(userVO, pageable, tags, isCustomHabit, complexities, locale.getLanguage()));
         } else {
             throw new BadRequestException("You should enter at least one parameter");
         }
