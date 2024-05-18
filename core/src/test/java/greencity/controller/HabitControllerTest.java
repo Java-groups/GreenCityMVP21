@@ -84,7 +84,7 @@ class HabitControllerTest {
     }
 
     @Test
-    void getHabitByIdTest() throws Exception {
+    void getHabitById_HabitExists_ReturnsHabit() throws Exception {
         HabitDto habitDto = HabitDto.builder()
                 .id(1L)
                 .image("someImageUrl")
@@ -106,7 +106,7 @@ class HabitControllerTest {
     }
 
     @Test
-    void getAllTest() throws Exception {
+    void getAll_HabitsExist_ReturnsHabits() throws Exception {
         PageableDto<HabitDto> pageableDto = new PageableDto<>(
                 List.of(new HabitDto()),
                 1,
@@ -130,7 +130,7 @@ class HabitControllerTest {
     }
 
     @Test
-    void getShoppingListItemsTest() throws Exception {
+    void getShoppingListItems_HabitExists_ReturnsItems() throws Exception {
         ShoppingListItemDto item = ShoppingListItemDto.builder()
                 .id(1L)
                 .text("Example text")
@@ -150,7 +150,7 @@ class HabitControllerTest {
     }
 
     @Test
-    void getAllByTagsAndLanguageCodeTest() throws Exception {
+    void getAllByTagsAndLanguageCode_ValidTags_ReturnsHabits() throws Exception {
         PageableDto<HabitDto> pageableDto = new PageableDto<>(List.of(new HabitDto()), 1, 1, 1);
 
         when(habitService.getAllByTagsAndLanguageCode(any(Pageable.class), anyList(), eq("en")))
@@ -170,7 +170,7 @@ class HabitControllerTest {
     }
 
     @Test
-    void getAllByDifferentParametersTest() throws Exception {
+    void getAllByDifferentParameters_ValidParameters_ReturnsHabits() throws Exception {
         PageableDto<HabitDto> pageableDto = new PageableDto<>(
                 List.of(new HabitDto()),
                 1,
@@ -200,7 +200,7 @@ class HabitControllerTest {
     }
 
     @Test
-    void getAllByDifferentParametersNoParamsProvided() throws Exception {
+    void getAllByDifferentParameters_NoParamsProvided_ThrowsBadRequestException() throws Exception {
         when(habitService.getAllByDifferentParameters(
                 eq(userVO),
                 any(Pageable.class),
@@ -224,7 +224,7 @@ class HabitControllerTest {
     }
 
     @Test
-    void findAllHabitsTagsTest() throws Exception {
+    void findAllHabitsTags_TagsExist_ReturnsTags() throws Exception {
         List<String> tags = List.of("Recycling", "Conservation");
 
         when(tagsService.findAllHabitsTags("en")).thenReturn(tags);
@@ -237,7 +237,7 @@ class HabitControllerTest {
     }
 
     @Test
-    void addCustomHabitTest() throws Exception {
+    void addCustomHabit_ValidHabit_CreatesHabit() throws Exception {
         ObjectMapper objectMapper = new ObjectMapper();
         AddCustomHabitDtoRequest request = AddCustomHabitDtoRequest.builder().complexity(1).build();
         AddCustomHabitDtoResponse response = AddCustomHabitDtoResponse.builder().id(1L).complexity(1).build();
@@ -271,7 +271,7 @@ class HabitControllerTest {
     }
 
     @Test
-    void getFriendsAssignedToHabitProfilePicturesTest() throws Exception {
+    void getFriendsAssignedToHabitProfilePictures_HabitExists_ReturnsPictures() throws Exception {
         Long habitId = 1L;
         UserProfilePictureDto pic1 = new UserProfilePictureDto(1L, "url1", "Description 1");
         UserProfilePictureDto pic2 = new UserProfilePictureDto(2L, "url2", "Description 2");
