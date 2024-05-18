@@ -6,6 +6,7 @@ import greencity.dto.user.EcoNewsAuthorDto;
 import greencity.entity.EcoNewsComment;
 import greencity.entity.User;
 import org.junit.jupiter.api.BeforeEach;
+import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;
 import org.mockito.InjectMocks;
@@ -23,6 +24,7 @@ class EcoNewsAuthorDtoMapperTest {
 
 
     @Test
+    @DisplayName("Test to map User to EcoNewsAuthorDto")
     void convert() {
 
         EcoNewsAuthorDto expected = getEcoNewsAuthorDto();

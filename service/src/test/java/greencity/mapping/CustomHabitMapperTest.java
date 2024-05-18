@@ -4,6 +4,7 @@ package greencity.mapping;
 import greencity.dto.habit.AddCustomHabitDtoRequest;
 import greencity.entity.Habit;
 import greencity.entity.User;
+import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;
 import org.mockito.InjectMocks;
@@ -17,6 +18,7 @@ class CustomHabitMapperTest {
     @InjectMocks
     CustomHabitMapper mapper;
     @Test
+    @DisplayName("Test to convert Habit to Custom Habit")
     void convertTest() {
 
         Habit expected = getCustomHabit();
