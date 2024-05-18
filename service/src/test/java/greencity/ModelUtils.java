@@ -678,11 +678,20 @@ public class ModelUtils {
             .build();
     }
 
-    public static CategoryDto getCategoryWithUaNameAndWithParentCategory(){
+    public static CategoryDto getCategoryDtoWithUaNameAndWithParentCategory(){
         return CategoryDto.builder()
                 .name("Test Category")
                 .nameUa("Тестова Категорія")
                 .parentCategoryId(5L)
+                .build();
+    }
+
+    public static Category getCategoryWithNameId(){
+        return Category.builder()
+                .id(1L)
+                .name("Test Category")
+                //.nameUa("Тестова Категорія")
+                //.parentCategoryId(5L)
                 .build();
     }
 }
