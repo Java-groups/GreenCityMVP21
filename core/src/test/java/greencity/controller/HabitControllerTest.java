@@ -41,7 +41,6 @@ import org.springframework.security.test.context.support.WithMockUser;
 import org.springframework.test.context.ContextConfiguration;
 import org.springframework.test.web.servlet.MockMvc;
 import org.springframework.test.web.servlet.setup.MockMvcBuilders;
-import org.springframework.web.method.support.HandlerMethodArgumentResolver;
 import org.springframework.web.multipart.MultipartFile;
 import org.testcontainers.shaded.com.fasterxml.jackson.databind.ObjectMapper;
 
@@ -180,14 +179,11 @@ class HabitControllerTest {
                 1
         );
 
-        HandlerMethodArgumentResolver userVoResolver = new UserVoResolver(userVO);
-        HandlerMethodArgumentResolver pageableResolver = new PageableResolver();
-
         when(habitService.getAllByDifferentParameters(eq(userVO), any(), any(), any(), any(), eq("en")))
                 .thenReturn(pageableDto);
 
         mockMvc = MockMvcBuilders.standaloneSetup(new HabitController(habitService, tagsService))
-                .setCustomArgumentResolvers(userVoResolver, pageableResolver)
+                .setCustomArgumentResolvers(new UserVoResolver(userVO), new PageableResolver())
                 .build();
 
         mockMvc.perform(get("/habit/search")
@@ -283,12 +279,10 @@ class HabitControllerTest {
         UserProfilePictureDto pic2 = new UserProfilePictureDto(2L, "url2", "Description 2");
         List<UserProfilePictureDto> pictures = List.of(pic1, pic2);
 
-        HandlerMethodArgumentResolver userVoResolver = new UserVoResolver(userVO);
-
         when(habitService.getFriendsAssignedToHabitProfilePictures(habitId, userVO.getId())).thenReturn(pictures);
 
         mockMvc = MockMvcBuilders.standaloneSetup(new HabitController(habitService, tagsService))
-                .setCustomArgumentResolvers(userVoResolver)
+                .setCustomArgumentResolvers(new UserVoResolver(userVO))
                 .build();
 
         mockMvc.perform(get("/habit/" + habitId + "/friends/profile-pictures")
