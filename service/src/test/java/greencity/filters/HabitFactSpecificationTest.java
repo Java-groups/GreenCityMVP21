@@ -25,73 +25,74 @@ class HabitFactSpecificationTest {
     private CriteriaBuilder criteriaBuilder;
 
     @Mock
+    private Path path;
+
+    @Mock
+    private Path<Long> pathLong;
+
+    @Mock
+    private Path<HabitFact> habitFactPath;
+
+    @Mock
     private Predicate predicate;
+
+    @Mock
+    private Root<HabitFactTranslation> habitFactTranslationRoot;
+
+    private HabitFactSpecification createSpecification(String key, String type) {
+        SearchCriteria searchCriteria = new SearchCriteria(key, "1", type);
+        List<SearchCriteria> criteriaList = List.of(searchCriteria);
+        return new HabitFactSpecification(criteriaList);
+    }
 
     @Test
     void toPredicate_IdCriteria_GeneratesCorrectPredicate() {
-        SearchCriteria searchCriteria = new SearchCriteria("1", "1", "id");
-        List<SearchCriteria> criteriaList = List.of(searchCriteria);
-        HabitFactSpecification specification = new HabitFactSpecification(criteriaList);
+        HabitFactSpecification specification = createSpecification("1", "id");
 
-        Path idPath = mock(Path.class);
+        when(root.get("1")).thenReturn(path);
+        when(criteriaBuilder.equal(path, "1")).thenReturn(predicate);
+        when(criteriaBuilder.conjunction()).thenReturn(predicate);
+        when(criteriaBuilder.and(any(Predicate.class), any(Predicate.class))).thenReturn(predicate);
 
-        when(root.get("1")).thenReturn(idPath);
-        when(criteriaBuilder.equal(idPath, "1")).thenReturn(mock(Predicate.class));
-        when(criteriaBuilder.conjunction()).thenReturn(mock(Predicate.class));
-        when(criteriaBuilder.and(any(Predicate.class), any(Predicate.class))).thenReturn(mock(Predicate.class));
+        Predicate result = specification.toPredicate(root, criteriaQuery, criteriaBuilder);
 
-        Predicate predicate = specification.toPredicate(root, criteriaQuery, criteriaBuilder);
-
-        assertNotNull(predicate, "Predicate should not be null");
-        verify(criteriaBuilder).equal(idPath, "1");
+        assertNotNull(result, "Predicate should not be null");
+        verify(criteriaBuilder).equal(path, "1");
     }
 
     @Test
     void toPredicate_HabitIdCriteria_GeneratesCorrectPredicate() {
-        SearchCriteria searchCriteria = new SearchCriteria("1", "1", "habitId");
-        List<SearchCriteria> criteriaList = List.of(searchCriteria);
-        HabitFactSpecification specification = new HabitFactSpecification(criteriaList);
+        HabitFactSpecification specification = createSpecification("1", "habitId");
 
         Join<HabitFact, Habit> habitJoin = mock(Join.class);
         when(root.join(HabitFact_.habit)).thenReturn(habitJoin);
-        when(criteriaBuilder.equal(habitJoin.get(Habit_.id), "1")).thenReturn(mock(Predicate.class));
-        when(criteriaBuilder.conjunction()).thenReturn(mock(Predicate.class));
-        when(criteriaBuilder.and(any(Predicate.class), any(Predicate.class))).thenReturn(mock(Predicate.class));
+        when(criteriaBuilder.equal(habitJoin.get(Habit_.id), "1")).thenReturn(predicate);
+        when(criteriaBuilder.conjunction()).thenReturn(predicate);
+        when(criteriaBuilder.and(any(Predicate.class), any(Predicate.class))).thenReturn(predicate);
 
-        Predicate predicate = specification.toPredicate(root, criteriaQuery, criteriaBuilder);
+        Predicate result = specification.toPredicate(root, criteriaQuery, criteriaBuilder);
 
-        assertNotNull(predicate);
+        assertNotNull(result, "Predicate should not be null");
         verify(criteriaBuilder).equal(habitJoin.get(Habit_.id), "1");
     }
 
-
     @Test
     void toPredicate_ContentCriteria_GeneratesCorrectPredicate() {
-        SearchCriteria searchCriteria = new SearchCriteria("test", "1", "content");
-        List<SearchCriteria> criteriaList = List.of(searchCriteria);
-        HabitFactSpecification specification = new HabitFactSpecification(criteriaList);
-
-        Root<HabitFactTranslation> habitFactTranslationRoot = mock(Root.class);
-        Path<Long> translationHabitFactIdPath = mock(Path.class);
-        Predicate conjunctionPredicate = mock(Predicate.class);
-        Predicate contentPredicate = mock(Predicate.class);
-        Path<HabitFact> habitFactPath = mock(Path.class);
-        Path<Long> habitFactIdPath = mock(Path.class);
-        Predicate idPredicate = mock(Predicate.class);
+        HabitFactSpecification specification = createSpecification("test", "content");
 
         when(criteriaQuery.from(HabitFactTranslation.class)).thenReturn(habitFactTranslationRoot);
-        when(criteriaBuilder.like(any(Path.class), eq("%test%"))).thenReturn(contentPredicate);
-        when(root.get(HabitFact_.id)).thenReturn(habitFactIdPath);
+        when(criteriaBuilder.like(any(Path.class), eq("%test%"))).thenReturn(predicate);
+        when(root.get(HabitFact_.id)).thenReturn(pathLong);
         when(habitFactTranslationRoot.get(HabitFactTranslation_.habitFact)).thenReturn(habitFactPath);
-        when(habitFactPath.get(HabitFact_.id)).thenReturn(translationHabitFactIdPath);
-        when(criteriaBuilder.equal(translationHabitFactIdPath, habitFactIdPath)).thenReturn(idPredicate);
-        when(criteriaBuilder.conjunction()).thenReturn(conjunctionPredicate);
-        when(criteriaBuilder.and(any(Predicate.class), any(Predicate.class))).thenReturn(mock(Predicate.class));
+        when(habitFactPath.get(HabitFact_.id)).thenReturn(pathLong);
+        when(criteriaBuilder.equal(pathLong, pathLong)).thenReturn(predicate);
+        when(criteriaBuilder.conjunction()).thenReturn(predicate);
+        when(criteriaBuilder.and(any(Predicate.class), any(Predicate.class))).thenReturn(predicate);
 
-        Predicate predicate = specification.toPredicate(root, criteriaQuery, criteriaBuilder);
+        Predicate result = specification.toPredicate(root, criteriaQuery, criteriaBuilder);
 
-        assertNotNull(predicate);
+        assertNotNull(result, "Predicate should not be null");
         verify(criteriaBuilder).like(any(Path.class), eq("%test%"));
-        verify(criteriaBuilder).equal(translationHabitFactIdPath, habitFactIdPath);
+        verify(criteriaBuilder).equal(pathLong, pathLong);
     }
 }
