@@ -443,6 +443,7 @@ public class ModelUtils {
             .createdDate(LocalDateTime.now())
             .modifiedDate(LocalDateTime.now())
             .user(getUser())
+            .usersLiked(new HashSet<>())
             .ecoNews(getEcoNews())
             .build();
     }
