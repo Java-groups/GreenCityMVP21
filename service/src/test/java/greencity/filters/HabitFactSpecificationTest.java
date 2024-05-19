@@ -52,7 +52,7 @@ class HabitFactSpecificationTest {
         when(root.get("1")).thenReturn(path);
         when(criteriaBuilder.equal(path, "1")).thenReturn(predicate);
         when(criteriaBuilder.conjunction()).thenReturn(predicate);
-        when(criteriaBuilder.and(any(Predicate.class), any(Predicate.class))).thenReturn(predicate);
+        when(criteriaBuilder.and(predicate, predicate)).thenReturn(predicate);
 
         Predicate result = specification.toPredicate(root, criteriaQuery, criteriaBuilder);
 
@@ -68,7 +68,7 @@ class HabitFactSpecificationTest {
         when(root.join(HabitFact_.habit)).thenReturn(habitJoin);
         when(criteriaBuilder.equal(habitJoin.get(Habit_.id), "1")).thenReturn(predicate);
         when(criteriaBuilder.conjunction()).thenReturn(predicate);
-        when(criteriaBuilder.and(any(Predicate.class), any(Predicate.class))).thenReturn(predicate);
+        when(criteriaBuilder.and(predicate, predicate)).thenReturn(predicate);
 
         Predicate result = specification.toPredicate(root, criteriaQuery, criteriaBuilder);
 
@@ -87,7 +87,7 @@ class HabitFactSpecificationTest {
         when(habitFactPath.get(HabitFact_.id)).thenReturn(pathLong);
         when(criteriaBuilder.equal(pathLong, pathLong)).thenReturn(predicate);
         when(criteriaBuilder.conjunction()).thenReturn(predicate);
-        when(criteriaBuilder.and(any(Predicate.class), any(Predicate.class))).thenReturn(predicate);
+        when(criteriaBuilder.and(predicate, predicate)).thenReturn(predicate);
 
         Predicate result = specification.toPredicate(root, criteriaQuery, criteriaBuilder);
 
