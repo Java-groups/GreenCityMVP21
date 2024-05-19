@@ -46,8 +46,8 @@ import org.testcontainers.shaded.com.fasterxml.jackson.databind.ObjectMapper;
 
 import java.util.*;
 
-@WebMvcTest(HabitController.class)
 @WithMockUser(username = "user")
+@WebMvcTest(HabitController.class)
 @ContextConfiguration(classes = {GreenCityApplication.class})
 class HabitControllerTest {
 
