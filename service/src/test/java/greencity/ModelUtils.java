@@ -7,6 +7,7 @@ import greencity.dto.econews.*;
 import greencity.dto.econewscomment.*;
 import greencity.dto.habit.*;
 import greencity.dto.habitfact.*;
+import greencity.dto.habitstatuscalendar.HabitStatusCalendarVO;
 import greencity.dto.language.LanguageDTO;
 import greencity.dto.language.LanguageTranslationDTO;
 import greencity.dto.language.LanguageVO;
@@ -756,6 +757,29 @@ public class ModelUtils {
                 .complexity(3)
                 .defaultDuration(7)
                 .habitTranslations(List.of(ModelUtils.getHabitTranslation()))
+                .build();
+    }
+
+    public static HabitStatusCalendarVO getHabitStatusCalendarVO(){
+        return HabitStatusCalendarVO.builder()
+                .id(4L)
+                .enrollDate(LocalDate.now())
+                .habitAssignVO(getHabitAssignVO())
+                .build();
+    }
+
+    public static HabitAssignVO getHabitAssignVO(){
+
+        return HabitAssignVO.builder()
+                .id(1L)
+                .status(HabitAssignStatus.ACTIVE)
+                .createDateTime(ZonedDateTime.now())
+                .habitVO(getHabitV0())
+                .userVO(getUserVO())
+                .duration(7)
+                .habitStreak(5)
+                .workingDays(6)
+                .lastEnrollmentDate(ZonedDateTime.now())
                 .build();
     }
 }
