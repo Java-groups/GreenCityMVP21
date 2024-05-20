@@ -75,9 +75,13 @@ class UtilsMapperTest {
         private String name;
         private int number;
 
+        public TargetClass() {
+        }
+
         public TargetClass(String name, int number) {
             this.name = name;
             this.number = number;
         }
     }
+
 }
