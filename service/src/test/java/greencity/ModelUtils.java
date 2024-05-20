@@ -2,6 +2,7 @@ package greencity;
 
 import greencity.constant.AppConstant;
 import greencity.dto.PageableAdvancedDto;
+import greencity.dto.category.CategoryDto;
 import greencity.dto.econews.*;
 import greencity.dto.econewscomment.*;
 import greencity.dto.habit.*;
@@ -200,6 +201,27 @@ public class ModelUtils {
             .enrollDate(LocalDate.now()).id(1L).build();
     }
 
+    public static HabitTranslation getHabitTranslation() {
+        Language language = getLanguage();
+        Habit habit = Habit.builder()
+                .id(1L)
+                .image("image.png")
+                .defaultDuration(30)
+                .complexity(2)
+                .tags(Set.of(getTag()))
+                .shoppingListItems(Set.of(getShoppingListItem()))
+                .build();
+        return HabitTranslation.builder()
+                .id(1L)
+                .name("Habit Name")
+                .description("Habit Description")
+                .habitItem("Habit Item")
+                .language(language)
+                .habit(habit)
+                .build();
+    }
+
+
     public static HabitAssign getHabitAssign() {
         return HabitAssign.builder()
             .id(1L)
@@ -377,6 +399,14 @@ public class ModelUtils {
         return new URL(TestConst.SITE);
     }
 
+    public static Habit getCustomHabit() {
+        return Habit.builder()
+                .image("imagePath")
+                .complexity(2)
+                .defaultDuration(7)
+                .isCustomHabit(true)
+                .build();
+    }
     public static EcoNewsAuthorDto getEcoNewsAuthorDto() {
         return new EcoNewsAuthorDto(1L, TestConst.NAME);
     }
@@ -434,6 +464,7 @@ public class ModelUtils {
             .createdDate(LocalDateTime.now())
             .modifiedDate(LocalDateTime.now())
             .user(getUser())
+            .usersLiked(new HashSet<>())
             .ecoNews(getEcoNews())
             .build();
     }
@@ -667,5 +698,22 @@ public class ModelUtils {
             .text("item")
             .status(ShoppingListItemStatus.INPROGRESS)
             .build();
+    }
+
+    public static CategoryDto getCategoryDtoWithUaNameAndWithParentCategory(){
+        return CategoryDto.builder()
+                .name("Test Category")
+                .nameUa("Тестова Категорія")
+                .parentCategoryId(5L)
+                .build();
+    }
+
+    public static Category getCategoryWithNameId(){
+        return Category.builder()
+                .id(1L)
+                .name("Test Category")
+                //.nameUa("Тестова Категорія")
+                //.parentCategoryId(5L)
+                .build();
     }
 }
