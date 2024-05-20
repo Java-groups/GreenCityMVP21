@@ -15,7 +15,7 @@ import static org.junit.jupiter.api.Assertions.*;
 class HabitStatusCalendarMapperTest {
 
     @InjectMocks
-    HabitStatusCalendarMapper mapper;
+    private HabitStatusCalendarMapper mapper;
     @Test
     @DisplayName("Test convert from HabitStatusCalendarVO to HabitStatusCalendar")
     void convert() {

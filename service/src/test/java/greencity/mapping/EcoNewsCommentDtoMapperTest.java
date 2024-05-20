@@ -19,7 +19,7 @@ import static org.junit.jupiter.api.Assertions.*;
 class EcoNewsCommentDtoMapperTest {
 
     @InjectMocks
-    EcoNewsCommentDtoMapper mapper;
+    private EcoNewsCommentDtoMapper mapper;
 
     @Test
     void convert() {

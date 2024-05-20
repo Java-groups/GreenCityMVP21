@@ -15,7 +15,7 @@ import static org.junit.jupiter.api.Assertions.*;
 class EcoNewsVOMapperTest {
 
     @InjectMocks
-    EcoNewsVOMapper mapper;
+    private EcoNewsVOMapper mapper;
 
     @Test
     @DisplayName("Test convert from EcoNews to EcoNewsVO")

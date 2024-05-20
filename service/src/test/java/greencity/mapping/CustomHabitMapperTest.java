@@ -16,7 +16,8 @@ import static org.junit.jupiter.api.Assertions.*;
 class CustomHabitMapperTest {
 
     @InjectMocks
-    CustomHabitMapper mapper;
+    private CustomHabitMapper mapper;
+
     @Test
     @DisplayName("Test to convert Habit to Custom Habit")
     void convertTest() {

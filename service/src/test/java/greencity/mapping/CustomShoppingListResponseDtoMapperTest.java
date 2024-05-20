@@ -20,7 +20,7 @@ import static org.junit.jupiter.api.Assertions.*;
 class CustomShoppingListResponseDtoMapperTest {
 
     @InjectMocks
-    CustomShoppingListResponseDtoMapper mapper;
+    private CustomShoppingListResponseDtoMapper mapper;
 
     @Test
     @DisplayName("Test mapping from CustomShoppingListItem to CustomShoppingListItemResponseDto")

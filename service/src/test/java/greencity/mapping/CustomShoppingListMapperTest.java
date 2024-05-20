@@ -21,7 +21,7 @@ import static org.junit.jupiter.api.Assertions.*;
 class CustomShoppingListMapperTest {
 
     @InjectMocks
-    CustomShoppingListMapper mapper;
+    private CustomShoppingListMapper mapper;
 
     @Test
     @DisplayName("Test Convert CustomShoppingListItemResponseDto to CustomShoppingListItem")

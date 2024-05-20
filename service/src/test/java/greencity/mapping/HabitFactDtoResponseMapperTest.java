@@ -23,7 +23,7 @@ import static org.junit.jupiter.api.Assertions.*;
 class HabitFactDtoResponseMapperTest {
 
     @InjectMocks
-    HabitFactDtoResponseMapper mapper;
+    private HabitFactDtoResponseMapper mapper;
 
     @Test
     @DisplayName("Test comvert from HabitFactVO to HabitFactDtoResponse")

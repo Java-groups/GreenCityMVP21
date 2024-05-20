@@ -15,7 +15,7 @@ import static org.junit.jupiter.api.Assertions.*;
 class EcoNewsDtoMapperTest {
 
     @InjectMocks
-    EcoNewsDtoMapper mapper;
+    private EcoNewsDtoMapper mapper;
 
     @Test
     @DisplayName("Test convert form EcoNews to EcoNewsDto")

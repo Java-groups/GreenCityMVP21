@@ -20,7 +20,7 @@ import static org.junit.jupiter.api.Assertions.*;
 class EcoNewsAuthorDtoMapperTest {
 
     @InjectMocks
-    EcoNewsAuthorDtoMapper mapper;
+    private EcoNewsAuthorDtoMapper mapper;
 
 
     @Test

@@ -20,7 +20,7 @@ import static org.junit.jupiter.api.Assertions.*;
 class HabitManagementDtoMapperTest {
 
     @InjectMocks
-    HabitManagementDtoMapper mapper;
+    private HabitManagementDtoMapper mapper;
 
     @Test
     @DisplayName("Test convert from Habit to HabitManagementDto")

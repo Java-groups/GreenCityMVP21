@@ -15,7 +15,7 @@ import static org.junit.jupiter.api.Assertions.*;
 class HabitStatisticDtoMapperTest {
 
     @InjectMocks
-    HabitStatisticDtoMapper mapper;
+    private HabitStatisticDtoMapper mapper;
 
     @Test
     @DisplayName("Test covert form HabitStatistic to HabitStatisticDto")
