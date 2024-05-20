@@ -716,4 +716,20 @@ public class ModelUtils {
                 //.parentCategoryId(5L)
                 .build();
     }
+
+    public static HabitVO getHabitV0(){
+        return HabitVO.builder()
+                .id(3L)
+                .image("image_path")
+                .complexity(3)
+                .build();
+    }
+
+    public static HabitFactVO getHabitFactV0() {
+        return HabitFactVO.builder()
+                .id(1L)
+                .translations(List.of(ModelUtils.getFactTranslationVO()))
+                .habit(ModelUtils.getHabitV0())
+                .build();
+    }
 }
