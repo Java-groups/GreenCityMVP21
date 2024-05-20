@@ -15,13 +15,13 @@ import static org.junit.jupiter.api.Assertions.*;
 class EcoNewsVOMapperTest {
 
     @InjectMocks
-    private EcoNewsVOMapper mapper;
+    EcoNewsVOMapper mapper;
 
     @Test
     @DisplayName("Test convert from EcoNews to EcoNewsVO")
     void convert() {
-        EcoNews ecoNews = getEcoNews();
 
+        EcoNews ecoNews = getEcoNews();
         EcoNewsVO result = mapper.convert(ecoNews);
 
         assertNotNull(result);
@@ -42,7 +42,6 @@ class EcoNewsVOMapperTest {
         assertEquals(ecoNews.getTags().getFirst().getTagTranslations().getFirst().getName(), result.getTags().getFirst().getTagTranslations().getFirst().getName());
         assertNotNull(result.getUsersLikedNews());
         assertEquals(ecoNews.getUsersLikedNews().size(), result.getUsersLikedNews().size());
-        assertNotNull(result.getUsersDislikedNews());
         assertEquals(ecoNews.getUsersDislikedNews().size(), result.getUsersDislikedNews().size());
         assertNotNull(result.getEcoNewsComments());
         assertEquals(ecoNews.getEcoNewsComments().size(), result.getEcoNewsComments().size());
