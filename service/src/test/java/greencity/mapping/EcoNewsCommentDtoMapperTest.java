@@ -1,5 +1,6 @@
 package greencity.mapping;
 
+import greencity.ModelUtils;
 import greencity.dto.econewscomment.EcoNewsCommentDto;
 import greencity.entity.EcoNewsComment;
 import greencity.entity.User;
@@ -23,36 +24,20 @@ class EcoNewsCommentDtoMapperTest {
 
     @Test
     void convert() {
+        
+        EcoNewsComment ecoNewsComment = ModelUtils.getEcoNewsComment();
+        EcoNewsCommentDto result = mapper.convert(ecoNewsComment);
 
-        User user = User.builder()
-                .id(1L)
-                .name("John Doe")
-                .build();
-
-        EcoNewsComment ecoNewsComment = EcoNewsComment.builder()
-                .id(1L)
-                .text("Sample Comment")
-                .createdDate(LocalDateTime.now())
-                .modifiedDate(LocalDateTime.now())
-                .user(user)
-                .comments(new ArrayList<>())
-                .usersLiked(new HashSet<>())
-                .deleted(false)
-                .build();
-
-
-        EcoNewsCommentDto dto = mapper.convert(ecoNewsComment);
-
-        assert dto != null;
-        assertEquals(dto.getId(), ecoNewsComment.getId());
-        assertEquals(dto.getModifiedDate(), ecoNewsComment.getModifiedDate());
-        assertEquals(dto.getAuthor().getId(), user.getId());
-        assertEquals(dto.getAuthor().getName(), user.getName());
-        assertEquals(dto.getText() , ecoNewsComment.getText());
-        assertEquals(dto.getReplies(),ecoNewsComment.getComments().size());
-        assertEquals(dto.getLikes(),ecoNewsComment.getUsersLiked().size());
-        assertEquals(dto.isCurrentUserLiked(),ecoNewsComment.isCurrentUserLiked());
-        assertEquals(dto.getStatus(), CommentStatus.EDITED);
+        assert result != null;
+        assertEquals( ecoNewsComment.getId(), result.getId());
+        assertEquals( ecoNewsComment.getModifiedDate(), result.getModifiedDate());
+        assertEquals( ecoNewsComment.getUser().getId(), result.getAuthor().getId());
+        assertEquals( ecoNewsComment.getUser().getName(), result.getAuthor().getName());
+        assertEquals( ecoNewsComment.getText(), result.getText() );
+        assertEquals( ecoNewsComment.getComments().size(), result.getReplies());
+        assertEquals( ecoNewsComment.getUsersLiked().size(), result.getLikes());
+        assertEquals( ecoNewsComment.isCurrentUserLiked(), result.isCurrentUserLiked());
+        assertEquals( CommentStatus.EDITED, result.getStatus());
 
     }
 }

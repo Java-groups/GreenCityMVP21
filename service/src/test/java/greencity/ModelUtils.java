@@ -486,6 +486,7 @@ public class ModelUtils {
             .user(getUser())
             .usersLiked(new HashSet<>())
             .ecoNews(getEcoNews())
+            .comments(new ArrayList<>())
             .build();
     }
 
