@@ -249,9 +249,25 @@ public class ModelUtils {
             .build();
     }
 
+    public static HabitAssign getHabitAssignSimple() {
+        return HabitAssign.builder()
+                .id(1L)
+                .status(HabitAssignStatus.ACQUIRED)
+                .createDate(ZonedDateTime.now())
+                .userShoppingListItems(new ArrayList<>())
+                .workingDays(0)
+                .duration(0)
+                .habitStreak(0)
+                .lastEnrollmentDate(ZonedDateTime.now())
+                .build();
+    }
+
     public static HabitStatistic getHabitStatistic() {
         return HabitStatistic.builder()
-            .id(1L).habitRate(HabitRate.GOOD).createDate(ZonedDateTime.now())
+            .id(1L)
+            .habitRate(HabitRate.GOOD)
+            .createDate(ZonedDateTime.now())
+            .habitAssign(getHabitAssignSimple())
             .amountOfItems(10).build();
     }
 
