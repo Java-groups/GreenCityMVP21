@@ -785,4 +785,19 @@ public class ModelUtils {
                 .lastEnrollmentDate(ZonedDateTime.now())
                 .build();
     }
+
+    public static HabitFactTranslation getHabitFactTranslation() {
+        return HabitFactTranslation.builder()
+                .factOfDayStatus(FactOfDayStatus.CURRENT)
+                .language(getLanguage())
+                .habitFact(getHabitFact())
+                .build();
+    }
+
+    public static HabitFact getHabitFact(){
+        return HabitFact.builder()
+                .id(4L)
+                .habit(getHabit())
+                .build();
+    }
 }
