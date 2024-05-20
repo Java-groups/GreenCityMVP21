@@ -732,4 +732,14 @@ public class ModelUtils {
                 .habit(ModelUtils.getHabitV0())
                 .build();
     }
+
+    public static Habit getHabit(){
+        return Habit.builder()
+                .id(2L)
+                .image("image_path")
+                .complexity(3)
+                .defaultDuration(7)
+                .habitTranslations(List.of(ModelUtils.getHabitTranslation()))
+                .build();
+    }
 }
