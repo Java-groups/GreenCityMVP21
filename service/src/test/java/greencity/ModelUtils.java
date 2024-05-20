@@ -201,6 +201,27 @@ public class ModelUtils {
             .enrollDate(LocalDate.now()).id(1L).build();
     }
 
+    public static HabitTranslation getHabitTranslation() {
+        Language language = getLanguage();
+        Habit habit = Habit.builder()
+                .id(1L)
+                .image("image.png")
+                .defaultDuration(30)
+                .complexity(2)
+                .tags(Set.of(getTag()))
+                .shoppingListItems(Set.of(getShoppingListItem()))
+                .build();
+        return HabitTranslation.builder()
+                .id(1L)
+                .name("Habit Name")
+                .description("Habit Description")
+                .habitItem("Habit Item")
+                .language(language)
+                .habit(habit)
+                .build();
+    }
+
+
     public static HabitAssign getHabitAssign() {
         return HabitAssign.builder()
             .id(1L)
