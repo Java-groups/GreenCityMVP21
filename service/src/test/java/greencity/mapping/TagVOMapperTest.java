@@ -48,7 +48,15 @@ class TagVOMapperTest {
 
     @Test
     void convertTest() {
-        assertEquals(expected, mapper.convert(target));
+        TagVO actual = mapper.convert(target);
+
+        assertEquals(expected.getId(), actual.getId());
+        assertEquals(expected.getType(), actual.getType());
+        assertEquals(expected.getTagTranslations(), actual.getTagTranslations());
+        assertEquals(expected.getEcoNews(), actual.getEcoNews());
+        assertEquals(expected.getHabits(), actual.getHabits());
+
+        assertEquals(expected, actual);
     }
 
     // should be extracted as a LanguageMapper?

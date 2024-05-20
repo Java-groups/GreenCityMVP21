@@ -24,6 +24,12 @@ class TagDtoMapperTest {
 
     @Test
     void convertTagDtoToTagTest() {
-        Assertions.assertEquals(expected, tagDtoMapper.convert(target));
+        TagDto actual = tagDtoMapper.convert(target);
+
+        Assertions.assertEquals(expected.getId(), actual.getId());
+        Assertions.assertEquals(expected.getName(), actual.getName());
+
+        Assertions.assertEquals(expected, actual);
+
     }
 }

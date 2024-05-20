@@ -40,7 +40,14 @@ public class HabitTranslationDtoMapperTest {
 
     @Test
     public void testConvert() {
-        Assertions.assertEquals(habitTranslationDto, habitTranslationDtoMapper.convert(habitTranslation));
+        HabitTranslationDto habitTranslationDtoActual = habitTranslationDtoMapper.convert(habitTranslation);
+
+        Assertions.assertEquals(habitTranslationDto.getDescription(), habitTranslationDtoActual.getDescription());
+        Assertions.assertEquals(habitTranslationDto.getHabitItem(), habitTranslationDtoActual.getHabitItem());
+        Assertions.assertEquals(habitTranslationDto.getLanguageCode(), habitTranslationDtoActual.getLanguageCode());
+        Assertions.assertEquals(habitTranslationDto.getName(), habitTranslationDtoActual.getName());
+
+        Assertions.assertEquals(habitTranslationDto, habitTranslationDtoActual);
     }
 
     @Test
