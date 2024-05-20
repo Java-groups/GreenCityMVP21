@@ -199,7 +199,10 @@ public class ModelUtils {
 
     public static HabitStatusCalendar getHabitStatusCalendar() {
         return HabitStatusCalendar.builder()
-            .enrollDate(LocalDate.now()).id(1L).build();
+            .enrollDate(LocalDate.now())
+                .id(1L)
+                .habitAssign(getHabitAssignSimple())
+                .build();
     }
 
     public static HabitTranslation getHabitTranslation() {
