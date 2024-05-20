@@ -19,8 +19,6 @@ import greencity.dto.shoppinglistitem.ShoppingListItemDto;
 import greencity.dto.user.UserProfilePictureDto;
 import greencity.dto.user.UserVO;
 import greencity.exception.exceptions.BadRequestException;
-import greencity.resolver.PageableResolver;
-import greencity.resolver.UserVoResolver;
 import greencity.service.HabitService;
 import greencity.service.LanguageService;
 import greencity.service.TagsService;
@@ -40,7 +38,6 @@ import org.springframework.security.core.authority.SimpleGrantedAuthority;
 import org.springframework.security.test.context.support.WithMockUser;
 import org.springframework.test.context.ContextConfiguration;
 import org.springframework.test.web.servlet.MockMvc;
-import org.springframework.test.web.servlet.setup.MockMvcBuilders;
 import org.springframework.web.multipart.MultipartFile;
 import org.testcontainers.shaded.com.fasterxml.jackson.databind.ObjectMapper;
 
@@ -79,6 +76,7 @@ class HabitControllerTest {
                 .email("john@example.com")
                 .build();
 
+        when(userService.findByEmail(anyString())).thenReturn(userVO);
         when(languageService.findAllLanguageCodes()).thenReturn(List.of("en"));
     }
 
@@ -182,10 +180,6 @@ class HabitControllerTest {
         when(habitService.getAllByDifferentParameters(eq(userVO), any(), any(), any(), any(), eq("en")))
                 .thenReturn(pageableDto);
 
-        mockMvc = MockMvcBuilders.standaloneSetup(new HabitController(habitService, tagsService))
-                .setCustomArgumentResolvers(new UserVoResolver(userVO), new PageableResolver())
-                .build();
-
         mockMvc.perform(get("/habit/search")
                         .param("tags", "tag1", "tag2")
                         .param("isCustomHabit", "true")
@@ -281,12 +275,7 @@ class HabitControllerTest {
 
         when(habitService.getFriendsAssignedToHabitProfilePictures(habitId, userVO.getId())).thenReturn(pictures);
 
-        mockMvc = MockMvcBuilders.standaloneSetup(new HabitController(habitService, tagsService))
-                .setCustomArgumentResolvers(new UserVoResolver(userVO))
-                .build();
-
-        mockMvc.perform(get("/habit/" + habitId + "/friends/profile-pictures")
-                        .with(authentication(createAuth(userVO))))
+        mockMvc.perform(get("/habit/" + habitId + "/friends/profile-pictures"))
                 .andExpect(status().isOk())
                 .andExpect(content().contentType(APPLICATION_JSON))
                 .andExpect(jsonPath("$[0].name").value("url1"))
