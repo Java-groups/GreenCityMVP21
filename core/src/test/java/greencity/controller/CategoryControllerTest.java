@@ -1,6 +1,7 @@
 package greencity.controller;
 
 
+import greencity.dto.category.CategoryDto;
 import greencity.service.CategoryService;
 
 import org.junit.jupiter.api.BeforeEach;
@@ -50,12 +51,19 @@ class CategoryControllerTest {
     void saveCategory() throws Exception {
         String name = "Category Name";
         String nameUa = "Категорія";
-        int id = 5;
+        long id = 5;
+
+        CategoryDto categoryDto = CategoryDto.builder()
+                .name(name)
+                //.nameUa(nameUa)
+                //.parentCategoryId(id)
+                .build();
 
         String json = "{\n" +
-                "  \"name\": \""+ name +"\",\n" +
-                "  \"nameUa\": \" " + nameUa + "\",\n" +
-                "  \"parentCategoryId\": " + id + "\n" +
+                "  \"name\": \""+ name +"\"\n" +
+               // "  \"name\": \""+ name +"\",\n" +
+               // "  \"nameUa\": \" " + nameUa + "\",\n" +
+               // "  \"parentCategoryId\": " + id + "\n" +
                 "}";
 
         System.out.println(json);
@@ -64,7 +72,7 @@ class CategoryControllerTest {
                         .content(json))
                 .andExpect(status().isCreated());
 
-        assert categoryService.findAllCategoryDto() != null;
+        verify(categoryService).save(categoryDto);
     }
 
     @Test
