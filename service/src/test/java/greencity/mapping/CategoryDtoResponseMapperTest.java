@@ -16,7 +16,7 @@ import static org.junit.jupiter.api.Assertions.*;
 class CategoryDtoResponseMapperTest {
 
     @InjectMocks
-    CategoryDtoResponseMapper mapper;
+    private CategoryDtoResponseMapper mapper;
 
     @Test
     @DisplayName("Test converting Category to CategoryDtoResponse")
