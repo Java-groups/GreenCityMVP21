@@ -5,6 +5,7 @@ import greencity.dto.econewscomment.EcoNewsCommentDto;
 import greencity.entity.EcoNewsComment;
 import greencity.entity.User;
 import greencity.enums.CommentStatus;
+import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;
 import org.mockito.InjectMocks;
@@ -23,6 +24,7 @@ class EcoNewsCommentDtoMapperTest {
     private EcoNewsCommentDtoMapper mapper;
 
     @Test
+    @DisplayName("Test convert from EcoNewsComment to EcoNewsCommentDto")
     void convert() {
         
         EcoNewsComment ecoNewsComment = ModelUtils.getEcoNewsComment();
