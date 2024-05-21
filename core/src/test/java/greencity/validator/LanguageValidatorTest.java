@@ -17,13 +17,13 @@ import static org.mockito.Mockito.when;
 
 
 @ExtendWith(MockitoExtension.class)
-public class LanguageValidatorTest {
+class LanguageValidatorTest {
 
     @InjectMocks
-    private LanguageValidator languageValidator;
+    LanguageValidator languageValidator;
 
     @Mock
-    private LanguageService languageService;
+    LanguageService languageService;
 
     @BeforeEach
     void setup() {
