@@ -482,7 +482,7 @@ public class ModelUtils {
             .id(1L)
             .text("text")
             .createdDate(LocalDateTime.now())
-            .modifiedDate(LocalDateTime.now())
+            .modifiedDate(LocalDateTime.now().plusHours(5))
             .user(getUser())
             .usersLiked(new HashSet<>())
             .ecoNews(getEcoNews())
