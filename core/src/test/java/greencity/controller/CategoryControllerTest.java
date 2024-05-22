@@ -50,21 +50,15 @@ class CategoryControllerTest {
     @DisplayName("Category Controller Post request to create new Category Test")
     void saveCategory() throws Exception {
         String name = "Category Name";
-        String nameUa = "Категорія";
-        long id = 5;
+
 
         CategoryDto categoryDto = CategoryDto.builder()
                 .name(name)
-                //.nameUa(nameUa)
-                //.parentCategoryId(id)
                 .build();
 
         String json = "{\n" +
                 "  \"name\": \""+ name +"\"\n" +
-               // "  \"name\": \""+ name +"\",\n" +
-               // "  \"nameUa\": \" " + nameUa + "\",\n" +
-               // "  \"parentCategoryId\": " + id + "\n" +
-                "}";
+                 "}";
 
         System.out.println(json);
         mockMvc.perform(post(categoryLink)
