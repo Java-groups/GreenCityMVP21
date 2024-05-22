@@ -159,7 +159,7 @@ public class HabitController {
         @Parameter(hidden = true) Pageable pageable) throws BadRequestException {
         if (isValid(tags, isCustomHabit, complexities)) {
             return ResponseEntity.status(HttpStatus.OK).body(
-            habitService.getAllByDifferentParameters(userVO, pageable, tags,
+                habitService.getAllByDifferentParameters(userVO, pageable, tags,
                     isCustomHabit, complexities, locale.getLanguage()));
         } else {
             throw new BadRequestException("You should enter at least one parameter");
