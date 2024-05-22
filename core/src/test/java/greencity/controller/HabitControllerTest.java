@@ -20,6 +20,7 @@ import greencity.dto.shoppinglistitem.ShoppingListItemDto;
 import greencity.dto.user.UserProfilePictureDto;
 import greencity.dto.user.UserVO;
 import greencity.exception.exceptions.BadRequestException;
+import greencity.exception.handler.CustomExceptionHandler;
 import greencity.service.HabitService;
 import greencity.service.LanguageService;
 import greencity.service.TagsService;
@@ -41,11 +42,13 @@ import org.springframework.test.context.ContextConfiguration;
 import org.springframework.test.web.servlet.MockMvc;
 import org.springframework.web.multipart.MultipartFile;
 import org.testcontainers.shaded.com.fasterxml.jackson.databind.ObjectMapper;
+import org.springframework.context.annotation.Import;
 
 import java.util.*;
 
 @WithMockUser(username = "user")
 @WebMvcTest(HabitController.class)
+@Import(CustomExceptionHandler.class)
 @ContextConfiguration(classes = {GreenCityApplication.class})
 class HabitControllerTest {
 
@@ -257,6 +260,23 @@ class HabitControllerTest {
                 .andExpect(jsonPath("$[1].name").value("url2"));
 
         verify(habitService).getFriendsAssignedToHabitProfilePictures(habitId, userVO.getId());
+    }
+
+    @Test
+    void whenBadRequestExceptionThrown_thenHandledByCustomExceptionHandler() throws Exception {
+        when(habitService.getAllByDifferentParameters(
+                eq(userVO),
+                any(Pageable.class),
+                eq(Optional.empty()),
+                eq(Optional.empty()),
+                eq(Optional.empty()),
+                eq("en")
+        )).thenThrow(new BadRequestException("You should enter at least one parameter"));
+
+        mockMvc.perform(get("/habit/search")
+                        .locale(Locale.ENGLISH))
+                .andExpect(status().isBadRequest())
+                .andExpect(jsonPath("$.message").value("You should enter at least one parameter"));
     }
 
     private Authentication createAuth(UserVO user) {
