@@ -26,6 +26,7 @@ import greencity.service.LanguageService;
 import greencity.service.TagsService;
 import greencity.service.UserService;
 import org.junit.jupiter.api.BeforeEach;
+import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
 import org.modelmapper.ModelMapper;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -84,6 +85,7 @@ class HabitControllerTest {
     }
 
     @Test
+    @DisplayName("Test to get habit by ID and return habit details if exists")
     void getHabitById_HabitExists_ReturnsHabit() throws Exception {
         HabitDto habitDto = getHabitDto();
 
@@ -102,6 +104,7 @@ class HabitControllerTest {
     }
 
     @Test
+    @DisplayName("Test to get all habits and return habits list if exists")
     void getAll_HabitsExist_ReturnsHabits() throws Exception {
         when(habitService.getAllHabitsByLanguageCode(any(), any(), eq("en"))).thenReturn(pageableDto);
 
@@ -119,6 +122,7 @@ class HabitControllerTest {
     }
 
     @Test
+    @DisplayName("Test to get shopping list items for a habit and return items if exists")
     void getShoppingListItems_HabitExists_ReturnsItems() throws Exception {
         ShoppingListItemDto item = getShoppingListItemDto(1L, "Example text", "Pending");
         List<ShoppingListItemDto> items = Collections.singletonList(item);
@@ -136,6 +140,7 @@ class HabitControllerTest {
     }
 
     @Test
+    @DisplayName("Test to get all habits by tags and language code and return habits list if exists")
     void getAllByTagsAndLanguageCode_ValidTags_ReturnsHabits() throws Exception {
         when(habitService.getAllByTagsAndLanguageCode(any(Pageable.class), anyList(), eq("en")))
                 .thenReturn(pageableDto);
@@ -154,6 +159,7 @@ class HabitControllerTest {
     }
 
     @Test
+    @DisplayName("Test to get all habits by different parameters and return habits list if exists")
     void getAllByDifferentParameters_ValidParameters_ReturnsHabits() throws Exception {
         when(habitService.getAllByDifferentParameters(eq(userVO), any(), any(), any(), any(), eq("en")))
                 .thenReturn(pageableDto);
@@ -172,6 +178,7 @@ class HabitControllerTest {
     }
 
     @Test
+    @DisplayName("Test to throw BadRequestException when no parameters provided")
     void getAllByDifferentParameters_NoParamsProvided_ThrowsBadRequestException() throws Exception {
         when(habitService.getAllByDifferentParameters(
                 eq(userVO),
@@ -196,6 +203,7 @@ class HabitControllerTest {
     }
 
     @Test
+    @DisplayName("Test to get all habit tags and return tags if exists")
     void findAllHabitsTags_TagsExist_ReturnsTags() throws Exception {
         List<String> tags = List.of("Recycling", "Conservation");
 
@@ -211,6 +219,7 @@ class HabitControllerTest {
     }
 
     @Test
+    @DisplayName("Test to add a custom habit and create habit if valid")
     void addCustomHabit_ValidHabit_CreatesHabit() throws Exception {
         ObjectMapper objectMapper = new ObjectMapper();
         AddCustomHabitDtoRequest request = AddCustomHabitDtoRequest.builder().complexity(1).build();
@@ -245,6 +254,7 @@ class HabitControllerTest {
     }
 
     @Test
+    @DisplayName("Test to get friends assigned to habit profile pictures and return pictures if exists")
     void getFriendsAssignedToHabitProfilePictures_HabitExists_ReturnsPictures() throws Exception {
         Long habitId = 1L;
         UserProfilePictureDto pic1 = getUserProfilePictureDto(1L, "url1", "Description 1");
@@ -263,6 +273,7 @@ class HabitControllerTest {
     }
 
     @Test
+    @DisplayName("Test to handle BadRequestException using CustomExceptionHandler")
     void whenBadRequestExceptionThrown_thenHandledByCustomExceptionHandler() throws Exception {
         when(habitService.getAllByDifferentParameters(
                 eq(userVO),
