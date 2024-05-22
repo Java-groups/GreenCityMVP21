@@ -1,5 +1,6 @@
 package greencity.controller;
 
+import static greencity.ModelUtils.*;
 import static org.junit.Assert.assertEquals;
 import static org.junit.jupiter.api.Assertions.assertInstanceOf;
 import static org.mockito.ArgumentMatchers.*;
@@ -68,13 +69,12 @@ class HabitControllerTest {
 
     private UserVO userVO;
 
+    private PageableDto<HabitDto> pageableDto;
+
     @BeforeEach
     void setUp() {
-        userVO = UserVO.builder()
-                .id(1L)
-                .name("John Doe")
-                .email("john@example.com")
-                .build();
+        userVO = getUserVO();
+        pageableDto = getPageableHabitDto(1, 1, 1);
 
         when(userService.findByEmail(anyString())).thenReturn(userVO);
         when(languageService.findAllLanguageCodes()).thenReturn(List.of("en"));
@@ -82,11 +82,7 @@ class HabitControllerTest {
 
     @Test
     void getHabitById_HabitExists_ReturnsHabit() throws Exception {
-        HabitDto habitDto = HabitDto.builder()
-                .id(1L)
-                .image("someImageUrl")
-                .complexity(2)
-                .build();
+        HabitDto habitDto = getHabitDto();
 
         when(habitService.getByIdAndLanguageCode(1L, "en")).thenReturn(habitDto);
 
@@ -104,13 +100,6 @@ class HabitControllerTest {
 
     @Test
     void getAll_HabitsExist_ReturnsHabits() throws Exception {
-        PageableDto<HabitDto> pageableDto = new PageableDto<>(
-                List.of(new HabitDto()),
-                1,
-                1,
-                1
-        );
-
         when(habitService.getAllHabitsByLanguageCode(any(), any(), eq("en"))).thenReturn(pageableDto);
 
         mockMvc.perform(get("/habit")
@@ -128,12 +117,7 @@ class HabitControllerTest {
 
     @Test
     void getShoppingListItems_HabitExists_ReturnsItems() throws Exception {
-        ShoppingListItemDto item = ShoppingListItemDto.builder()
-                .id(1L)
-                .text("Example text")
-                .status("Pending")
-                .build();
-
+        ShoppingListItemDto item = getShoppingListItemDto(1L, "Example text", "Pending");
         List<ShoppingListItemDto> items = Collections.singletonList(item);
 
         when(habitService.getShoppingListForHabit(1L, "en")).thenReturn(items);
@@ -150,8 +134,6 @@ class HabitControllerTest {
 
     @Test
     void getAllByTagsAndLanguageCode_ValidTags_ReturnsHabits() throws Exception {
-        PageableDto<HabitDto> pageableDto = new PageableDto<>(List.of(new HabitDto()), 1, 1, 1);
-
         when(habitService.getAllByTagsAndLanguageCode(any(Pageable.class), anyList(), eq("en")))
                 .thenReturn(pageableDto);
 
@@ -170,13 +152,6 @@ class HabitControllerTest {
 
     @Test
     void getAllByDifferentParameters_ValidParameters_ReturnsHabits() throws Exception {
-        PageableDto<HabitDto> pageableDto = new PageableDto<>(
-                List.of(new HabitDto()),
-                1,
-                1,
-                1
-        );
-
         when(habitService.getAllByDifferentParameters(eq(userVO), any(), any(), any(), any(), eq("en")))
                 .thenReturn(pageableDto);
 
@@ -269,8 +244,8 @@ class HabitControllerTest {
     @Test
     void getFriendsAssignedToHabitProfilePictures_HabitExists_ReturnsPictures() throws Exception {
         Long habitId = 1L;
-        UserProfilePictureDto pic1 = new UserProfilePictureDto(1L, "url1", "Description 1");
-        UserProfilePictureDto pic2 = new UserProfilePictureDto(2L, "url2", "Description 2");
+        UserProfilePictureDto pic1 = getUserProfilePictureDto(1L, "url1", "Description 1");
+        UserProfilePictureDto pic2 = getUserProfilePictureDto(2L, "url2", "Description 2");
         List<UserProfilePictureDto> pictures = List.of(pic1, pic2);
 
         when(habitService.getFriendsAssignedToHabitProfilePictures(habitId, userVO.getId())).thenReturn(pictures);
