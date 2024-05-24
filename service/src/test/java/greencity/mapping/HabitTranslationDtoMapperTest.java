@@ -9,7 +9,7 @@ import org.junit.jupiter.api.Test;
 
 import java.util.List;
 
-public class HabitTranslationDtoMapperTest {
+class HabitTranslationDtoMapperTest {
 
     HabitTranslationDtoMapper habitTranslationDtoMapper = new HabitTranslationDtoMapper();
 
@@ -39,7 +39,7 @@ public class HabitTranslationDtoMapperTest {
     }
 
     @Test
-    public void testConvert() {
+    void testConvert() {
         HabitTranslationDto habitTranslationDtoActual = habitTranslationDtoMapper.convert(habitTranslation);
 
         Assertions.assertEquals(habitTranslationDto.getDescription(), habitTranslationDtoActual.getDescription());
@@ -51,7 +51,7 @@ public class HabitTranslationDtoMapperTest {
     }
 
     @Test
-    public void testMapToList() {
+    void testMapToList() {
         Assertions.assertEquals(List.of(habitTranslationDto), habitTranslationDtoMapper.mapAllToList(List.of(habitTranslation)));
     }
 }

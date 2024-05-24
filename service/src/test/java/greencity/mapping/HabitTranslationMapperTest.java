@@ -2,14 +2,13 @@ package greencity.mapping;
 
 import greencity.dto.habittranslation.HabitTranslationDto;
 import greencity.entity.HabitTranslation;
-import greencity.entity.Language;
 import org.junit.jupiter.api.Assertions;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 
 import java.util.List;
 
-public class HabitTranslationMapperTest {
+class HabitTranslationMapperTest {
 
     HabitTranslationMapper habitTranslationMapper = new HabitTranslationMapper();
 
@@ -32,7 +31,7 @@ public class HabitTranslationMapperTest {
     }
 
     @Test
-    public void testConvert() {
+    void testConvert() {
         HabitTranslation habitTranslationActual = habitTranslationMapper.convert(habitTranslationDto);
 
         Assertions.assertEquals(habitTranslation.getId(), habitTranslationActual.getId());
@@ -46,7 +45,7 @@ public class HabitTranslationMapperTest {
     }
 
     @Test
-    public void testMapToList() {
+    void testMapToList() {
         Assertions.assertEquals(List.of(habitTranslation), habitTranslationMapper.mapAllToList(List.of(habitTranslationDto)));
     }
 }
