@@ -19,6 +19,7 @@ import io.swagger.v3.oas.annotations.media.Schema;
 import io.swagger.v3.oas.annotations.responses.ApiResponse;
 import io.swagger.v3.oas.annotations.responses.ApiResponses;
 import lombok.RequiredArgsConstructor;
+import lombok.extern.slf4j.Slf4j;
 import org.springframework.data.domain.Pageable;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.MediaType;
@@ -35,6 +36,7 @@ import java.util.Locale;
 @RestController
 @RequestMapping("/econews")
 @RequiredArgsConstructor
+@Slf4j
 public class EcoNewsController {
     private final EcoNewsService ecoNewsService;
     private final TagsService tagService;
@@ -72,7 +74,7 @@ public class EcoNewsController {
             @Parameter(description = SwaggerExampleModel.ADD_ECO_NEWS_REQUEST,
                     required = true) @RequestPart @ValidEcoNewsDtoRequest AddEcoNewsDtoRequest addEcoNewsDtoRequest,
             @Parameter(description = "Image of eco news") @ImageValidation
-            @RequestPart(required = false) MultipartFile image,
+                    @RequestPart(required = false) MultipartFile image,
             @Parameter(hidden = true) Principal principal) {
         return ResponseEntity.status(HttpStatus.CREATED).body(
                 ecoNewsService.saveEcoNews(addEcoNewsDtoRequest, image, principal.getName()));
@@ -147,7 +149,7 @@ public class EcoNewsController {
         @ApiResponse(responseCode = "303", description = HttpStatuses.SEE_OTHER),
         @ApiResponse(responseCode = "403", description = HttpStatuses.FORBIDDEN)
     })
-    @PutMapping(path = "/update", consumes = {MediaType.APPLICATION_JSON_VALUE,
+    @PutMapping(path = "/update", consumes = {
         MediaType.MULTIPART_FORM_DATA_VALUE})
     public ResponseEntity<EcoNewsGenericDto> update(
             @Parameter(description = SwaggerExampleModel.UPDATE_ECO_NEWS,
