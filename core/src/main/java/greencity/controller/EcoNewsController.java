@@ -23,6 +23,7 @@ import org.springframework.data.domain.Pageable;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.MediaType;
 import org.springframework.http.ResponseEntity;
+import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.validation.annotation.Validated;
 import org.springframework.web.bind.annotation.*;
 import org.springframework.web.multipart.MultipartFile;
@@ -369,7 +370,8 @@ public class EcoNewsController {
      */
     @Operation(summary = "Check if user liked news")
     @GetMapping("/isLikedByUser")
-    public ResponseEntity<Boolean> checkNewsIsLikedByUser(@RequestParam("econewsId") Long econewsId,
+    @PreAuthorize("isAuthenticated()")
+    public ResponseEntity<Boolean> checkNewsIsLikedByUser(@RequestParam(value = "econewsId") Long econewsId,
                                                           @Parameter(hidden = true) @CurrentUser UserVO user) {
         return ResponseEntity.status(HttpStatus.OK).body(ecoNewsService.checkNewsIsLikedByUser(econewsId, user));
     }
