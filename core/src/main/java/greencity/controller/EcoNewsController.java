@@ -19,7 +19,6 @@ import io.swagger.v3.oas.annotations.media.Schema;
 import io.swagger.v3.oas.annotations.responses.ApiResponse;
 import io.swagger.v3.oas.annotations.responses.ApiResponses;
 import lombok.RequiredArgsConstructor;
-import lombok.extern.slf4j.Slf4j;
 import org.springframework.data.domain.Pageable;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.MediaType;
@@ -36,7 +35,6 @@ import java.util.Locale;
 @RestController
 @RequestMapping("/econews")
 @RequiredArgsConstructor
-@Slf4j
 public class EcoNewsController {
     private final EcoNewsService ecoNewsService;
     private final TagsService tagService;
