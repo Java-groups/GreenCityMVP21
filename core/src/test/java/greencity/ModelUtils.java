@@ -2,6 +2,7 @@ package greencity;
 
 import com.fasterxml.jackson.databind.ObjectMapper;
 import greencity.constant.AppConstant;
+import greencity.dto.PageableDto;
 import greencity.dto.econews.AddEcoNewsDtoRequest;
 import greencity.dto.econews.AddEcoNewsDtoResponse;
 import greencity.dto.econews.EcoNewsDto;
@@ -12,11 +13,13 @@ import greencity.dto.econewscomment.EcoNewsCommentDto;
 import greencity.dto.habit.*;
 import greencity.dto.habitfact.*;
 import greencity.dto.habitstatistic.AddHabitStatisticDto;
+import greencity.dto.habitstatistic.UpdateHabitStatisticDto;
 import greencity.dto.habittranslation.HabitTranslationDto;
 import greencity.dto.language.LanguageDTO;
 import greencity.dto.language.LanguageTranslationDTO;
 import greencity.dto.language.LanguageVO;
 import greencity.dto.shoppinglistitem.CustomShoppingListItemResponseDto;
+import greencity.dto.shoppinglistitem.ShoppingListItemDto;
 import greencity.dto.shoppinglistitem.ShoppingListItemPostDto;
 import greencity.dto.shoppinglistitem.ShoppingListItemRequestDto;
 import greencity.dto.tag.TagPostDto;
@@ -81,8 +84,29 @@ public class ModelUtils {
             .build();
     }
 
+    public static HabitDto getHabitDto() {
+        return HabitDto.builder()
+            .id(1L)
+            .image("someImageUrl")
+            .complexity(2)
+            .build();
+    }
+
+    public static ShoppingListItemDto getShoppingListItemDto(Long id, String text, String status) {
+        return ShoppingListItemDto.builder()
+                .id(id)
+                .text(text)
+                .status(status)
+                .build();
+    }
+
     public static EcoNewsAuthorDto getEcoNewsAuthorDto() {
         return new EcoNewsAuthorDto(1L, TestConst.NAME);
+    }
+
+    public static PageableDto<HabitDto> getPageableHabitDto(int totalElements, int currentPage, int totalPages) {
+        List<HabitDto> habitList = List.of(getHabitDto());
+        return new PageableDto<>(habitList, totalElements, currentPage, totalPages);
     }
 
     public static EcoNewsDto getEcoNewsDto() {
@@ -126,6 +150,13 @@ public class ModelUtils {
             .habitRate(HabitRate.DEFAULT)
             .createDate(ZonedDateTime.now())
             .build();
+    }
+
+    public static UpdateHabitStatisticDto getUpdateHabitStatisticDto() {
+        return UpdateHabitStatisticDto.builder()
+                .amountOfItems(5)
+                .habitRate(HabitRate.DEFAULT)
+                .build();
     }
 
     public static HabitStatistic getHabitStatistic() {
@@ -212,8 +243,12 @@ public class ModelUtils {
         return () -> "test@gmail.com";
     }
 
-    public static UserProfilePictureDto getUserProfilePictureDto() {
-        return new UserProfilePictureDto(1L, "name", "image");
+    public static UserProfilePictureDto getUserProfilePictureDto(Long id, String name, String profilePicturePath) {
+        return UserProfilePictureDto.builder()
+                .id(id)
+                .name(name)
+                .profilePicturePath(profilePicturePath)
+                .build();
     }
 
     public static ObjectMapper getObjectMapper() {
