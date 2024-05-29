@@ -20,7 +20,7 @@ public final class SwaggerExampleModel {
             + "  ],\n"
             + "  \"text\": \"string\",\n"
             + "  \"title\": \"string\",\n"
-            + "  \"source\": \"string\",\n";
+            + "  \"source\": \"string\"\n";
 
     private static final String EXAMPLE_FOR_UPDATE_ECO_NEWS =
         "  \"image\": \"string\",\n"
