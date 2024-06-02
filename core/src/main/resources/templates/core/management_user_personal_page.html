@@ -225,12 +225,11 @@
                 </div>
 
                 <div class="divider"></div>
-                <div class="divider"></div>
 
                 <div class="info-title-text" style="margin-top: 15px">
                     <span>[[#{greenCity.personal.page.myFriends}]]</span>
-                    <a href="#">[[#{greenCity.pages.seeAll}]]</a>
-                    <h4 th:text="${user.userFriends.size()} + ' connections text'"></h4>
+                    <a href="#">[[#{greenCity.pages.seeAll}]] HERE WE ARE</a>
+                    <h4 th:text="${user.userFriends.size()} + ' connections'"></h4>
                     <div class="friends-list">
                         <th:block class="list-of"
                                   th:each="friend, iterStatus :${@userServiceImpl.getSixFriendsWithTheHighestRating(user.id)}">
