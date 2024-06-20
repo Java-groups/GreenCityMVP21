@@ -59,6 +59,9 @@ class EventServiceImplTest {
     @Mock
     UserRepo userRepo;
 
+    @Mock
+    UserService userService;
+
     @InjectMocks
     EventServiceImpl eventService;
 
@@ -305,7 +308,7 @@ class EventServiceImplTest {
         Event toDelete = Event.builder().author(author).build();
         UserVO userVO = ModelUtils.getUserVO().setRole(Role.ROLE_ADMIN);
 
-        when(restClient.findByEmail(anyString())).thenReturn(userVO);
+        when(userService.findByEmail(anyString())).thenReturn(userVO);
         when(eventRepo.findById(anyLong())).thenReturn(Optional.of(toDelete));
 
         eventService.delete(1L, "test@mail.com");
@@ -326,7 +329,7 @@ class EventServiceImplTest {
         Event toDelete = Event.builder().author(author).build();
         UserVO userVO = ModelUtils.getUserVO().setId(2L);
 
-        when(restClient.findByEmail(anyString())).thenReturn(userVO);
+        when(userService.findByEmail(anyString())).thenReturn(userVO);
         when(eventRepo.findById(anyLong())).thenReturn(Optional.of(toDelete));
 
         assertThrows(UserHasNoPermissionToAccessException.class,

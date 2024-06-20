@@ -9,9 +9,7 @@ import lombok.*;
 @Setter
 @EqualsAndHashCode
 public class EventImageDto {
-
     private String imagePath;
 
     private boolean isMain;
-
 }

@@ -5,6 +5,8 @@ import greencity.constant.ErrorMessage;
 import greencity.dto.PageableAdvancedDto;
 import greencity.dto.event.*;
 import greencity.entity.Tag;
+import greencity.entity.event.EventAddress;
+import greencity.entity.event.EventDayInfo;
 import greencity.entity.event.EventImage;
 import greencity.entity.event.Event;
 import greencity.dto.tag.TagVO;
@@ -20,6 +22,7 @@ import greencity.message.EventEmailMessage;
 import greencity.repository.EventRepo;
 import greencity.repository.UserRepo;
 import lombok.RequiredArgsConstructor;
+import lombok.val;
 import org.modelmapper.ModelMapper;
 import org.modelmapper.TypeToken;
 import org.springframework.cache.annotation.EnableCaching;
@@ -30,18 +33,22 @@ import org.springframework.web.context.request.RequestAttributes;
 import org.springframework.web.context.request.RequestContextHolder;
 import org.springframework.web.multipart.MultipartFile;
 
+import java.time.LocalDateTime;
+import java.time.chrono.ChronoZonedDateTime;
 import java.util.*;
 import java.util.concurrent.Executors;
 import java.util.concurrent.ThreadPoolExecutor;
+import java.util.stream.Collectors;
 
 @Service
 @EnableCaching
 @RequiredArgsConstructor
-public class EventServiceImpl implements EventService{
+public class EventServiceImpl implements EventService {
     private final EventRepo eventRepo;
     private final ModelMapper modelMapper;
     private final FileService fileService;
     private final UserRepo userRepo;
+    private final UserService userService;
     private final RestClient restClient;
     private final TagsService tagsService;
     private final ThreadPoolExecutor emailThreadPool = (ThreadPoolExecutor) Executors.newFixedThreadPool(1);
@@ -88,10 +95,66 @@ public class EventServiceImpl implements EventService{
         return modelMapper.map(eventToSave, EventResponseDto.class);
     }
 
+    @Override
+    public EventResponseDto updateEvent(Long id, EventUpdateRequestDto eventUpdateRequestDto, String email) {
+        UserVO userVO = userService.findByEmail(email);
+        Event event = eventRepo.findById(id)
+                .orElseThrow(() -> new NotFoundException(ErrorMessage.EVENT_NOT_FOUND_BY_ID + id));
+
+        if (!event.getAuthor().getId().equals(userVO.getId()) && userVO.getRole() != Role.ROLE_ADMIN) {
+            throw new UserHasNoPermissionToAccessException("User has no permission to edit this event");
+        }
+
+        if (event.getDayInfos().stream().anyMatch(
+                d -> d.getStartDateTime().isBefore(ChronoZonedDateTime.from(LocalDateTime.now())))) {
+            throw new IllegalArgumentException("Cannot edit past events");
+        }
+
+        event.setTitle(eventUpdateRequestDto.getTitle());
+        event.setDescription(eventUpdateRequestDto.getDescription());
+        event.setOpen(eventUpdateRequestDto.getIsOpen());
+
+        updateDayInfos(event, eventUpdateRequestDto.getDateTimes());
+        updateImages(event, eventUpdateRequestDto.getImages());
+        updateTags(event, eventUpdateRequestDto.getTagNames());
+
+        eventRepo.save(event);
+        return modelMapper.map(event, EventResponseDto.class);
+    }
+
+    private void updateDayInfos(Event event, List<EventResponseDayInfoDto> eventResponseDayInfoDto) {
+        List<EventDayInfo> dayInfos = eventResponseDayInfoDto.stream()
+                .map(dto -> modelMapper.map(dto, EventDayInfo.class))
+                .collect(Collectors.toList());
+
+        event.getDayInfos().clear();
+        event.getDayInfos().addAll(dayInfos);
+    }
+
+    private void updateImages(Event event, List<EventImageDto> images) {
+        List<EventImage> updatedImages = images.stream()
+                .map(imgDto -> modelMapper.map(imgDto, EventImage.class))
+                .collect(Collectors.toList());
+
+        event.getImages().clear();
+        event.getImages().addAll(updatedImages);
+    }
+
+    private void updateTags(Event event, List<String> tagNames) {
+        List<Tag> tags = modelMapper.map(
+                tagsService.findTagsByNamesAndType(tagNames, TagType.EVENT),
+                new TypeToken<List<Tag>>() {
+                }.getType());
+
+        event.getTags().clear();
+        event.getTags().addAll(tags);
+    }
+
+    @Override
     public void delete(Long id, String email) {
-        UserVO userVO = restClient.findByEmail(email);
+        UserVO userVO = userService.findByEmail(email);
         Event toDelete = eventRepo.findById(id)
-                .orElseThrow(() -> new NotFoundException(ErrorMessage.EVENT_NOT_FOUND));
+                .orElseThrow(() -> new NotFoundException(ErrorMessage.EVENT_NOT_FOUND_BY_ID + id));
 
         if (toDelete.getAuthor().getId().equals(userVO.getId()) || userVO.getRole() == Role.ROLE_ADMIN) {
             eventRepo.delete(toDelete);
