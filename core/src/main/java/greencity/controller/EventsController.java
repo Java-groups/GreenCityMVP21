@@ -138,10 +138,10 @@ public class EventsController {
     })
     @PutMapping("/{eventId}")
     public ResponseEntity<EventResponseDto> updateEvent(
-            @PathVariable Long eventId,
             @RequestBody EventUpdateRequestDto eventUpdateRequestDto,
+            @ImageArrayValidation @Size(max = 5, message = "Download up to 5 images") MultipartFile[] images,
             @Parameter(hidden = true) Principal principal) {
-        return ResponseEntity.ok(eventService.updateEvent(eventId, eventUpdateRequestDto, principal.getName()));
+        return ResponseEntity.ok(eventService.updateEvent(eventUpdateRequestDto, images, principal.getName()));
     }
 
     /**

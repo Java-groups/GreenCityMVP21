@@ -13,7 +13,7 @@ import java.util.List;
 public interface EventService {
     EventResponseDto save(EventRequestSaveDto event, MultipartFile[] images, UserVO author);
 
-    EventResponseDto updateEvent(Long id, EventUpdateRequestDto eventUpdateRequestDto, String email);
+    EventResponseDto updateEvent(EventUpdateRequestDto eventUpdateRequestDto, MultipartFile[] images, String email);
 
     void delete(Long id, String email);
 
