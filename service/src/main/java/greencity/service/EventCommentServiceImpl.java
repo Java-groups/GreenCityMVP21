@@ -14,6 +14,7 @@ import greencity.exception.exceptions.NotFoundException;
 import greencity.exception.exceptions.UserHasNoPermissionToAccessException;
 import greencity.repository.EventCommentRepo;
 import greencity.repository.EventRepo;
+import greencity.repository.UserRepo;
 import lombok.AllArgsConstructor;
 import org.modelmapper.ModelMapper;
 import org.springframework.data.domain.Page;
@@ -21,7 +22,10 @@ import org.springframework.data.domain.Pageable;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
-import java.util.List;
+import java.util.*;
+import java.util.regex.Matcher;
+import java.util.regex.Pattern;
+import java.util.stream.Collectors;
 
 @Service
 @AllArgsConstructor
@@ -29,6 +33,7 @@ public class EventCommentServiceImpl implements EventCommentService {
     private final EventRepo eventRepo;
     private final EventCommentRepo eventCommentRepo;
     private final RestClient restClient;
+    private final UserRepo userRepo;
     private ModelMapper modelMapper;
 
     /**
@@ -49,6 +54,26 @@ public class EventCommentServiceImpl implements EventCommentService {
         EventComment eventComment = modelMapper.map(requestDto, EventComment.class);
         eventComment.setEvent(event);
         eventComment.setUser(modelMapper.map(user, User.class));
+        Set<User> mentionedUsers = new HashSet<>();
+        if (requestDto.getText().contains("@") || requestDto.getText().contains("#")) {
+            String[] textByWord = requestDto.getText().split(" ");
+            Pattern p1 = Pattern.compile("@\\w+");
+            Pattern p2 = Pattern.compile("#\\w+");
+            List<String> usernames = Arrays.stream(textByWord)
+                    .filter(word -> {
+                Matcher m1 = p1.matcher(word);
+                Matcher m2 = p2.matcher(word);
+                return m1.matches() || m2.matches();
+            })
+                    .map(username -> username.substring(1))
+                    .toList();
+            mentionedUsers = usernames.stream().map(userRepo::findByName)
+                    .filter(Optional::isPresent)
+                    .map(Optional::get).collect(Collectors.toSet());
+        }
+        eventComment.setMentionedUsers(mentionedUsers);
+        eventComment.setStatus(CommentStatus.ORIGINAL);
+
         eventComment = eventCommentRepo.save(eventComment);
         return modelMapper.map(eventComment, EventCommentResponseDto.class);
     }
