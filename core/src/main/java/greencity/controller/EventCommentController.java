@@ -7,7 +7,9 @@ import greencity.dto.PageableDto;
 import greencity.dto.econewscomment.AddEcoNewsCommentDtoResponse;
 import greencity.dto.eventcomment.EventCommentRequestDto;
 import greencity.dto.eventcomment.EventCommentResponseDto;
+import greencity.dto.user.UserManagementDto;
 import greencity.dto.user.UserVO;
+import greencity.exception.exceptions.BadRequestException;
 import greencity.service.EventCommentService;
 import io.swagger.v3.oas.annotations.Operation;
 import io.swagger.v3.oas.annotations.Parameter;
@@ -20,12 +22,16 @@ import jakarta.validation.Valid;
 import jakarta.validation.constraints.Size;
 import lombok.AllArgsConstructor;
 import org.springframework.data.domain.Pageable;
+import org.springframework.data.domain.Sort;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.validation.annotation.Validated;
 import org.springframework.web.bind.annotation.*;
 
+import java.lang.reflect.Field;
 import java.security.Principal;
+import java.util.Arrays;
+import java.util.List;
 
 @Validated
 @AllArgsConstructor
@@ -87,16 +93,25 @@ public class EventCommentController {
     @Operation(summary = "Get all comments of event.")
     @ApiResponses(value = {
             @ApiResponse(responseCode = "200", description = HttpStatuses.OK),
-            @ApiResponse(responseCode = "400", description = HttpStatuses.BAD_REQUEST)
+            @ApiResponse(responseCode = "400", description = HttpStatuses.BAD_REQUEST),
+            @ApiResponse(responseCode = "404", description = HttpStatuses.NOT_FOUND)
     })
     @GetMapping("/{eventId}")
     @ApiPageableWithoutSort
     public ResponseEntity<PageableDto<EventCommentResponseDto>> getAllEventComments(
             @Parameter(hidden = true) Pageable pageable,
-            @PathVariable Long eventId,
-            @Parameter(hidden = true) @CurrentUser UserVO user) {
+            @PathVariable Long eventId) {
+        Field[] fields = EventCommentResponseDto.class.getDeclaredFields();
+        List<String> fieldsNames = Arrays.stream(fields).map(Field::getName).toList();
+        for(Sort.Order order : pageable.getSort()) {
+            for (Field field: fields){
+                if (!fieldsNames.contains(order.getProperty())) {
+                    throw new BadRequestException(order.getProperty() + " property not exist");
+                }
+            }
+        }
         return ResponseEntity.status(HttpStatus.OK)
-                .body(eventCommentService.getAllEventComments(pageable, eventId, user));
+                .body(eventCommentService.getAllEventComments(pageable, eventId));
     }
 
     /**
@@ -164,9 +179,8 @@ public class EventCommentController {
     @GetMapping("/comment/{commentId}")
     @ApiPageableWithoutSort
     public ResponseEntity<EventCommentResponseDto> getByEventCommentId(
-            @PathVariable Long commentId,
-            @Parameter(hidden = true) @CurrentUser UserVO user) {
+            @PathVariable Long commentId) {
         return ResponseEntity.status(HttpStatus.OK)
-                .body(eventCommentService.getByEventCommentId(commentId, user));
+                .body(eventCommentService.getByEventCommentId(commentId));
     }
 }

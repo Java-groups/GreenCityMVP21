@@ -19,11 +19,11 @@ public interface EventCommentService {
      */
     EventCommentResponseDto save(Long eventId, EventCommentRequestDto requestDto, UserVO user);
 
-    int countOfComments(Long ecoNewsId);
+    int countOfComments(Long eventId);
 
-    PageableDto<EventCommentResponseDto> getAllEventComments(Pageable pageable, Long eventId, UserVO userVO);
+    PageableDto<EventCommentResponseDto> getAllEventComments(Pageable pageable, Long eventId);
 
-    EventCommentResponseDto getByEventCommentId(Long commentId, UserVO userVO);
+    EventCommentResponseDto getByEventCommentId(Long commentId);
 
     /**
      * Method for updating the {@link EventComment} by id.

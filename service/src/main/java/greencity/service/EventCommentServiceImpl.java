@@ -147,7 +147,7 @@ public class EventCommentServiceImpl implements EventCommentService {
      * @return all comments to certain event specified by eventId.
      */
     @Override
-    public PageableDto<EventCommentResponseDto> getAllEventComments(Pageable pageable, Long eventId, UserVO userVO) {
+    public PageableDto<EventCommentResponseDto> getAllEventComments(Pageable pageable, Long eventId) {
         Event event = eventRepo.findById(eventId)
                 .orElseThrow(() -> new NotFoundException(ErrorMessage.EVENT_NOT_FOUND_BY_ID + eventId));
         Page<EventComment> pages = eventCommentRepo.findAllByEventOrderByCreatedDateDesc(event, pageable);
@@ -170,7 +170,7 @@ public class EventCommentServiceImpl implements EventCommentService {
      * @return comment to event with certain commentId.
      */
     @Override
-    public EventCommentResponseDto getByEventCommentId(Long commentId, UserVO userVO) {
+    public EventCommentResponseDto getByEventCommentId(Long commentId) {
         EventComment eventComment = eventCommentRepo.findById(commentId).orElseThrow(() -> new NotFoundException(ErrorMessage.EVENT_COMMENT_NOT_FOUND_BY_ID + commentId));
         return modelMapper.map(eventComment, EventCommentResponseDto.class);
     }
