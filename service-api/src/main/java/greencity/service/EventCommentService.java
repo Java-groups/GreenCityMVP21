@@ -23,6 +23,8 @@ public interface EventCommentService {
 
     PageableDto<EventCommentResponseDto> getAllEventComments(Pageable pageable, Long eventId, UserVO userVO);
 
+    EventCommentResponseDto getByEventCommentId(Long commentId, UserVO userVO);
+
     /**
      * Method for updating the {@link EventComment} by id.
      *

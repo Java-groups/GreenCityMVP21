@@ -474,6 +474,12 @@ public class RestClient {
                 RestTemplateLinks.SEND_EVENT_CREATION_NOTIFICATION, HttpMethod.POST, entity, Object.class).getBody();
     }
 
+    /**
+     * send SendEventCommentNotification to GreenCityUser.
+     *
+     * @param eventCommentMessageInfoDto with information for sending email to user
+     *                              that their event was commented.
+     */
     public void sendEventCommentNotification(EventCommentMessageInfoDto eventCommentMessageInfoDto) {
         String content = """
                 <html>
@@ -488,23 +494,62 @@ public class RestClient {
                     </body>
                 </html>
                 """.formatted(
-                eventCommentMessageInfoDto.getAuthorName(),
+                eventCommentMessageInfoDto.getReceiverName(),
                 eventCommentMessageInfoDto.getEventName(),
                 eventCommentMessageInfoDto.getCommentAuthorName(),
                 eventCommentMessageInfoDto.getCommentCreatedDateTime().format(DateTimeFormatter.ofPattern("dd.MM.yyyy HH:mm:ss")),
                 eventCommentMessageInfoDto.getCommentText(),
-                greenCityMvpServerAddress + "/events/comments/" + eventCommentMessageInfoDto.getCommentId()
+                greenCityMvpServerAddress + "/events/comments/comment" + eventCommentMessageInfoDto.getCommentId()
         );
         HttpHeaders headers = setHeader();
         headers.setContentType(MediaType.APPLICATION_JSON);
         HttpEntity<EventCommentMessage> entity = new HttpEntity<>(EventCommentMessage.builder()
                 .title("Your Event was commented")
                 .body(content)
-                .email(eventCommentMessageInfoDto.getEventAuthorEmail())
+                .email(eventCommentMessageInfoDto.getEmailReceiver())
                 .build(),
                 headers);
         restTemplate.exchange(greenCityUserServerAddress
                         + RestTemplateLinks.SEND_EVENT_COMMENT_NOTIFICATION, HttpMethod.POST, entity, Object.class).getBody();
+    }
+
+    /**
+     * send SendEventCommentNotification to GreenCityUser.
+     *
+     * @param eventCommentMessageInfoDto with information for sending email to user
+     *                              that they were mentioned in comment to event.
+     */
+    public void sendMentionedInEventCommentNotification(EventCommentMessageInfoDto eventCommentMessageInfoDto) {
+        String content = """
+                <html>
+                    <body>
+                        <p>Hi %s,</p>
+                        <p>You have been mentioned in the comment to the %s.</p>
+                        <p>%s on %s</p>
+                        <p>Text of the comment: %s</p>
+                        <p><a href="%s">Go to comment</a></p>
+                        <p>Sincerely yours,</p>
+                        <p>GreenCity team</p>
+                    </body>
+                </html>
+                """.formatted(
+                eventCommentMessageInfoDto.getReceiverName(),
+                eventCommentMessageInfoDto.getEventName(),
+                eventCommentMessageInfoDto.getCommentAuthorName(),
+                eventCommentMessageInfoDto.getCommentCreatedDateTime().format(DateTimeFormatter.ofPattern("dd.MM.yyyy HH:mm:ss")),
+                eventCommentMessageInfoDto.getCommentText(),
+                greenCityMvpServerAddress + "/events/comments/comment" + eventCommentMessageInfoDto.getCommentId()
+        );
+        HttpHeaders headers = setHeader();
+        headers.setContentType(MediaType.APPLICATION_JSON);
+        HttpEntity<EventCommentMessage> entity = new HttpEntity<>(EventCommentMessage.builder()
+                .title("You have been mentioned in comment to Event")
+                .body(content)
+                .email(eventCommentMessageInfoDto.getEmailReceiver())
+                .build(),
+                headers);
+        restTemplate.exchange(greenCityUserServerAddress
+                + RestTemplateLinks.SEND_EVENT_COMMENT_NOTIFICATION, HttpMethod.POST, entity, Object.class).getBody();
     }
 
     /**

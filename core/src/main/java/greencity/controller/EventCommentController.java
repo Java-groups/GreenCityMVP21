@@ -147,4 +147,25 @@ public class EventCommentController {
             @Parameter(hidden = true) Principal principal) {
         return ResponseEntity.status(HttpStatus.OK).body(eventCommentService.delete(eventCommentId, principal.getName()));
     }
+
+    /**
+     * Method to get event comment by comment id {@link Event} specified by
+     * eventId and commentId.
+     *
+     * @param commentId id of {@link EventComment}
+     * @return EventCommentResponseDto of {@link EventCommentResponseDto}
+     */
+    @Operation(summary = "Get comment to event by event id and comment id.")
+    @ApiResponses(value = {
+            @ApiResponse(responseCode = "200", description = HttpStatuses.OK),
+            @ApiResponse(responseCode = "400", description = HttpStatuses.BAD_REQUEST)
+    })
+    @GetMapping("/comment/{commentId}")
+    @ApiPageableWithoutSort
+    public ResponseEntity<EventCommentResponseDto> getByEventCommentId(
+            @PathVariable Long commentId,
+            @Parameter(hidden = true) @CurrentUser UserVO user) {
+        return ResponseEntity.status(HttpStatus.OK)
+                .body(eventCommentService.getByEventCommentId(commentId, user));
+    }
 }

@@ -12,11 +12,11 @@ import java.time.LocalDateTime;
 @EqualsAndHashCode
 @ToString
 public class EventCommentMessageInfoDto {
-    String authorName;
+    String receiverName;
     String eventName;
     String commentAuthorName;
     LocalDateTime commentCreatedDateTime;
     String commentText;
     Long commentId;
-    String eventAuthorEmail;
+    String emailReceiver;
 }
