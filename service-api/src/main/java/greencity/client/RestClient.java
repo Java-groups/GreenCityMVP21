@@ -7,6 +7,7 @@ import greencity.dto.econews.EcoNewsForSendEmailDto;
 import greencity.dto.user.*;
 import greencity.enums.EmailNotification;
 import greencity.enums.Role;
+import greencity.message.EventCommentMessage;
 import greencity.message.EventEmailMessage;
 import greencity.message.SendHabitNotification;
 import greencity.message.SendReportEmailMessage;
@@ -35,6 +36,9 @@ public class RestClient {
     @Setter
     @Value("${greencityuser.server.address}")
     private String greenCityUserServerAddress;
+    @Setter
+    @Value("${greencitymvp.server.address}")
+    private String greenCityMvpServerAddress;
     private final HttpServletRequest httpServletRequest;
 
     /**
@@ -465,6 +469,34 @@ public class RestClient {
         HttpEntity<EventEmailMessage> entity = new HttpEntity<>(message, headers);
         restTemplate.exchange(greenCityUserServerAddress +
                 RestTemplateLinks.SEND_EVENT_CREATION_NOTIFICATION, HttpMethod.POST, entity, Object.class).getBody();
+    }
+
+    public void sendEventCommentNotification(EventCommentMessage eventCommentMessage) {
+        String content = """
+                <html>
+                    <body>
+                        <p>Hi %s,</p>
+                        <p>You've got a new comment on your event %s.</p>
+                        <p>%s on %s</p>
+                        <p>Text of the comment: %s</p>
+                        <p><a href="%s">Go to comment</a></p>
+                        <p>Sincerely yours,</p>
+                        <p>GreenCity team</p>
+                    </body>
+                </html>
+                """.formatted(
+                eventCommentMessage.getAuthorName(),
+                eventCommentMessage.getEventName(),
+                eventCommentMessage.getCommentAuthorName(),
+                eventCommentMessage.getCommentCreatedDateTime(),
+                eventCommentMessage.getCommentText(),
+                greenCityMvpServerAddress + "/events/comments/" + eventCommentMessage.getCommentId()
+        );
+        HttpHeaders headers = new HttpHeaders();
+        headers.setContentType(MediaType.TEXT_HTML);
+        HttpEntity<EventCommentMessage> entity = new HttpEntity<>(eventCommentMessage, headers);
+        restTemplate.exchange(greenCityUserServerAddress
+                        + RestTemplateLinks.SEND_EMAIL_NOTIFICATION, HttpMethod.POST, entity, Object.class).getBody();
     }
 
     /**

@@ -12,6 +12,8 @@ import greencity.entity.event.Event;
 import greencity.enums.CommentStatus;
 import greencity.exception.exceptions.NotFoundException;
 import greencity.exception.exceptions.UserHasNoPermissionToAccessException;
+import greencity.message.EventCommentMessage;
+import greencity.message.EventEmailMessage;
 import greencity.repository.EventCommentRepo;
 import greencity.repository.EventRepo;
 import greencity.repository.UserRepo;
@@ -21,8 +23,12 @@ import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
+import org.springframework.web.context.request.RequestAttributes;
+import org.springframework.web.context.request.RequestContextHolder;
 
 import java.util.*;
+import java.util.concurrent.Executors;
+import java.util.concurrent.ThreadPoolExecutor;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 import java.util.stream.Collectors;
@@ -35,6 +41,7 @@ public class EventCommentServiceImpl implements EventCommentService {
     private final RestClient restClient;
     private final UserRepo userRepo;
     private ModelMapper modelMapper;
+    private final ThreadPoolExecutor emailThreadPool = (ThreadPoolExecutor) Executors.newFixedThreadPool(1);
 
     /**
      * Method to save {@link EventComment}.
@@ -75,7 +82,28 @@ public class EventCommentServiceImpl implements EventCommentService {
         eventComment.setStatus(CommentStatus.ORIGINAL);
 
         eventComment = eventCommentRepo.save(eventComment);
+        EventCommentMessage message = EventCommentMessage.builder()
+                .authorName(event.getAuthor().getName())
+                .eventName(event.getTitle())
+                .commentAuthorName(user.getName())
+                .commentCreatedDateTime(eventComment.getCreatedDate())
+                .commentText(eventComment.getText())
+                .commentId(eventComment.getId())
+                .build();
+        sendEmailNotification(message);
         return modelMapper.map(eventComment, EventCommentResponseDto.class);
+    }
+
+    public void sendEmailNotification(EventCommentMessage eventCommentMessage) {
+        RequestAttributes originalRequestAttributes = RequestContextHolder.getRequestAttributes();
+        emailThreadPool.submit(() -> {
+            try {
+                RequestContextHolder.setRequestAttributes(originalRequestAttributes);
+                restClient.sendEventCommentNotification(eventCommentMessage);
+            } finally {
+                RequestContextHolder.resetRequestAttributes();
+            }
+        });
     }
 
     /**
