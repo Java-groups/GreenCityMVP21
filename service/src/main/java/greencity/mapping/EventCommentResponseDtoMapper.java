@@ -16,6 +16,7 @@ public class EventCommentResponseDtoMapper extends AbstractConverter<EventCommen
                 .text(eventComment.getText())
                 .createdDate(eventComment.getCreatedDate())
                 .author(authorMapper.convert(eventComment.getUser()))
+                .modifiedDate(eventComment.getModifiedDate())
                 .eventId(eventComment.getEvent().getId())
                 .mentionedUsers(mentionedUserMapper.mapAllToList(eventComment.getMentionedUsers()))
                 .build();
