@@ -45,7 +45,7 @@ public class EventComment {
     @ManyToOne
     private Event event;
 
-    @ManyToOne
+    @ManyToOne(fetch = FetchType.LAZY)
     private EventComment parentComment;
 
     @Builder.Default

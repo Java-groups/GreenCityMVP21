@@ -10,11 +10,11 @@ import greencity.entity.EventComment;
 import greencity.entity.User;
 import greencity.entity.event.Event;
 import greencity.enums.CommentStatus;
+import greencity.exception.exceptions.BadRequestException;
 import greencity.exception.exceptions.NotFoundException;
 import greencity.exception.exceptions.UserHasNoPermissionToAccessException;
 import greencity.repository.EventCommentRepo;
 import greencity.repository.EventRepo;
-import greencity.repository.UserRepo;
 import lombok.AllArgsConstructor;
 import org.modelmapper.ModelMapper;
 import org.springframework.data.domain.Page;
@@ -51,7 +51,31 @@ public class EventCommentServiceImpl implements EventCommentService {
         EventComment eventComment = modelMapper.map(requestDto, EventComment.class);
         eventComment.setEvent(event);
         eventComment.setUser(modelMapper.map(user, User.class));
+
+        if (requestDto.getParentCommentId() != null && requestDto.getParentCommentId() > 0) {
+            Long parentCommentId = requestDto.getParentCommentId();
+            EventComment parentEventComment = eventCommentRepo
+                    .findByIdAndStatusNot(parentCommentId, CommentStatus.DELETED)
+                    .orElseThrow(() ->
+                            new NotFoundException(ErrorMessage.EVENT_COMMENT_NOT_FOUND_BY_ID + parentCommentId));
+
+            if (!parentEventComment.getEvent().getId().equals(eventId)) {
+                throw new NotFoundException(ErrorMessage.EVENT_COMMENT_NOT_FOUND_BY_ID + parentCommentId
+                        + " in event with id: " + eventId);
+            }
+
+            if (parentEventComment.getParentComment() != null) {
+                throw new BadRequestException(ErrorMessage.CANNOT_REPLY_THE_REPLY);
+            }
+
+            eventComment.setParentComment(parentEventComment);
+        } else if (requestDto.getParentCommentId() == null) {
+            eventComment.setParentComment(null);
+        }
+
+        eventComment.setStatus(CommentStatus.ORIGINAL);
         eventComment = eventCommentRepo.save(eventComment);
+        System.out.println(eventComment.getEvent().getId());
         return modelMapper.map(eventComment, EventCommentResponseDto.class);
     }
 

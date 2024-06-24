@@ -13,5 +13,7 @@ import lombok.*;
 public class EventCommentRequestDto {
     @NotBlank
     @Size(min = 1, max = 8000)
-    String text;
+    private String text;
+
+    private Long parentCommentId;
 }
