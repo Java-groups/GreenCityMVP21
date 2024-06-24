@@ -7,16 +7,18 @@ import org.springframework.stereotype.Component;
 
 @Component
 public class EventCommentResponseDtoMapper extends AbstractConverter<EventComment, EventCommentResponseDto> {
-    private EventCommentAuthorDtoMapper mapper = new EventCommentAuthorDtoMapper();
+    private final EventCommentAuthorDtoMapper authorMapper = new EventCommentAuthorDtoMapper();
+    private final EventCommentMentionedUserMapper mentionedUserMapper = new EventCommentMentionedUserMapper();
     @Override
     protected EventCommentResponseDto convert(EventComment eventComment) {
         return EventCommentResponseDto.builder()
                 .id(eventComment.getId())
                 .text(eventComment.getText())
                 .createdDate(eventComment.getCreatedDate())
+                .author(authorMapper.convert(eventComment.getUser()))
                 .modifiedDate(eventComment.getModifiedDate())
-                .author(mapper.convert(eventComment.getUser()))
                 .eventId(eventComment.getEvent().getId())
+                .mentionedUsers(mentionedUserMapper.mapAllToList(eventComment.getMentionedUsers()))
                 .build();
     }
 }

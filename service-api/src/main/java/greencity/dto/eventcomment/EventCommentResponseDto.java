@@ -3,6 +3,7 @@ package greencity.dto.eventcomment;
 import lombok.*;
 
 import java.time.LocalDateTime;
+import java.util.List;
 
 @Getter
 @Setter
@@ -22,4 +23,6 @@ public class EventCommentResponseDto {
     private EventCommentAuthorDto author;
 
     private Long eventId;
+
+    private List<EventCommentMentionedUserDto> mentionedUsers;
 }
