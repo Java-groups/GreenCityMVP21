@@ -17,6 +17,8 @@ public class EventCommentResponseDto {
 
     private LocalDateTime createdDate;
 
+    private LocalDateTime modifiedDate;
+
     private EventCommentAuthorDto author;
 
     private Long eventId;
