@@ -65,22 +65,29 @@ public class EventCommentServiceImpl implements EventCommentService {
         eventComment.setMentionedUsers(mentionedUsers);
         eventComment.setStatus(CommentStatus.ORIGINAL);
         eventComment = eventCommentRepo.save(eventComment);
-        EventCommentMessageInfoDto message = EventCommentMessageInfoDto.builder()
-                .receiverName(event.getAuthor().getName())
-                .eventName(event.getTitle())
-                .commentAuthorName(user.getName())
-                .commentCreatedDateTime(eventComment.getCreatedDate())
-                .commentText(eventComment.getText())
-                .commentId(eventComment.getId())
-                .emailReceiver(event.getAuthor().getEmail())
-                .build();
-        sendEmailNotificationToEventAuthor(message);
-        mentionedUsers.forEach(
-                mentionedUser -> sendEmailNotificationToMentionedUser
-                        (message.setReceiverName(mentionedUser.getName())
-                                .setEmailReceiver(mentionedUser.getEmail()))
-        );
+        sendNotifications(eventComment, event, eventComment.getUser());
         return modelMapper.map(eventComment, EventCommentResponseDto.class);
+    }
+
+    private void sendNotifications(EventComment comment, Event event, User commentAuthor) {
+        EventCommentMessageInfoDto message = getMessageDto(comment, event, commentAuthor);
+        sendEmailNotificationToEventAuthor(message);
+        comment.getMentionedUsers().forEach(
+                mentionedUser -> sendEmailNotificationToMentionedUser
+                        (getMessageDto(comment, event, mentionedUser))
+        );
+    }
+
+    private EventCommentMessageInfoDto getMessageDto(EventComment comment, Event event, User receiver) {
+        return EventCommentMessageInfoDto.builder()
+                .receiverName(receiver.getName())
+                .eventName(event.getTitle())
+                .commentAuthorName(comment.getUser().getName())
+                .commentCreatedDateTime(comment.getCreatedDate())
+                .commentText(comment.getText())
+                .commentId(comment.getId())
+                .emailReceiver(receiver.getEmail())
+                .build();
     }
 
     /**
@@ -88,7 +95,7 @@ public class EventCommentServiceImpl implements EventCommentService {
      *
      * @param eventCommentMessageInfoDto with all necessary data about comment.
      */
-    public void sendEmailNotificationToEventAuthor(EventCommentMessageInfoDto eventCommentMessageInfoDto) {
+    private void sendEmailNotificationToEventAuthor(EventCommentMessageInfoDto eventCommentMessageInfoDto) {
         RequestAttributes originalRequestAttributes = RequestContextHolder.getRequestAttributes();
         emailThreadPool.submit(() -> {
             try {
@@ -105,7 +112,7 @@ public class EventCommentServiceImpl implements EventCommentService {
      *
      * @param eventCommentMessageInfoDto with all necessary data about comment.
      */
-    public void sendEmailNotificationToMentionedUser(EventCommentMessageInfoDto eventCommentMessageInfoDto) {
+    private void sendEmailNotificationToMentionedUser(EventCommentMessageInfoDto eventCommentMessageInfoDto) {
         RequestAttributes originalRequestAttributes = RequestContextHolder.getRequestAttributes();
         emailThreadPool.submit(() -> {
             try {
@@ -193,18 +200,10 @@ public class EventCommentServiceImpl implements EventCommentService {
         comment.setStatus(CommentStatus.EDITED);
         Set<User> mentionedUsers = mentionedUsers(commentText);
         comment.setMentionedUsers(mentionedUsers);
-        eventCommentRepo.save(comment);
+        EventComment savedComment = eventCommentRepo.save(comment);
         mentionedUsers.forEach(
                 mentionedUser -> sendEmailNotificationToMentionedUser
-                        (EventCommentMessageInfoDto.builder()
-                                .receiverName(mentionedUser.getName())
-                                .eventName(comment.getEvent().getTitle())
-                                .commentAuthorName(comment.getUser().getName())
-                                .commentCreatedDateTime(comment.getCreatedDate())
-                                .commentText(commentText)
-                                .commentId(commentId)
-                                .emailReceiver(mentionedUser.getEmail())
-                                .build())
+                        (getMessageDto(savedComment, savedComment.getEvent(), mentionedUser))
         );
     }
 

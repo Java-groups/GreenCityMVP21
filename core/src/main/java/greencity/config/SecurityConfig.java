@@ -155,6 +155,7 @@ public class SecurityConfig {
                                 "/events/author/{userId}",
                                 "/events/comments/{eventId}/count",
                                 "/events/comments/{eventId}",
+                                "/events/comments/comment/{commentId}",
                                 "/token")
                         .permitAll()
                         .requestMatchers(HttpMethod.POST,

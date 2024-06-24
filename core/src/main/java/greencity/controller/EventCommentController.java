@@ -158,7 +158,8 @@ public class EventCommentController {
     @Operation(summary = "Get comment to event by event id and comment id.")
     @ApiResponses(value = {
             @ApiResponse(responseCode = "200", description = HttpStatuses.OK),
-            @ApiResponse(responseCode = "400", description = HttpStatuses.BAD_REQUEST)
+            @ApiResponse(responseCode = "400", description = HttpStatuses.BAD_REQUEST),
+            @ApiResponse(responseCode = "404", description = HttpStatuses.NOT_FOUND)
     })
     @GetMapping("/comment/{commentId}")
     @ApiPageableWithoutSort
