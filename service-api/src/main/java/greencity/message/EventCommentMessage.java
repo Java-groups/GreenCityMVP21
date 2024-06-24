@@ -1,21 +1,16 @@
 package greencity.message;
 
-import lombok.*;
+import lombok.AllArgsConstructor;
+import lombok.Builder;
+import lombok.Data;
+import lombok.NoArgsConstructor;
 
-import java.time.LocalDateTime;
-
-@Getter
-@Setter
-@AllArgsConstructor
+@Data
 @NoArgsConstructor
+@AllArgsConstructor
 @Builder
-@EqualsAndHashCode
-@ToString
 public class EventCommentMessage {
-    String authorName;
-    String eventName;
-    String commentAuthorName;
-    LocalDateTime commentCreatedDateTime;
-    String commentText;
-    Long commentId;
+    private String title;
+    private String body;
+    private String email;
 }

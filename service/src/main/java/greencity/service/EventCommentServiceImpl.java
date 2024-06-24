@@ -12,8 +12,7 @@ import greencity.entity.event.Event;
 import greencity.enums.CommentStatus;
 import greencity.exception.exceptions.NotFoundException;
 import greencity.exception.exceptions.UserHasNoPermissionToAccessException;
-import greencity.message.EventCommentMessage;
-import greencity.message.EventEmailMessage;
+import greencity.dto.eventcomment.EventCommentMessageInfoDto;
 import greencity.repository.EventCommentRepo;
 import greencity.repository.EventRepo;
 import greencity.repository.UserRepo;
@@ -82,24 +81,25 @@ public class EventCommentServiceImpl implements EventCommentService {
         eventComment.setStatus(CommentStatus.ORIGINAL);
 
         eventComment = eventCommentRepo.save(eventComment);
-        EventCommentMessage message = EventCommentMessage.builder()
+        EventCommentMessageInfoDto message = EventCommentMessageInfoDto.builder()
                 .authorName(event.getAuthor().getName())
                 .eventName(event.getTitle())
                 .commentAuthorName(user.getName())
                 .commentCreatedDateTime(eventComment.getCreatedDate())
                 .commentText(eventComment.getText())
                 .commentId(eventComment.getId())
+                .eventAuthorEmail(event.getAuthor().getEmail())
                 .build();
         sendEmailNotification(message);
         return modelMapper.map(eventComment, EventCommentResponseDto.class);
     }
 
-    public void sendEmailNotification(EventCommentMessage eventCommentMessage) {
+    public void sendEmailNotification(EventCommentMessageInfoDto eventCommentMessageInfoDto) {
         RequestAttributes originalRequestAttributes = RequestContextHolder.getRequestAttributes();
         emailThreadPool.submit(() -> {
             try {
                 RequestContextHolder.setRequestAttributes(originalRequestAttributes);
-                restClient.sendEventCommentNotification(eventCommentMessage);
+                restClient.sendEventCommentNotification(eventCommentMessageInfoDto);
             } finally {
                 RequestContextHolder.resetRequestAttributes();
             }

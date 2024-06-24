@@ -4,10 +4,11 @@ import com.google.gson.Gson;
 import greencity.constant.RestTemplateLinks;
 import greencity.dto.PageableAdvancedDto;
 import greencity.dto.econews.EcoNewsForSendEmailDto;
+import greencity.message.EventCommentMessage;
 import greencity.dto.user.*;
 import greencity.enums.EmailNotification;
 import greencity.enums.Role;
-import greencity.message.EventCommentMessage;
+import greencity.dto.eventcomment.EventCommentMessageInfoDto;
 import greencity.message.EventEmailMessage;
 import greencity.message.SendHabitNotification;
 import greencity.message.SendReportEmailMessage;
@@ -23,6 +24,8 @@ import org.springframework.web.client.RestTemplate;
 import org.springframework.web.util.UriComponentsBuilder;
 import jakarta.servlet.http.Cookie;
 import jakarta.servlet.http.HttpServletRequest;
+
+import java.time.format.DateTimeFormatter;
 import java.util.Arrays;
 import java.util.List;
 import java.util.Map;
@@ -471,7 +474,7 @@ public class RestClient {
                 RestTemplateLinks.SEND_EVENT_CREATION_NOTIFICATION, HttpMethod.POST, entity, Object.class).getBody();
     }
 
-    public void sendEventCommentNotification(EventCommentMessage eventCommentMessage) {
+    public void sendEventCommentNotification(EventCommentMessageInfoDto eventCommentMessageInfoDto) {
         String content = """
                 <html>
                     <body>
@@ -485,18 +488,23 @@ public class RestClient {
                     </body>
                 </html>
                 """.formatted(
-                eventCommentMessage.getAuthorName(),
-                eventCommentMessage.getEventName(),
-                eventCommentMessage.getCommentAuthorName(),
-                eventCommentMessage.getCommentCreatedDateTime(),
-                eventCommentMessage.getCommentText(),
-                greenCityMvpServerAddress + "/events/comments/" + eventCommentMessage.getCommentId()
+                eventCommentMessageInfoDto.getAuthorName(),
+                eventCommentMessageInfoDto.getEventName(),
+                eventCommentMessageInfoDto.getCommentAuthorName(),
+                eventCommentMessageInfoDto.getCommentCreatedDateTime().format(DateTimeFormatter.ofPattern("dd.MM.yyyy HH:mm:ss")),
+                eventCommentMessageInfoDto.getCommentText(),
+                greenCityMvpServerAddress + "/events/comments/" + eventCommentMessageInfoDto.getCommentId()
         );
-        HttpHeaders headers = new HttpHeaders();
-        headers.setContentType(MediaType.TEXT_HTML);
-        HttpEntity<EventCommentMessage> entity = new HttpEntity<>(eventCommentMessage, headers);
+        HttpHeaders headers = setHeader();
+        headers.setContentType(MediaType.APPLICATION_JSON);
+        HttpEntity<EventCommentMessage> entity = new HttpEntity<>(EventCommentMessage.builder()
+                .title("Your Event was commented")
+                .body(content)
+                .email(eventCommentMessageInfoDto.getEventAuthorEmail())
+                .build(),
+                headers);
         restTemplate.exchange(greenCityUserServerAddress
-                        + RestTemplateLinks.SEND_EMAIL_NOTIFICATION, HttpMethod.POST, entity, Object.class).getBody();
+                        + RestTemplateLinks.SEND_EVENT_COMMENT_NOTIFICATION, HttpMethod.POST, entity, Object.class).getBody();
     }
 
     /**
