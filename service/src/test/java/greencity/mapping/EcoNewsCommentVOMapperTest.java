@@ -30,7 +30,7 @@ class EcoNewsCommentVOMapperTest {
         ecoNewsComment.setDeleted(false);
         ecoNewsComment.setCreatedDate(dateTime);
         ecoNewsComment.setText("Sample text");
-        ecoNewsComment.setUser(ModelUtils.getUser());
+        ecoNewsComment.setUser(ModelUtils.getUser(1L));
         ecoNewsComment.setUsersLiked(Collections.emptySet());
         ecoNewsComment.setCurrentUserLiked(false);
         ecoNewsComment.setEcoNews(ModelUtils.getEcoNews());
@@ -61,7 +61,7 @@ class EcoNewsCommentVOMapperTest {
         parentComment.setDeleted(false);
         parentComment.setCreatedDate(dateTime);
         parentComment.setText("Parent text");
-        parentComment.setUser(ModelUtils.getUser());
+        parentComment.setUser(ModelUtils.getUser(1L));
         parentComment.setUsersLiked(Collections.emptySet());
         parentComment.setCurrentUserLiked(false);
         parentComment.setEcoNews(ModelUtils.getEcoNews());
@@ -72,7 +72,7 @@ class EcoNewsCommentVOMapperTest {
         ecoNewsComment.setDeleted(false);
         ecoNewsComment.setCreatedDate(dateTime);
         ecoNewsComment.setText("Sample text");
-        ecoNewsComment.setUser(ModelUtils.getUser());
+        ecoNewsComment.setUser(ModelUtils.getUser(1L));
         ecoNewsComment.setUsersLiked(Collections.emptySet());
         ecoNewsComment.setCurrentUserLiked(false);
         ecoNewsComment.setEcoNews(ModelUtils.getEcoNews());

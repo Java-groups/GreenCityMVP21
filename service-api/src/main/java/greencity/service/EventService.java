@@ -13,11 +13,9 @@ import java.util.List;
 public interface EventService {
     EventResponseDto save(EventRequestSaveDto event, MultipartFile[] images, UserVO author);
 
-    EventResponseDto updateEvent(EventUpdateRequestDto eventUpdateRequestDto, MultipartFile[] images, String email);
+    EventResponseDto update(EventUpdateRequestDto eventUpdateRequestDto, MultipartFile[] images, String email);
 
     void delete(Long id, String email);
-
-    EventResponseDto update(EventRequestSaveDto event, List<MultipartFile> images, UserVO author);
 
     //Pageable implements sorted criteria
     PageableAdvancedDto<EventResponseDto> findAll(Pageable pageable);

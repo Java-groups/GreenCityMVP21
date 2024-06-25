@@ -7,21 +7,5 @@
             <column name="event_id">1</column>
             <column name="user_id">4</column>
         </insert>
-        <insert tableName="event_attenders">
-            <column name="event_id">1</column>
-            <column name="user_id">5</column>
-        </insert>
-        <insert tableName="event_attenders">
-            <column name="event_id">1</column>
-            <column name="user_id">6</column>
-        </insert>
-        <insert tableName="event_attenders">
-            <column name="event_id">2</column>
-            <column name="user_id">5</column>
-        </insert>
-        <insert tableName="event_attenders">
-            <column name="event_id">2</column>
-            <column name="user_id">6</column>
-        </insert>
     </changeSet>
 </databaseChangeLog>

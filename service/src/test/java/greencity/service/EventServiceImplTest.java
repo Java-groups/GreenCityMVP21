@@ -4,6 +4,7 @@ import greencity.ModelUtils;
 import greencity.client.RestClient;
 import greencity.dto.PageableAdvancedDto;
 import greencity.dto.event.*;
+import greencity.dto.tag.TagVO;
 import greencity.dto.user.UserVO;
 import greencity.entity.User;
 import greencity.entity.event.EventAddress;
@@ -11,10 +12,11 @@ import greencity.entity.event.EventDayInfo;
 import greencity.entity.event.EventImage;
 import greencity.entity.event.Event;
 import greencity.enums.EventStatus;
+import greencity.enums.TagType;
 import greencity.exception.exceptions.BadRequestException;
 import greencity.exception.exceptions.NotFoundException;
 import greencity.enums.Role;
-import greencity.exception.exceptions.NotFoundException;
+import greencity.entity.Tag;
 import greencity.exception.exceptions.UserHasNoPermissionToAccessException;
 import greencity.exception.exceptions.WrongIdException;
 import greencity.message.EventEmailMessage;
@@ -26,6 +28,7 @@ import org.junit.jupiter.api.extension.ExtendWith;
 import org.mockito.InjectMocks;
 import org.mockito.Mock;
 import org.modelmapper.ModelMapper;
+import org.modelmapper.TypeToken;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.PageImpl;
 import org.springframework.data.domain.PageRequest;
@@ -34,17 +37,16 @@ import org.springframework.mock.web.MockMultipartFile;
 import org.springframework.test.context.junit.jupiter.SpringExtension;
 import org.springframework.web.context.request.RequestAttributes;
 import org.springframework.web.context.request.RequestContextHolder;
+import org.springframework.web.multipart.MultipartFile;
 
 import java.math.BigDecimal;
 import java.time.LocalDateTime;
 import java.time.ZoneId;
 import java.time.ZonedDateTime;
-import java.util.HashSet;
-import java.util.List;
-import java.util.Optional;
-import java.util.Set;
+import java.util.*;
 import java.util.concurrent.ExecutorService;
 
+import static greencity.ModelUtils.*;
 import static org.junit.jupiter.api.Assertions.*;
 import static org.mockito.Mockito.*;
 
@@ -65,6 +67,9 @@ class EventServiceImplTest {
 
     @Mock
     UserService userService;
+
+    @Mock
+    TagsService tagsService;
 
     @InjectMocks
     EventServiceImpl eventService;
@@ -158,7 +163,7 @@ class EventServiceImplTest {
                         EventImageDto.builder().imagePath("another path").isMain(false).build()))
                 .build();
 
-        user = ModelUtils.getUser();
+        user = ModelUtils.getUser(1L);
         dayInfo1 = EventDayInfo.builder()
                 .dayNumber(1)
                 .isAllDay(true)
@@ -201,7 +206,7 @@ class EventServiceImplTest {
 
     @Test
     void save() {
-        UserVO userVO = ModelUtils.getUserVO();
+        UserVO userVO = getUserVO();
         when(fileService.upload(file1)).thenReturn("imagePath");
         when(fileService.upload(file2)).thenReturn("another path");
         when(modelMapper.map(eventRequestSaveDto, Event.class)).thenReturn(eventForRequest);
@@ -280,7 +285,7 @@ class EventServiceImplTest {
                 pageRequest, events.size());
         PageableAdvancedDto<EventResponseDto> expected = new PageableAdvancedDto<>(expectedDto, expectedDto.size(), 0, 1,
                 0, false, false, true, true);
-        when(userRepo.findById(authorId)).thenReturn(Optional.of(ModelUtils.getUser()));
+        when(userRepo.findById(authorId)).thenReturn(Optional.of(ModelUtils.getUser(1L)));
         when(eventRepo.findAllByAuthorId(pageable, authorId)).thenReturn(translationPage);
         when(modelMapper.map(eventForResponse, EventResponseDto.class)).thenReturn(eventResponseDto);
         assertEquals(expected, eventService.findAllByAuthor(pageable, authorId));
@@ -310,7 +315,7 @@ class EventServiceImplTest {
     void deleteTest_SuccessScenario() {
         User author = User.builder().id(1L).build();
         Event toDelete = Event.builder().author(author).build();
-        UserVO userVO = ModelUtils.getUserVO().setRole(Role.ROLE_ADMIN);
+        UserVO userVO = getUserVO().setRole(Role.ROLE_ADMIN);
 
         when(userService.findByEmail(anyString())).thenReturn(userVO);
         when(eventRepo.findById(anyLong())).thenReturn(Optional.of(toDelete));
@@ -331,7 +336,7 @@ class EventServiceImplTest {
     void deleteTest_NoPermissionException() {
         User author = User.builder().id(1L).build();
         Event toDelete = Event.builder().author(author).build();
-        UserVO userVO = ModelUtils.getUserVO().setId(2L);
+        UserVO userVO = getUserVO().setId(2L);
 
         when(userService.findByEmail(anyString())).thenReturn(userVO);
         when(eventRepo.findById(anyLong())).thenReturn(Optional.of(toDelete));
@@ -342,10 +347,10 @@ class EventServiceImplTest {
   
     @Test
     void addAttenderToOpenEvent() {
-        Event event = ModelUtils.getEvent();
-        UserVO userVO = ModelUtils.getUserVO();
+        Event event = getEvent(1L);
+        UserVO userVO = getUserVO();
         userVO.setId(4L);
-        User user = ModelUtils.getUser();
+        User user = ModelUtils.getUser(1L);
         user.setId(4L);
         EventEmailMessage eventEmailMessage = ModelUtils.getEventEmailMessage();
 
@@ -366,8 +371,8 @@ class EventServiceImplTest {
     @Test
     void addAttenderToOpenEvent_ReturnsBadRequestEventAuthor() {
         Event event = ModelUtils.getEventModelDto();
-        UserVO userVO = ModelUtils.getUserVO();
-        User user = ModelUtils.getUser();
+        UserVO userVO = getUserVO();
+        User user = ModelUtils.getUser(1L);
         EventEmailMessage eventEmailMessage = ModelUtils.getEventEmailMessage();
 
         when(eventRepo.findById(anyLong())).thenReturn(Optional.of(event));
@@ -385,8 +390,8 @@ class EventServiceImplTest {
     @Test
     void addAttenderToOpenEvent_ReturnsBadRequestEventUserAlreadySubscribed() {
         Event event = ModelUtils.getEventModelDto();
-        UserVO userVO = ModelUtils.getUserVO();
-        User user = ModelUtils.getUser();
+        UserVO userVO = getUserVO();
+        User user = ModelUtils.getUser(1L);
         EventEmailMessage eventEmailMessage = ModelUtils.getEventEmailMessage();
 
         Set<User> userSet = new HashSet<>();
@@ -408,9 +413,9 @@ class EventServiceImplTest {
     @Test
     void addAttenderToCloseEvent_ReturnsBadRequest() {
         Event event = ModelUtils.getClosedEvent();
-        UserVO userVO = ModelUtils.getUserVO();
+        UserVO userVO = getUserVO();
         userVO.setId(4L);
-        User user = ModelUtils.getUser();
+        User user = ModelUtils.getUser(1L);
         user.setId(4L);
         EventEmailMessage eventEmailMessage = ModelUtils.getEventEmailMessage();
 
@@ -429,7 +434,92 @@ class EventServiceImplTest {
     @Test
     void addAttenderToEventIfEventNotFoundException() {
         when(eventRepo.findById(any())).thenReturn(Optional.empty());
-        assertThrows(NotFoundException.class, () -> eventService.addAttender(1L, ModelUtils.getUserVO()));
+        assertThrows(NotFoundException.class, () -> eventService.addAttender(1L, getUserVO()));
         verify(eventRepo).findById(any());
+    }
+
+    @Test
+    void update_SuccessScenario() {
+        UserVO userVO = getUserVO();
+        Event event = getEvent(1L);
+        String email = "user@mail.com";
+
+        List<TagVO> tagVOs = Arrays.asList(new TagVO(), new TagVO());
+        List<Tag> tags = Arrays.asList(new Tag(), new Tag());
+
+        EventUpdateRequestDto eventUpdateRequestDto = getEventUpdateRequestDto(
+                ZonedDateTime.now(),
+                ZonedDateTime.now().plusHours(1));
+        MultipartFile[] images = {file1, file2};
+
+        EventImage img1 = new EventImage();
+        img1.setImagePath("path/to/img1");
+        EventImage img2 = new EventImage();
+        img2.setImagePath("path/to/img2");
+
+        List<EventImage> eventImages = Arrays.asList(img1, img2);
+        event.setImages(eventImages);
+
+        when(userService.findByEmail(email)).thenReturn(userVO);
+        when(eventRepo.findById(eventUpdateRequestDto.getId())).thenReturn(Optional.of(event));
+        when(tagsService.findTagsByNamesAndType(eventUpdateRequestDto.getTagNames(), TagType.EVENT)).thenReturn(tagVOs);
+        when(modelMapper.map(tagVOs, new TypeToken<List<Tag>>() {}.getType())).thenReturn(tags);
+        when(modelMapper.map(event, EventResponseDto.class)).thenReturn(eventResponseDto);
+
+        assertEquals(eventResponseDto, eventService.update(eventUpdateRequestDto, images, email));
+
+        verify(fileService, times(event.getImages().size())).delete(anyString());
+        verify(fileService, times(2)).upload(any());
+        verify(eventRepo).save(event);
+    }
+
+    @Test
+    void update_EventNotFound() {
+        UserVO userVO = getUserVO();
+        String email = "user@mail.com";
+        EventUpdateRequestDto eventUpdateRequestDto = getEventUpdateRequestDto(
+                ZonedDateTime.now(),
+                ZonedDateTime.now().plusHours(1));
+        MultipartFile[] images = {file1, file2};
+
+        when(userService.findByEmail(email)).thenReturn(userVO);
+        when(eventRepo.findById(eventUpdateRequestDto.getId())).thenReturn(Optional.empty());
+
+        assertThrows(NotFoundException.class, () ->
+                eventService.update(eventUpdateRequestDto, images, email));
+    }
+
+    @Test
+    void update_NoPermission() {
+        UserVO userVO = getUserVO();
+        Event event = getEvent(2L);
+        String email = "user@mail.com";
+        EventUpdateRequestDto eventUpdateRequestDto = getEventUpdateRequestDto(
+                ZonedDateTime.now(),
+                ZonedDateTime.now().plusHours(1));
+        MultipartFile[] images = {file1, file2};
+
+        when(userService.findByEmail(email)).thenReturn(userVO);
+        when(eventRepo.findById(eventUpdateRequestDto.getId())).thenReturn(Optional.of(event));
+
+        assertThrows(UserHasNoPermissionToAccessException.class, () ->
+                eventService.update(eventUpdateRequestDto, images, email));
+    }
+
+    @Test
+    void update_IllegalArgumentException() {
+        UserVO userVO = getUserVO();
+        Event event = getPastEvent();
+        EventUpdateRequestDto eventUpdateRequestDto = getEventUpdateRequestDto(
+                ZonedDateTime.now().minusDays(5),
+                ZonedDateTime.now().minusDays(1));
+        MultipartFile[] images = {file1, file2};
+        String email = "user@mail.com";
+
+        when(userService.findByEmail(email)).thenReturn(userVO);
+        when(eventRepo.findById(eventUpdateRequestDto.getId())).thenReturn(Optional.of(event));
+
+        assertThrows(IllegalArgumentException.class, () ->
+                eventService.update(eventUpdateRequestDto, images, email));
     }
 }

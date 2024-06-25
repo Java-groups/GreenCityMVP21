@@ -17,7 +17,7 @@ class UserProfilePictureDtoMapperTest {
 
     @Test
     void convertTest() {
-        User user = ModelUtils.getUser();
+        User user = ModelUtils.getUser(1L);
 
         UserProfilePictureDto expected = UserProfilePictureDto.builder()
             .id(user.getId())

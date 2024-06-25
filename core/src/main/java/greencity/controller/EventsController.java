@@ -122,8 +122,7 @@ public class EventsController {
      * Updates an existing event with new data provided via DTO.
      * This method allows updating the event if the principal (current user) has appropriate permissions.
      *
-     * @param eventId the ID of the event to be updated.
-     * @param eventUpdateRequestDto the DTO containing updated data for the event.
+     * @param eventDto the DTO containing updated data for the event.
      * @param principal the security principal representing the currently authenticated user.
      * @return a {@link ResponseEntity} with {@link EventResponseDto}, reflecting the updated event data.
      */
@@ -136,12 +135,13 @@ public class EventsController {
             @ApiResponse(responseCode = "403", description = "Forbidden, current user does not have permission to update this event"),
             @ApiResponse(responseCode = "404", description = "The event with specified ID was not found")
     })
-    @PutMapping("/{eventId}")
-    public ResponseEntity<EventResponseDto> updateEvent(
-            @RequestBody EventUpdateRequestDto eventUpdateRequestDto,
-            @ImageArrayValidation @Size(max = 5, message = "Download up to 5 images") MultipartFile[] images,
+    @PutMapping(consumes = {MediaType.MULTIPART_FORM_DATA_VALUE, MediaType.APPLICATION_JSON_VALUE})
+    public ResponseEntity<EventResponseDto> update(
+            @RequestPart("event") @Valid EventUpdateRequestDto eventDto,
+            @RequestPart(value = "images", required = false) @ImageArrayValidation @Size(max = 5, message = "Download up to 5 images") MultipartFile[] images,
             @Parameter(hidden = true) Principal principal) {
-        return ResponseEntity.ok(eventService.updateEvent(eventUpdateRequestDto, images, principal.getName()));
+
+        return ResponseEntity.ok().body(eventService.update(eventDto, images, principal.getName()));
     }
 
     /**
