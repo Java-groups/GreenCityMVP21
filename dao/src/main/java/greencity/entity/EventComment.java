@@ -11,7 +11,9 @@ import org.springframework.data.jpa.domain.support.AuditingEntityListener;
 
 import java.time.LocalDateTime;
 import java.util.ArrayList;
+import java.util.HashSet;
 import java.util.List;
+import java.util.Set;
 
 @Entity
 @Table(name = "events_comments")
@@ -55,4 +57,12 @@ public class EventComment {
     @Column(nullable = false)
     @Enumerated(EnumType.STRING)
     private CommentStatus status;
+
+    @ManyToMany
+    @JoinTable(
+            name = "events_comments_mentioned_users",
+            joinColumns = @JoinColumn(name = "event_comment_id", referencedColumnName = "id", table = "events_comments"),
+            inverseJoinColumns = @JoinColumn(name = "user_id", referencedColumnName = "id", table = "users")
+    )
+    Set<User> mentionedUsers = new HashSet<>();
 }

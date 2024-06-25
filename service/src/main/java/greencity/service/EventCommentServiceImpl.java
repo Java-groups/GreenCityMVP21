@@ -13,6 +13,7 @@ import greencity.enums.CommentStatus;
 import greencity.exception.exceptions.BadRequestException;
 import greencity.exception.exceptions.NotFoundException;
 import greencity.exception.exceptions.UserHasNoPermissionToAccessException;
+import greencity.dto.eventcomment.EventCommentMessageInfoDto;
 import greencity.repository.EventCommentRepo;
 import greencity.repository.EventRepo;
 import lombok.AllArgsConstructor;
@@ -21,8 +22,15 @@ import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
+import org.springframework.web.context.request.RequestAttributes;
+import org.springframework.web.context.request.RequestContextHolder;
 
-import java.util.List;
+import java.util.*;
+import java.util.concurrent.Executors;
+import java.util.concurrent.ThreadPoolExecutor;
+import java.util.regex.Matcher;
+import java.util.regex.Pattern;
+import java.util.stream.Collectors;
 
 @Service
 @AllArgsConstructor
@@ -31,7 +39,9 @@ public class EventCommentServiceImpl implements EventCommentService {
     private final EventCommentRepo eventCommentRepo;
     private final UserService userService;
     private final RestClient restClient;
+    private final UserRepo userRepo;
     private ModelMapper modelMapper;
+    private final ThreadPoolExecutor emailThreadPool = (ThreadPoolExecutor) Executors.newFixedThreadPool(1);
 
     /**
      * Method to save {@link EventComment}.
@@ -51,11 +61,39 @@ public class EventCommentServiceImpl implements EventCommentService {
         EventComment eventComment = modelMapper.map(requestDto, EventComment.class);
         eventComment.setEvent(event);
         eventComment.setUser(modelMapper.map(user, User.class));
-
         setParentComment(eventId, eventComment, requestDto);
 
+        Set<User> mentionedUsers = new HashSet<>();
+        if (requestDto.getText().contains("@") || requestDto.getText().contains("#")) {
+            String[] textByWord = requestDto.getText().split(" ");
+            Pattern p1 = Pattern.compile("@\\w+");
+            Pattern p2 = Pattern.compile("#\\w+");
+            List<String> usernames = Arrays.stream(textByWord)
+                    .filter(word -> {
+                Matcher m1 = p1.matcher(word);
+                Matcher m2 = p2.matcher(word);
+                return m1.matches() || m2.matches();
+            })
+                    .map(username -> username.substring(1))
+                    .toList();
+            mentionedUsers = usernames.stream().map(userRepo::findByName)
+                    .filter(Optional::isPresent)
+                    .map(Optional::get).collect(Collectors.toSet());
+        }
+        eventComment.setMentionedUsers(mentionedUsers);
         eventComment.setStatus(CommentStatus.ORIGINAL);
+
         eventComment = eventCommentRepo.save(eventComment);
+        EventCommentMessageInfoDto message = EventCommentMessageInfoDto.builder()
+                .authorName(event.getAuthor().getName())
+                .eventName(event.getTitle())
+                .commentAuthorName(user.getName())
+                .commentCreatedDateTime(eventComment.getCreatedDate())
+                .commentText(eventComment.getText())
+                .commentId(eventComment.getId())
+                .eventAuthorEmail(event.getAuthor().getEmail())
+                .build();
+        sendEmailNotification(message);
         return modelMapper.map(eventComment, EventCommentResponseDto.class);
     }
 
@@ -80,6 +118,18 @@ public class EventCommentServiceImpl implements EventCommentService {
         } else if (requestDto.getParentCommentId() == null) {
             eventComment.setParentComment(null);
         }
+    }
+  
+    public void sendEmailNotification(EventCommentMessageInfoDto eventCommentMessageInfoDto) {
+        RequestAttributes originalRequestAttributes = RequestContextHolder.getRequestAttributes();
+        emailThreadPool.submit(() -> {
+            try {
+                RequestContextHolder.setRequestAttributes(originalRequestAttributes);
+                restClient.sendEventCommentNotification(eventCommentMessageInfoDto);
+            } finally {
+                RequestContextHolder.resetRequestAttributes();
+            }
+        });
     }
 
     /**
