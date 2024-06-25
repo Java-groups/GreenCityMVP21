@@ -1,9 +1,9 @@
 package greencity.controller;
 
+import com.fasterxml.jackson.core.JsonProcessingException;
 import com.fasterxml.jackson.databind.DeserializationFeature;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import com.fasterxml.jackson.datatype.jsr310.JavaTimeModule;
-import com.github.dockerjava.api.exception.UnauthorizedException;
 import greencity.converters.UserArgumentResolver;
 import greencity.dto.event.EventRequestSaveDto;
 import greencity.dto.event.EventUpdateRequestDto;
@@ -245,7 +245,7 @@ class EventsControllerTest {
 
         when(principal.getName()).thenReturn("testUser@gmail.com");
 
-        mockMvc.perform(delete(eventsLink + "/delete/{eventId}", 1L)
+        mockMvc.perform(delete(eventsLink + "/{eventId}", 1L)
                         .principal(principal)
                         .contentType(MediaType.APPLICATION_JSON))
                 .andExpect(status().isOk());
@@ -260,7 +260,7 @@ class EventsControllerTest {
         when(principal.getName()).thenReturn("testUser@gmail.com");
         doThrow(new NotFoundException("Event not found")).when(eventService).delete(anyLong(), anyString());
 
-        mockMvc.perform(delete(eventsLink + "/delete/{eventId}", 1L)
+        mockMvc.perform(delete(eventsLink + "/{eventId}", 1L)
                         .principal(principal)
                         .contentType(MediaType.APPLICATION_JSON))
                 .andExpect(status().isNotFound())
@@ -277,7 +277,7 @@ class EventsControllerTest {
 
         when(principal.getName()).thenReturn("testUser@gmail.com");
 
-        mockMvc.perform(delete(eventsLink + "/delete/{eventId}", "not_number")
+        mockMvc.perform(delete(eventsLink + "/{eventId}", "not_number")
                         .principal(principal)
                         .contentType(MediaType.APPLICATION_JSON))
                 .andExpect(status().isBadRequest())
@@ -288,99 +288,17 @@ class EventsControllerTest {
         verify(eventService, never()).delete(anyLong(), anyString());
     }
 
-    @Test
-    @SneakyThrows
-    void updateTest_ReturnsSuccess() {
-        EventUpdateRequestDto updateEventDto = getEventUpdateRequestDto();
-
-        ObjectMapper objectMapper = new ObjectMapper();
-        objectMapper.findAndRegisterModules();
-        String json = objectMapper.writeValueAsString(updateEventDto);
-
-        MockMultipartFile jsonFile = new MockMultipartFile("event", "", "application/json", json.getBytes());
-        MockMultipartFile imageFile = new MockMultipartFile("images", "image.jpg", "image/jpeg", "Test image content".getBytes());
-
-        MockMultipartHttpServletRequestBuilder builder =
-                MockMvcRequestBuilders.multipart(eventsLink);
-        builder.with(request -> {
-            request.setMethod("PUT");
-            return request;
-        });
-
-        mockMvc.perform(builder
-                        .file(jsonFile)
-                        .file(imageFile)
-                        .principal(principal)
-                        .accept(MediaType.APPLICATION_JSON)
-                        .contentType(MediaType.MULTIPART_FORM_DATA_VALUE))
-                .andExpect(status().isOk());
-
-        verify(eventService).update(eq(updateEventDto), any(MultipartFile[].class), eq(principal.getName()));
-    }
-
-    @SneakyThrows
-    private EventUpdateRequestDto getEventUpdateRequestDto() {
-        String json = "{\n" +
-                "    \"id\": 1,\n" +
-                "    \"title\": \"Test title\",\n" +
-                "    \"description\": \"Test description\",\n" +
-                "    \"dateTimes\": [\n" +
-                "        {\n" +
-                "            \"allDay\": true,\n" +
-                "            \"startDateTime\": \"2024-06-02T14:20:45.252Z\",\n" +
-                "            \"endDateTime\": \"2024-06-02T14:20:45.252Z\",\n" +
-                "            \"dayNumber\": 0,\n" +
-                "            \"status\": \"ONLINE\",\n" +
-                "            \"link\": \"http://example.com\",\n" +
-                "            \"address\": {\n" +
-                "                \"latitude\": 40.71427,\n" +
-                "                \"longitude\": -74.00597,\n" +
-                "                \"addressUa\": \"Україна, Київ\",\n" +
-                "                \"addressEn\": \"USA, New York\"\n" +
-                "            }\n" +
-                "        }\n" +
-                "    ],\n" +
-                "    \"tagNames\": [\"Environment\", \"Recycling\"],\n" +
-                "    \"open\": true\n" +
-                "}";
-
-        ObjectMapper objectMapper = new ObjectMapper();
-        objectMapper.findAndRegisterModules();
-        objectMapper.configure(DeserializationFeature.READ_UNKNOWN_ENUM_VALUES_AS_NULL, true);
-        return objectMapper.readValue(json, EventUpdateRequestDto.class);
-    }
-
 //    @Test
 //    @SneakyThrows
-//    void updateTest() {
-//        // Инициализация
-//        Principal principal = Mockito.mock(Principal.class);
-//        when(principal.getName()).thenReturn("testUser@gmail.com");
+//    void updateTest_ReturnsSuccess() {
+//        EventUpdateRequestDto updateEventDto = getEventUpdateRequestDto();
 //
-//        String json = "{\n" +
-//                "  \"id\": 1,\n" +
-//                "  \"title\": \"New Title\",\n" +
-//                "  \"dateTimes\": [\n" +
-//                "    {\n" +
-//                "      \"startDateTime\": \"2024-06-02T14:20:45.252Z\",\n" +
-//                "      \"endDateTime\": \"2024-06-02T14:20:45.252Z\",\n" +
-//                "      \"dayNumber\": 0,\n" +
-//                "      \"isAllDay\": true,\n" +
-//                "      \"status\": \"ONLINE\",\n" +
-//                "      \"link\": \"http://example.com\",\n" +
-//                "      \"address\": null\n" +
-//                "    }\n" +
-//                "  ],\n" +
-//                "  \"description\": \"New Description\",\n" +
-//                "  \"tagNames\": [],\n" +
-//                "  \"isOpen\": true\n" +
-//                "}";
+//        ObjectMapper objectMapper = new ObjectMapper();
+//        objectMapper.findAndRegisterModules();
+//        String json = objectMapper.writeValueAsString(updateEventDto);
 //
-//        MockMultipartFile jsonFile = new MockMultipartFile(
-//                "event",
-//                "", // Удалите имя файла для совместимости со вторым примером
-//                "application/json",
-//                json.getBytes());
+//        MockMultipartFile jsonFile = new MockMultipartFile("event", "", "application/json", json.getBytes());
+//        MockMultipartFile imageFile = new MockMultipartFile("images", "image.jpg", "image/jpeg", "Test image content".getBytes());
 //
 //        MockMultipartHttpServletRequestBuilder builder =
 //                MockMvcRequestBuilders.multipart(eventsLink);
@@ -391,32 +309,109 @@ class EventsControllerTest {
 //
 //        mockMvc.perform(builder
 //                        .file(jsonFile)
+//                        .file(imageFile)
 //                        .principal(principal)
 //                        .accept(MediaType.APPLICATION_JSON)
-//                        .contentType(MediaType.APPLICATION_JSON))
+//                        .contentType(MediaType.MULTIPART_FORM_DATA_VALUE))
 //                .andExpect(status().isOk());
 //
-//        ObjectMapper mapper = new ObjectMapper();
-//        mapper.registerModule(new JavaTimeModule());
-//        EventUpdateRequestDto eventUpdateRequestDto = mapper.readValue(json, EventUpdateRequestDto.class);
-//
-//        verify(eventService).update(eq(eventUpdateRequestDto), any(), eq(principal.getName()));
+//        verify(eventService).update(eq(updateEventDto), any(MultipartFile[].class), eq(principal.getName()));
 //    }
 //
-//    @Test
-//    void updateTest_ReturnsBadRequest() throws Exception {
-//        mockMvc.perform(MockMvcRequestBuilders.put(eventsLink)
-//                        .content("{}")
-//                        .accept(MediaType.APPLICATION_JSON)
-//                        .contentType(MediaType.APPLICATION_JSON))
-//                .andExpect(status().isBadRequest());
-//    }
+//    @SneakyThrows
+//    private EventUpdateRequestDto getEventUpdateRequestDto() {
+//        String json = "{\n" +
+//                "    \"id\": 1,\n" +
+//                "    \"title\": \"Test title\",\n" +
+//                "    \"description\": \"Test description\",\n" +
+//                "    \"dateTimes\": [\n" +
+//                "        {\n" +
+//                "            \"allDay\": true,\n" +
+//                "            \"startDateTime\": \"2024-06-02T14:20:45.252Z\",\n" +
+//                "            \"endDateTime\": \"2024-06-02T14:20:45.252Z\",\n" +
+//                "            \"dayNumber\": 0,\n" +
+//                "            \"status\": \"ONLINE\",\n" +
+//                "            \"link\": \"http://example.com\",\n" +
+//                "            \"address\": {\n" +
+//                "                \"latitude\": 40.71427,\n" +
+//                "                \"longitude\": -74.00597,\n" +
+//                "                \"addressUa\": \"Україна, Київ\",\n" +
+//                "                \"addressEn\": \"USA, New York\"\n" +
+//                "            }\n" +
+//                "        }\n" +
+//                "    ],\n" +
+//                "    \"tagNames\": [\"Environment\", \"Recycling\"],\n" +
+//                "    \"open\": true\n" +
+//                "}";
 //
-//    @Test
-//    void updateTest_ReturnsUnsupportedMediaType() throws Exception {
-//        mockMvc.perform(MockMvcRequestBuilders.put(eventsLink)
-//                        .content("{}")
-//                        .accept(MediaType.APPLICATION_JSON))
-//                .andExpect(status().isUnsupportedMediaType());
+//        ObjectMapper objectMapper = new ObjectMapper();
+//        objectMapper.findAndRegisterModules();
+//        objectMapper.configure(DeserializationFeature.READ_UNKNOWN_ENUM_VALUES_AS_NULL, true);
+//        return objectMapper.readValue(json, EventUpdateRequestDto.class);
 //    }
+
+    @Test
+    void updateTest() throws Exception {
+        String json = "{\n" +
+                "  \"id\": 1,\n" +
+                "  \"title\": \"New Title\",\n" +
+                "  \"dateTimes\": [\n" +
+                "    {\n" +
+                "      \"startDateTime\": \"2024-06-02T14:20:45.252Z\",\n" +
+                "      \"endDateTime\": \"2024-06-02T14:20:45.252Z\",\n" +
+                "      \"dayNumber\": 0,\n" +
+                "      \"allDay\": true,\n" +
+                "      \"status\": \"ONLINE\",\n" +
+                "      \"link\": \"http://example.com\",\n" +
+                "      \"address\": null\n" +
+                "    }\n" +
+                "  ],\n" +
+                "  \"description\": \"New Description\",\n" +
+                "  \"tagNames\": [],\n" +
+                "  \"open\": true\n" +
+                "}";
+
+        MockMultipartFile jsonFile = new MockMultipartFile(
+                "event",
+                "",
+                "application/json",
+                json.getBytes());
+
+        MockMultipartHttpServletRequestBuilder builder =
+                MockMvcRequestBuilders.multipart(eventsLink);
+        builder.with(request -> {
+            request.setMethod("PUT");
+            return request;
+        });
+
+        mockMvc.perform(builder
+                        .file(jsonFile)
+                        .principal(principal)
+                        .accept(MediaType.APPLICATION_JSON)
+                        .contentType(MediaType.APPLICATION_JSON))
+                .andExpect(status().isOk());
+
+        ObjectMapper mapper = new ObjectMapper();
+        mapper.registerModule(new JavaTimeModule());
+        EventUpdateRequestDto eventUpdateRequestDto = mapper.readValue(json, EventUpdateRequestDto.class);
+
+        verify(eventService).update(eq(eventUpdateRequestDto), any(), eq(principal.getName()));
+    }
+
+    @Test
+    void updateTest_ReturnsBadRequest() throws Exception {
+        mockMvc.perform(MockMvcRequestBuilders.put(eventsLink)
+                        .content("{}")
+                        .accept(MediaType.APPLICATION_JSON)
+                        .contentType(MediaType.APPLICATION_JSON))
+                .andExpect(status().isBadRequest());
+    }
+
+    @Test
+    void updateTest_ReturnsUnsupportedMediaType() throws Exception {
+        mockMvc.perform(MockMvcRequestBuilders.put(eventsLink)
+                        .content("{}")
+                        .accept(MediaType.APPLICATION_JSON))
+                .andExpect(status().isUnsupportedMediaType());
+    }
 }

@@ -797,7 +797,7 @@ public class ModelUtils {
                 .user(getUser(1L))
                 .event(getEvent(1L))
                 .status(CommentStatus.ORIGINAL)
-                .comments(Arrays.asList(getSubEventComment()))
+                .comments(Collections.singletonList(getSubEventComment()))
                 .build();
     }
 

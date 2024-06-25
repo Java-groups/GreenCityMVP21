@@ -138,7 +138,8 @@ public class EventsController {
     @PutMapping(consumes = {MediaType.MULTIPART_FORM_DATA_VALUE, MediaType.APPLICATION_JSON_VALUE})
     public ResponseEntity<EventResponseDto> update(
             @RequestPart("event") @Valid EventUpdateRequestDto eventDto,
-            @RequestPart(value = "images", required = false) @ImageArrayValidation @Size(max = 5, message = "Download up to 5 images") MultipartFile[] images,
+            @RequestPart(value = "images", required = false)
+            @ImageArrayValidation @Size(max = 5, message = "Download up to 5 images") MultipartFile[] images,
             @Parameter(hidden = true) Principal principal) {
 
         return ResponseEntity.ok().body(eventService.update(eventDto, images, principal.getName()));
@@ -163,7 +164,7 @@ public class EventsController {
         @ApiResponse(responseCode = "404", description = HttpStatuses.NOT_FOUND,
             content = @Content(examples = @ExampleObject(HttpStatuses.NOT_FOUND)))
     })
-    @DeleteMapping("/delete/{eventId}")
+    @DeleteMapping("/{eventId}")
     public ResponseEntity<Object> delete(@PathVariable Long eventId, @Parameter(hidden = true) Principal principal) {
         eventService.delete(eventId, principal.getName());
         return ResponseEntity.status(HttpStatus.OK).build();

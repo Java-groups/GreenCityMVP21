@@ -69,7 +69,7 @@ class EventCommentServiceImplTest {
 
     @Test
     void updateCommentThatDoesntBelongsToUserThrowException() {
-        User user = ModelUtils.getUser();
+        User user = ModelUtils.getUser(1L);
         UserVO currentUser = getUserVO();
         user.setId(2L);
 
