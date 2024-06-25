@@ -789,6 +789,29 @@ public class ModelUtils {
                 .build();
     }
 
+    public static EventComment getEventComment() {
+        return EventComment.builder()
+                .id(1L)
+                .text("text")
+                .createdDate(LocalDateTime.now())
+                .user(getUser(1L))
+                .event(getEvent(1L))
+                .status(CommentStatus.ORIGINAL)
+                .comments(Arrays.asList(getSubEventComment()))
+                .build();
+    }
+
+    public static EventComment getSubEventComment() {
+        return EventComment.builder()
+                .id(1L)
+                .text("SubEventComment")
+                .status(CommentStatus.ORIGINAL)
+                .createdDate(LocalDateTime.now())
+                .user(getUser(1L))
+                .event(getEvent(1L))
+                .build();
+    }
+
     public static EventUpdateRequestDto getEventUpdateRequestDto(
             ZonedDateTime startDateTime,
             ZonedDateTime endDateTime

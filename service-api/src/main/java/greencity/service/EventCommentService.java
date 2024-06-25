@@ -22,4 +22,21 @@ public interface EventCommentService {
     int countOfComments(Long ecoNewsId);
 
     PageableDto<EventCommentResponseDto> getAllEventComments(Pageable pageable, Long eventId, UserVO userVO);
+
+    /**
+     * Method for updating the {@link EventComment} by id.
+     *
+     * @param commentId   - {@link EventComment} instance id which will be updated.
+     * @param commentText - {@link EventComment} text to update.
+     * @param email           User who wants to update a comment.
+     */
+    void update(Long commentId, String commentText, String email);
+
+    /**
+     * Method for deleting the {@link EventComment} by id.
+     *
+     * @param eventCommentId - {@link EventComment} instance id which will be deleted.
+     * @param email           User who wants to delete a comment.
+     */
+    String delete(Long eventCommentId, String email);
 }

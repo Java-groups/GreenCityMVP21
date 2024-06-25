@@ -12,16 +12,20 @@ import greencity.service.EventCommentService;
 import io.swagger.v3.oas.annotations.Operation;
 import io.swagger.v3.oas.annotations.Parameter;
 import io.swagger.v3.oas.annotations.media.Content;
+import io.swagger.v3.oas.annotations.media.ExampleObject;
 import io.swagger.v3.oas.annotations.media.Schema;
 import io.swagger.v3.oas.annotations.responses.ApiResponse;
 import io.swagger.v3.oas.annotations.responses.ApiResponses;
 import jakarta.validation.Valid;
+import jakarta.validation.constraints.Size;
 import lombok.AllArgsConstructor;
 import org.springframework.data.domain.Pageable;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.validation.annotation.Validated;
 import org.springframework.web.bind.annotation.*;
+
+import java.security.Principal;
 
 @Validated
 @AllArgsConstructor
@@ -93,5 +97,54 @@ public class EventCommentController {
             @Parameter(hidden = true) @CurrentUser UserVO user) {
         return ResponseEntity.status(HttpStatus.OK)
                 .body(eventCommentService.getAllEventComments(pageable, eventId, user));
+    }
+
+    /**
+     * Method to update certain {@link EventComment} by id.
+     *
+     * @param commentId of {@link EventComment} to update
+     * @param commentText edited text of {@link EventComment}
+     * @author Roman Kasarab
+     */
+    @Operation(summary = "Update comment.")
+    @ApiResponses(value = {
+            @ApiResponse(responseCode = "204", description = HttpStatuses.NO_CONTENT),
+            @ApiResponse(responseCode = "400", description = HttpStatuses.BAD_REQUEST,
+                    content = @Content(examples = @ExampleObject(HttpStatuses.BAD_REQUEST))),
+            @ApiResponse(responseCode = "401", description = HttpStatuses.UNAUTHORIZED,
+                    content = @Content(examples = @ExampleObject(HttpStatuses.UNAUTHORIZED))),
+            @ApiResponse(responseCode = "404", description = HttpStatuses.NOT_FOUND,
+                    content = @Content(examples = @ExampleObject(HttpStatuses.NOT_FOUND)))
+    })
+    @PatchMapping("/{commentId}")
+    public ResponseEntity<Object> update(
+            @PathVariable Long commentId,
+            @RequestBody @Size(min = 1, max = 8000) String commentText,
+            @Parameter(hidden = true) Principal principal) {
+        eventCommentService.update(commentId, commentText, principal.getName());
+        return ResponseEntity.status(HttpStatus.NO_CONTENT).build();
+    }
+
+    /**
+     * Method for deleting {EventComment} by its id.
+     *
+     * @param eventCommentId {@link EventComment} id
+     *                       which will be deleted.
+     * @return message of deleted comment {@link EventComment}.
+     * @author Roman Kasarab
+     */
+    @Operation(summary = "Delete comment")
+    @ApiResponses(value = {
+            @ApiResponse(responseCode = "200", description = HttpStatuses.OK),
+            @ApiResponse(responseCode = "401", description = HttpStatuses.UNAUTHORIZED,
+                    content = @Content(examples = @ExampleObject(HttpStatuses.UNAUTHORIZED))),
+            @ApiResponse(responseCode = "404", description = HttpStatuses.NOT_FOUND,
+                    content = @Content(examples = @ExampleObject(HttpStatuses.NOT_FOUND)))
+    })
+    @DeleteMapping("/{eventCommentId}")
+    public ResponseEntity<Object> delete(
+            @PathVariable Long eventCommentId,
+            @Parameter(hidden = true) Principal principal) {
+        return ResponseEntity.status(HttpStatus.OK).body(eventCommentService.delete(eventCommentId, principal.getName()));
     }
 }
