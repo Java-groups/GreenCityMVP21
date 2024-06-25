@@ -153,9 +153,9 @@ public class SecurityConfig {
                                 "/events",
                                 "/events/{id}",
                                 "/events/author/{userId}",
-                                "/events/comments/{eventId}/count",
-                                "/events/comments/{eventId}",
-                                "/events/comments/comment/{commentId}",
+                                "/events/{eventId}/comments/count",
+                                "/events/{eventId}/comments",
+                                "/events/{eventId}/comments/{commentId}",
                                 "/token")
                         .permitAll()
                         .requestMatchers(HttpMethod.POST,
@@ -231,7 +231,7 @@ public class SecurityConfig {
                                 "/user/{userId}/habit",
                                 "/habit/custom",
                                 "/custom/shopping-list-items/{userId}/{habitId}/custom-shopping-list-items",
-                                "/events/comments/{eventId}")
+                                "/events/{eventId}/comments")
                         .hasAnyRole(USER, ADMIN, MODERATOR, UBS_EMPLOYEE)
                         .requestMatchers(HttpMethod.PUT,
                                 "/habit/statistic/{id}",
@@ -255,11 +255,11 @@ public class SecurityConfig {
                                 USER_SHOPPING_LIST + "/{userShoppingListItemId}",
                                 "/user/profilePicture",
                                 "/user/deleteProfilePicture",
-                                "/events/comments/{commentId}")
+                                "/events/{eventId}/comments/{commentId}")
                         .hasAnyRole(USER, ADMIN, MODERATOR, UBS_EMPLOYEE)
                         .requestMatchers(HttpMethod.DELETE,
                                 ECONEWS_COMMENTS,
-                                "/events/comments/{eventCommentId}",
+                                "/events/{eventId}/comments/{eventCommentId}",
                                 "/econews/{econewsId}",
                                 CUSTOM_SHOPPING_LIST_ITEMS,
                                 CUSTOM_SHOPPING_LIST_URL,
