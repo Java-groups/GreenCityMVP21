@@ -16,6 +16,7 @@ import greencity.exception.exceptions.UserHasNoPermissionToAccessException;
 import greencity.dto.eventcomment.EventCommentMessageInfoDto;
 import greencity.repository.EventCommentRepo;
 import greencity.repository.EventRepo;
+import greencity.repository.UserRepo;
 import lombok.AllArgsConstructor;
 import org.modelmapper.ModelMapper;
 import org.springframework.data.domain.Page;
