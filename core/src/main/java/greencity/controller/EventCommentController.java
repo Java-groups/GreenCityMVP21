@@ -36,7 +36,7 @@ import java.util.List;
 @Validated
 @AllArgsConstructor
 @RestController
-@RequestMapping("/events/comments")
+@RequestMapping("/events/{eventId}/comments")
 public class EventCommentController {
     private final EventCommentService eventCommentService;
 
@@ -57,7 +57,7 @@ public class EventCommentController {
             @ApiResponse(responseCode = "401", description = HttpStatuses.UNAUTHORIZED),
             @ApiResponse(responseCode = "404", description = HttpStatuses.NOT_FOUND)
     })
-    @PostMapping("/{eventId}")
+    @PostMapping
     public ResponseEntity<EventCommentResponseDto> save(
             @PathVariable Long eventId,
             @Valid @RequestBody EventCommentRequestDto request,
@@ -78,7 +78,7 @@ public class EventCommentController {
             @ApiResponse(responseCode = "200", description = HttpStatuses.OK),
             @ApiResponse(responseCode = "404", description = HttpStatuses.NOT_FOUND)
     })
-    @GetMapping("/{eventId}/count")
+    @GetMapping("/count")
     public int getCountOfComments(@PathVariable Long eventId) {
         return eventCommentService.countOfComments(eventId);
     }
@@ -96,7 +96,7 @@ public class EventCommentController {
             @ApiResponse(responseCode = "400", description = HttpStatuses.BAD_REQUEST),
             @ApiResponse(responseCode = "404", description = HttpStatuses.NOT_FOUND)
     })
-    @GetMapping("/{eventId}")
+    @GetMapping
     @ApiPageableWithoutSort
     public ResponseEntity<PageableDto<EventCommentResponseDto>> getAllEventComments(
             @Parameter(hidden = true) Pageable pageable,
@@ -133,10 +133,11 @@ public class EventCommentController {
     })
     @PatchMapping("/{commentId}")
     public ResponseEntity<Object> update(
+            @PathVariable Long eventId,
             @PathVariable Long commentId,
             @RequestBody @Size(min = 1, max = 8000) String commentText,
             @Parameter(hidden = true) Principal principal) {
-        eventCommentService.update(commentId, commentText, principal.getName());
+        eventCommentService.update(eventId, commentId, commentText, principal.getName());
         return ResponseEntity.status(HttpStatus.NO_CONTENT).build();
     }
 
@@ -158,9 +159,10 @@ public class EventCommentController {
     })
     @DeleteMapping("/{eventCommentId}")
     public ResponseEntity<Object> delete(
+            @PathVariable Long eventId,
             @PathVariable Long eventCommentId,
             @Parameter(hidden = true) Principal principal) {
-        return ResponseEntity.status(HttpStatus.OK).body(eventCommentService.delete(eventCommentId, principal.getName()));
+        return ResponseEntity.status(HttpStatus.OK).body(eventCommentService.delete(eventId, eventCommentId, principal.getName()));
     }
 
     /**
@@ -176,11 +178,12 @@ public class EventCommentController {
             @ApiResponse(responseCode = "400", description = HttpStatuses.BAD_REQUEST),
             @ApiResponse(responseCode = "404", description = HttpStatuses.NOT_FOUND)
     })
-    @GetMapping("/comment/{commentId}")
+    @GetMapping("/{commentId}")
     @ApiPageableWithoutSort
     public ResponseEntity<EventCommentResponseDto> getByEventCommentId(
+            @PathVariable Long eventId,
             @PathVariable Long commentId) {
         return ResponseEntity.status(HttpStatus.OK)
-                .body(eventCommentService.getByEventCommentId(commentId));
+                .body(eventCommentService.getByEventCommentId(eventId, commentId));
     }
 }

@@ -41,7 +41,7 @@ import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.
 @ExtendWith(MockitoExtension.class)
 class EventCommentControllerTest {
 
-    private static final String eventsCommentLink = "/events/comments";
+    private static final String eventsCommentLink = "/events/{eventId}/comments";
 
     private MockMvc mockMvc;
 
@@ -76,12 +76,13 @@ class EventCommentControllerTest {
 
     @Test
     void testUpdateCommentSuccess() throws Exception {
+        Long eventId = 1L;
         Long commentId = 1L;
         String commentText = "This is a valid comment";
 
-        doNothing().when(eventCommentService).update(commentId, commentText, principal.getName());
+        doNothing().when(eventCommentService).update(eventId, commentId, commentText, principal.getName());
 
-        mockMvc.perform(patch(eventsCommentLink + "/{commentId}", commentId)
+        mockMvc.perform(patch(eventsCommentLink + "/{commentId}", eventId, commentId)
                         .contentType(MediaType.APPLICATION_JSON)
                         .content(commentText)
                         .principal(principal))
@@ -90,10 +91,11 @@ class EventCommentControllerTest {
 
     @Test
     void testUpdateCommentInvalidText() throws Exception {
+        Long eventId = 1L;
         Long commentId = 1L;
         String commentText = "";
 
-        mockMvc.perform(patch(eventsCommentLink + "/{commentId}", commentId)
+        mockMvc.perform(patch(eventsCommentLink + "/{commentId}", eventId, commentId)
                         .contentType(MediaType.APPLICATION_JSON)
                         .content(commentText)
                         .principal(principal))
@@ -113,7 +115,7 @@ class EventCommentControllerTest {
         when(userService.findByEmail(anyString())).thenReturn(userVO);
         when(eventCommentService.save(eventId, request, userVO)).thenReturn(response);
 
-        mockMvc.perform(post(eventsCommentLink + "/{eventId}", eventId)
+        mockMvc.perform(post(eventsCommentLink, eventId)
                 .contentType(MediaType.APPLICATION_JSON)
                 .content(content)
                 .principal(principal))
@@ -127,7 +129,7 @@ class EventCommentControllerTest {
                 "\"text\": null\n" +
                 "}";
 
-        mockMvc.perform(post(eventsCommentLink + "/{eventId}", eventId)
+        mockMvc.perform(post(eventsCommentLink, eventId)
                         .contentType(MediaType.APPLICATION_JSON)
                         .content(content)
                         .principal(principal))
@@ -146,7 +148,7 @@ class EventCommentControllerTest {
         when(userService.findByEmail(anyString())).thenReturn(userVO);
         when(eventCommentService.save(eventId, request, userVO)).thenThrow(new NotFoundException("Exception"));
 
-        mockMvc.perform(post(eventsCommentLink + "/{eventId}", eventId)
+        mockMvc.perform(post(eventsCommentLink, eventId)
                         .contentType(MediaType.APPLICATION_JSON)
                         .content(content)
                         .principal(principal))
@@ -157,7 +159,7 @@ class EventCommentControllerTest {
     void getCountOfCommentsTest_ReturnsIsOk() throws Exception {
         Long eventId = 1L;
         when(eventCommentService.countOfComments(eventId)).thenReturn(5);
-        mockMvc.perform(get(eventsCommentLink + "/{eventId}/count", eventId)
+        mockMvc.perform(get(eventsCommentLink + "/count", eventId)
                         .principal(principal))
                 .andExpect(status().isOk());
     }
@@ -166,7 +168,7 @@ class EventCommentControllerTest {
     void getCountOfCommentsTest_ReturnsNotFound() throws Exception {
         Long eventId = 0L;
         when(eventCommentService.countOfComments(eventId)).thenThrow(new NotFoundException("Exception"));
-        mockMvc.perform(get(eventsCommentLink + "/{eventId}/count", eventId)
+        mockMvc.perform(get(eventsCommentLink + "/count", eventId)
                         .principal(principal))
                 .andExpect(status().isNotFound());
     }
@@ -181,7 +183,7 @@ class EventCommentControllerTest {
         PageableDto<EventCommentResponseDto> response = new PageableDto<>(List.of(responseDto), 1, 0, 1);
         when(eventCommentService.getAllEventComments(pageable, eventId)).thenReturn(response);
 
-        mockMvc.perform(get(eventsCommentLink + "/{eventId}", eventId)
+        mockMvc.perform(get(eventsCommentLink, eventId)
                         .principal(principal))
                 .andExpect(status().isOk());
     }
@@ -190,7 +192,7 @@ class EventCommentControllerTest {
     void getAllEventCommentsTest_ReturnsBadRequest() throws Exception {
         Long eventId = 1L;
 
-        mockMvc.perform(get(eventsCommentLink + "/{eventId}?sort=unvalid,asc", eventId)
+        mockMvc.perform(get(eventsCommentLink + "?sort=unvalid,asc", eventId)
                         .principal(principal))
                 .andExpect(status().isBadRequest());
     }
@@ -203,28 +205,30 @@ class EventCommentControllerTest {
         Pageable pageable = PageRequest.of(pageNumber, pageSize);
         when(eventCommentService.getAllEventComments(pageable, eventId)).thenThrow(new NotFoundException("Exception"));
 
-        mockMvc.perform(get(eventsCommentLink + "/{eventId}", eventId)
+        mockMvc.perform(get(eventsCommentLink, eventId)
                         .principal(principal))
                 .andExpect(status().isNotFound());
     }
 
     @Test
     void getByEventCommentIdTest_ReturnsOk() throws Exception {
+        Long eventId = 1L;
         Long eventCommentId = 1L;
         EventCommentResponseDto response = EventCommentResponseDto.builder().eventId(eventCommentId).text("some comment text").build();
-        when(eventCommentService.getByEventCommentId(eventCommentId)).thenReturn(response);
+        when(eventCommentService.getByEventCommentId(eventId, eventCommentId)).thenReturn(response);
 
-        mockMvc.perform(get(eventsCommentLink + "/comment/{eventId}", eventCommentId)
+        mockMvc.perform(get(eventsCommentLink + "/{commentId}", eventId, eventCommentId)
                         .principal(principal))
                 .andExpect(status().isOk());
     }
 
     @Test
     void getByEventCommentIdTest_ReturnsNotFound () throws Exception {
+        Long eventId = 1L;
         Long eventCommentId = 0L;
-        when(eventCommentService.getByEventCommentId(eventCommentId)).thenThrow(new NotFoundException("Exception"));
+        when(eventCommentService.getByEventCommentId(eventId, eventCommentId)).thenThrow(new NotFoundException("Exception"));
 
-        mockMvc.perform(get(eventsCommentLink + "/comment/{eventId}", eventCommentId)
+        mockMvc.perform(get(eventsCommentLink + "/{commentId}", eventId, eventCommentId)
                         .principal(principal))
                 .andExpect(status().isNotFound());
     }

@@ -10,6 +10,7 @@ import greencity.entity.EventComment;
 import greencity.entity.User;
 import greencity.entity.event.Event;
 import greencity.enums.CommentStatus;
+import greencity.exception.exceptions.BadRequestException;
 import greencity.exception.exceptions.NotFoundException;
 import greencity.exception.exceptions.UserHasNoPermissionToAccessException;
 import greencity.dto.eventcomment.EventCommentMessageInfoDto;
@@ -141,7 +142,6 @@ public class EventCommentServiceImpl implements EventCommentService {
     /**
      * Method returns all comments to certain event specified by eventId.
      *
-     * @param userVO    current {@link User}
      * @param eventId specifies {@link Event} to which we
      *                  search for comments
      * @return all comments to certain event specified by eventId.
@@ -164,14 +164,17 @@ public class EventCommentServiceImpl implements EventCommentService {
     /**
      * Method returns comment to event with certain commentId.
      *
-     * @param userVO    current {@link User}
      * @param commentId specifies {@link EventComment} which we
      *                  search by id
      * @return comment to event with certain commentId.
      */
     @Override
-    public EventCommentResponseDto getByEventCommentId(Long commentId) {
+    public EventCommentResponseDto getByEventCommentId(Long eventId, Long commentId) {
+        Event event = eventRepo.findById(eventId).orElseThrow(() -> new NotFoundException(ErrorMessage.EVENT_NOT_FOUND_BY_ID + eventId));
         EventComment eventComment = eventCommentRepo.findById(commentId).orElseThrow(() -> new NotFoundException(ErrorMessage.EVENT_COMMENT_NOT_FOUND_BY_ID + commentId));
+        if (!eventComment.getEvent().getId().equals(eventId)) {
+            throw new BadRequestException("Comment with id " + commentId + " not found in comments of event with id " + eventId);
+        }
         return modelMapper.map(eventComment, EventCommentResponseDto.class);
     }
 
@@ -186,9 +189,13 @@ public class EventCommentServiceImpl implements EventCommentService {
      */
     @Transactional
     @Override
-    public void update(Long commentId, String commentText, String email) {
+    public void update(Long eventId, Long commentId, String commentText, String email) {
+        Event event = eventRepo.findById(eventId).orElseThrow(() -> new NotFoundException(ErrorMessage.EVENT_NOT_FOUND_BY_ID + eventId));
         EventComment comment = eventCommentRepo.findByIdAndStatusNot(commentId, CommentStatus.DELETED)
                 .orElseThrow(() -> new NotFoundException(ErrorMessage.EVENT_COMMENT_NOT_FOUND_BY_ID + commentId));
+        if (!comment.getEvent().getId().equals(eventId)) {
+            throw new BadRequestException("Comment with id " + commentId + " not found in comments of event with id " + eventId);
+        }
 
         UserVO currentUser = userService.findByEmail(email);
 
@@ -214,9 +221,13 @@ public class EventCommentServiceImpl implements EventCommentService {
      */
     @Transactional
     @Override
-    public String delete(Long eventCommentId, String email) {
+    public String delete(Long eventId, Long eventCommentId, String email) {
+        Event event = eventRepo.findById(eventId).orElseThrow(() -> new NotFoundException(ErrorMessage.EVENT_NOT_FOUND_BY_ID + eventId));
         EventComment eventComment = eventCommentRepo.findByIdAndStatusNot(eventCommentId, CommentStatus.DELETED)
                 .orElseThrow(() -> new NotFoundException(ErrorMessage.EVENT_COMMENT_NOT_FOUND_BY_ID + eventCommentId));
+        if (!eventComment.getEvent().getId().equals(eventId)) {
+            throw new BadRequestException("Comment with id " + eventCommentId + " not found in comments of event with id " + eventId);
+        }
 
         UserVO currentUser = restClient.findByEmail(email);
 
