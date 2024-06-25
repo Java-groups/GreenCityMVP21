@@ -1,9 +1,6 @@
 package greencity.dto.eventcomment;
 
-import greencity.annotations.NoEmojis;
-import greencity.annotations.NoLinks;
 import greencity.annotations.NoProhibitedContentInComment;
-import greencity.annotations.NoVideosAndPictures;
 import jakarta.validation.constraints.NotBlank;
 import jakarta.validation.constraints.Size;
 import lombok.*;
