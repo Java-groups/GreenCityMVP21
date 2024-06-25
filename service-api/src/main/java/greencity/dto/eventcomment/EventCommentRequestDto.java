@@ -1,5 +1,9 @@
 package greencity.dto.eventcomment;
 
+import greencity.annotations.NoEmojis;
+import greencity.annotations.NoLinks;
+import greencity.annotations.NoProhibitedContentInComment;
+import greencity.annotations.NoVideosAndPictures;
 import jakarta.validation.constraints.NotBlank;
 import jakarta.validation.constraints.Size;
 import lombok.*;
@@ -11,7 +15,8 @@ import lombok.*;
 @Builder
 @EqualsAndHashCode
 public class EventCommentRequestDto {
-    @NotBlank
+    @NotBlank(message = "Comment cannot be blank")
+    @NoProhibitedContentInComment
     @Size(min = 1, max = 8000)
     private String text;
 

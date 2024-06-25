@@ -52,6 +52,14 @@ public class EventCommentServiceImpl implements EventCommentService {
         eventComment.setEvent(event);
         eventComment.setUser(modelMapper.map(user, User.class));
 
+        setParentComment(eventId, eventComment, requestDto);
+
+        eventComment.setStatus(CommentStatus.ORIGINAL);
+        eventComment = eventCommentRepo.save(eventComment);
+        return modelMapper.map(eventComment, EventCommentResponseDto.class);
+    }
+
+    private void setParentComment(Long eventId, EventComment eventComment, EventCommentRequestDto requestDto) {
         if (requestDto.getParentCommentId() != null && requestDto.getParentCommentId() > 0) {
             Long parentCommentId = requestDto.getParentCommentId();
             EventComment parentEventComment = eventCommentRepo
@@ -72,11 +80,6 @@ public class EventCommentServiceImpl implements EventCommentService {
         } else if (requestDto.getParentCommentId() == null) {
             eventComment.setParentComment(null);
         }
-
-        eventComment.setStatus(CommentStatus.ORIGINAL);
-        eventComment = eventCommentRepo.save(eventComment);
-        System.out.println(eventComment.getEvent().getId());
-        return modelMapper.map(eventComment, EventCommentResponseDto.class);
     }
 
     /**
