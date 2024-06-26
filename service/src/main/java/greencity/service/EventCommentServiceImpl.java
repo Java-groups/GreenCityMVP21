@@ -10,6 +10,7 @@ import greencity.entity.EventComment;
 import greencity.entity.User;
 import greencity.entity.event.Event;
 import greencity.enums.CommentStatus;
+import greencity.exception.exceptions.BadRequestException;
 import greencity.exception.exceptions.NotFoundException;
 import greencity.exception.exceptions.UserHasNoPermissionToAccessException;
 import greencity.dto.eventcomment.EventCommentMessageInfoDto;
@@ -61,6 +62,8 @@ public class EventCommentServiceImpl implements EventCommentService {
         EventComment eventComment = modelMapper.map(requestDto, EventComment.class);
         eventComment.setEvent(event);
         eventComment.setUser(modelMapper.map(user, User.class));
+        setParentComment(eventId, eventComment, requestDto);
+
         Set<User> mentionedUsers = new HashSet<>();
         if (requestDto.getText().contains("@") || requestDto.getText().contains("#")) {
             String[] textByWord = requestDto.getText().split(" ");
@@ -95,6 +98,29 @@ public class EventCommentServiceImpl implements EventCommentService {
         return modelMapper.map(eventComment, EventCommentResponseDto.class);
     }
 
+    private void setParentComment(Long eventId, EventComment eventComment, EventCommentRequestDto requestDto) {
+        if (requestDto.getParentCommentId() != null && requestDto.getParentCommentId() > 0) {
+            Long parentCommentId = requestDto.getParentCommentId();
+            EventComment parentEventComment = eventCommentRepo
+                    .findByIdAndStatusNot(parentCommentId, CommentStatus.DELETED)
+                    .orElseThrow(() ->
+                            new NotFoundException(ErrorMessage.EVENT_COMMENT_NOT_FOUND_BY_ID + parentCommentId));
+
+            if (!parentEventComment.getEvent().getId().equals(eventId)) {
+                throw new NotFoundException(ErrorMessage.EVENT_COMMENT_NOT_FOUND_BY_ID + parentCommentId
+                        + " in event with id: " + eventId);
+            }
+
+            if (parentEventComment.getParentComment() != null) {
+                throw new BadRequestException(ErrorMessage.CANNOT_REPLY_THE_REPLY);
+            }
+
+            eventComment.setParentComment(parentEventComment);
+        } else if (requestDto.getParentCommentId() == null) {
+            eventComment.setParentComment(null);
+        }
+    }
+  
     public void sendEmailNotification(EventCommentMessageInfoDto eventCommentMessageInfoDto) {
         RequestAttributes originalRequestAttributes = RequestContextHolder.getRequestAttributes();
         emailThreadPool.submit(() -> {
