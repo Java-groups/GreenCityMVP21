@@ -34,7 +34,6 @@ import org.springframework.web.multipart.MultipartFile;
 import java.util.*;
 import java.util.concurrent.Executors;
 import java.util.concurrent.ThreadPoolExecutor;
-import java.util.stream.Collectors;
 
 @Service
 @EnableCaching
@@ -169,7 +168,7 @@ public class EventServiceImpl implements EventService{
     }
 
     @Override
-    public void removeAttender(Long eventId, String email) {
+    public String removeAttender(Long eventId, String email) {
         Event event = eventRepo.findById(eventId).orElseThrow(() ->
                 new NotFoundException(ErrorMessage.EVENT_NOT_FOUND_BY_ID + eventId));
 
@@ -183,6 +182,8 @@ public class EventServiceImpl implements EventService{
         EventEmailMessage eventEmailMessage = modelMapper.map(event, EventEmailMessage.class);
         eventEmailMessage.setSubject(String.format("The user %s has been removed from your event", currentUser.getName()));
         sendEmailNotification(eventEmailMessage);
+
+        return "User has been removed from your event";
     }
 
     private void checkingRemovingFromEvent(Event event, User user) {

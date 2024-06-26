@@ -170,7 +170,7 @@ public class EventsController {
             @ApiResponse(responseCode = "404", description = HttpStatuses.NOT_FOUND)
     })
     @DeleteMapping("/attender/{eventId}")
-    public void deleteAttender(@PathVariable Long eventId, @Parameter(hidden = true) @CurrentUser Principal principal) {
-        eventService.removeAttender(eventId, principal.getName());
+    public ResponseEntity<Object> deleteAttender(@PathVariable Long eventId, @Parameter(hidden = true) @CurrentUser Principal principal) {
+        return ResponseEntity.status(HttpStatus.OK).body(eventService.removeAttender(eventId, principal.getName()));
     }
 }
