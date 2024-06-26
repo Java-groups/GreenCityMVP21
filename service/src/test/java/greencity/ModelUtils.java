@@ -8,6 +8,10 @@ import greencity.dto.event.EventAddressDto;
 import greencity.dto.event.EventResponseDayInfoDto;
 import greencity.dto.event.EventSaveDayInfoDto;
 import greencity.dto.event.EventUpdateRequestDto;
+import greencity.dto.eventcomment.EventCommentAuthorDto;
+import greencity.dto.eventcomment.EventCommentMentionedUserDto;
+import greencity.dto.eventcomment.EventCommentRequestDto;
+import greencity.dto.eventcomment.EventCommentResponseDto;
 import greencity.dto.habit.*;
 import greencity.dto.habitfact.*;
 import greencity.dto.language.LanguageDTO;
@@ -863,6 +867,37 @@ public class ModelUtils {
                 .endDateTime(ZonedDateTime.of(LocalDateTime.now().minusDays(1), ZoneId.systemDefault()))
                 .dayNumber(1)
                 .link("some past link")
+                .build();
+    }
+
+    public static EventCommentRequestDto getEventCommentRequestDto() {
+        return EventCommentRequestDto.builder().text("text").build();
+    }
+
+    public static EventCommentResponseDto getEventCommentResponseDto() {
+        return EventCommentResponseDto.builder()
+                .id(1L)
+                .eventId(1L)
+                .createdDate(LocalDateTime.now())
+                .modifiedDate(LocalDateTime.now())
+                .text("text")
+                .author(getEventCommentAuthorDto())
+                .mentionedUsers(List.of(getEventCommentMentionedUserDto()))
+                .build();
+    }
+
+    public static EventCommentAuthorDto getEventCommentAuthorDto() {
+        return EventCommentAuthorDto.builder()
+                .id(1L)
+                .name("Name")
+                .userProfilePicturePath("picture/path")
+                .build();
+    }
+
+    public static EventCommentMentionedUserDto getEventCommentMentionedUserDto() {
+        return EventCommentMentionedUserDto.builder()
+                .id(2L)
+                .name("Username")
                 .build();
     }
 }

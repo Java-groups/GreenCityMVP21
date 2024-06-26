@@ -10,6 +10,7 @@ import greencity.entity.EventComment;
 import greencity.entity.User;
 import greencity.entity.event.Event;
 import greencity.enums.CommentStatus;
+import greencity.exception.exceptions.BadRequestException;
 import greencity.exception.exceptions.NotFoundException;
 import greencity.exception.exceptions.UserHasNoPermissionToAccessException;
 import greencity.dto.eventcomment.EventCommentMessageInfoDto;
@@ -61,46 +62,88 @@ public class EventCommentServiceImpl implements EventCommentService {
         EventComment eventComment = modelMapper.map(requestDto, EventComment.class);
         eventComment.setEvent(event);
         eventComment.setUser(modelMapper.map(user, User.class));
-        Set<User> mentionedUsers = new HashSet<>();
-        if (requestDto.getText().contains("@") || requestDto.getText().contains("#")) {
-            String[] textByWord = requestDto.getText().split(" ");
-            Pattern p1 = Pattern.compile("@\\w+");
-            Pattern p2 = Pattern.compile("#\\w+");
-            List<String> usernames = Arrays.stream(textByWord)
-                    .filter(word -> {
-                Matcher m1 = p1.matcher(word);
-                Matcher m2 = p2.matcher(word);
-                return m1.matches() || m2.matches();
-            })
-                    .map(username -> username.substring(1))
-                    .toList();
-            mentionedUsers = usernames.stream().map(userRepo::findByName)
-                    .filter(Optional::isPresent)
-                    .map(Optional::get).collect(Collectors.toSet());
-        }
+        Set<User> mentionedUsers = mentionedUsers(requestDto.getText());
+        setParentComment(eventId, eventComment, requestDto);
         eventComment.setMentionedUsers(mentionedUsers);
         eventComment.setStatus(CommentStatus.ORIGINAL);
-
         eventComment = eventCommentRepo.save(eventComment);
-        EventCommentMessageInfoDto message = EventCommentMessageInfoDto.builder()
-                .authorName(event.getAuthor().getName())
-                .eventName(event.getTitle())
-                .commentAuthorName(user.getName())
-                .commentCreatedDateTime(eventComment.getCreatedDate())
-                .commentText(eventComment.getText())
-                .commentId(eventComment.getId())
-                .eventAuthorEmail(event.getAuthor().getEmail())
-                .build();
-        sendEmailNotification(message);
+        sendNotifications(eventComment, event, eventComment.getUser());
         return modelMapper.map(eventComment, EventCommentResponseDto.class);
     }
 
-    public void sendEmailNotification(EventCommentMessageInfoDto eventCommentMessageInfoDto) {
+    private void sendNotifications(EventComment comment, Event event, User commentAuthor) {
+        EventCommentMessageInfoDto message = getMessageDto(comment, event, commentAuthor);
+        sendEmailNotificationToEventAuthor(message);
+        comment.getMentionedUsers().forEach(
+                mentionedUser -> sendEmailNotificationToMentionedUser
+                        (getMessageDto(comment, event, mentionedUser))
+        );
+    }
+
+    private EventCommentMessageInfoDto getMessageDto(EventComment comment, Event event, User receiver) {
+        return EventCommentMessageInfoDto.builder()
+                .receiverName(receiver.getName())
+                .eventId(event.getId())
+                .eventName(event.getTitle())
+                .commentAuthorName(comment.getUser().getName())
+                .commentCreatedDateTime(comment.getCreatedDate())
+                .commentText(comment.getText())
+                .commentId(comment.getId())
+                .emailReceiver(receiver.getEmail())
+                .build();
+    }
+
+    private void setParentComment(Long eventId, EventComment eventComment, EventCommentRequestDto requestDto) {
+        if (requestDto.getParentCommentId() != null && requestDto.getParentCommentId() > 0) {
+            Long parentCommentId = requestDto.getParentCommentId();
+            EventComment parentEventComment = eventCommentRepo
+                    .findByIdAndStatusNot(parentCommentId, CommentStatus.DELETED)
+                    .orElseThrow(() ->
+                            new NotFoundException(ErrorMessage.EVENT_COMMENT_NOT_FOUND_BY_ID + parentCommentId));
+
+            if (!parentEventComment.getEvent().getId().equals(eventId)) {
+                throw new NotFoundException(ErrorMessage.EVENT_COMMENT_NOT_FOUND_BY_ID + parentCommentId
+                        + " in event with id: " + eventId);
+            }
+
+            if (parentEventComment.getParentComment() != null) {
+                throw new BadRequestException(ErrorMessage.CANNOT_REPLY_THE_REPLY);
+            }
+
+            eventComment.setParentComment(parentEventComment);
+        } else if (requestDto.getParentCommentId() == null) {
+            eventComment.setParentComment(null);
+        }
+    }
+  
+     /**
+     * Method to send email notification to event author about comment on event.
+     *
+     * @param eventCommentMessageInfoDto with all necessary data about comment.
+     */
+    private void sendEmailNotificationToEventAuthor(EventCommentMessageInfoDto eventCommentMessageInfoDto) {
         RequestAttributes originalRequestAttributes = RequestContextHolder.getRequestAttributes();
         emailThreadPool.submit(() -> {
             try {
                 RequestContextHolder.setRequestAttributes(originalRequestAttributes);
                 restClient.sendEventCommentNotification(eventCommentMessageInfoDto);
+            } finally {
+                RequestContextHolder.resetRequestAttributes();
+            }
+        });
+    }
+
+    /**
+     * Method to send email notification to user about they were mentioned in comment on event.
+     *
+     * @param eventCommentMessageInfoDto with all necessary data about comment.
+     */
+    private void sendEmailNotificationToMentionedUser(EventCommentMessageInfoDto eventCommentMessageInfoDto) {
+        RequestAttributes originalRequestAttributes = RequestContextHolder.getRequestAttributes();
+        emailThreadPool.submit(() -> {
+            try {
+                RequestContextHolder.setRequestAttributes(originalRequestAttributes);
+                restClient.sendMentionedInEventCommentNotification(eventCommentMessageInfoDto);
             } finally {
                 RequestContextHolder.resetRequestAttributes();
             }
@@ -124,13 +167,12 @@ public class EventCommentServiceImpl implements EventCommentService {
     /**
      * Method returns all comments to certain event specified by eventId.
      *
-     * @param userVO    current {@link User}
      * @param eventId specifies {@link Event} to which we
      *                  search for comments
      * @return all comments to certain event specified by eventId.
      */
     @Override
-    public PageableDto<EventCommentResponseDto> getAllEventComments(Pageable pageable, Long eventId, UserVO userVO) {
+    public PageableDto<EventCommentResponseDto> getAllEventComments(Pageable pageable, Long eventId) {
         Event event = eventRepo.findById(eventId)
                 .orElseThrow(() -> new NotFoundException(ErrorMessage.EVENT_NOT_FOUND_BY_ID + eventId));
         Page<EventComment> pages = eventCommentRepo.findAllByEventOrderByCreatedDateDesc(event, pageable);
@@ -145,6 +187,23 @@ public class EventCommentServiceImpl implements EventCommentService {
     }
 
     /**
+     * Method returns comment to event with certain commentId.
+     *
+     * @param commentId specifies {@link EventComment} which we
+     *                  search by id
+     * @return comment to event with certain commentId.
+     */
+    @Override
+    public EventCommentResponseDto getByEventCommentId(Long eventId, Long commentId) {
+        Event event = eventRepo.findById(eventId).orElseThrow(() -> new NotFoundException(ErrorMessage.EVENT_NOT_FOUND_BY_ID + eventId));
+        EventComment eventComment = eventCommentRepo.findById(commentId).orElseThrow(() -> new NotFoundException(ErrorMessage.EVENT_COMMENT_NOT_FOUND_BY_ID + commentId));
+        if (!eventComment.getEvent().getId().equals(eventId)) {
+            throw new BadRequestException("Comment with id " + commentId + " not found in comments of event with id " + eventId);
+        }
+        return modelMapper.map(eventComment, EventCommentResponseDto.class);
+    }
+
+    /**
      * Updates the text of an existing event comment.
      * This method updates the text of an existing event comment specified by its ID.
      * The comment must not be deleted, and the user attempting the update must be the owner of the comment.
@@ -155,9 +214,13 @@ public class EventCommentServiceImpl implements EventCommentService {
      */
     @Transactional
     @Override
-    public void update(Long commentId, String commentText, String email) {
+    public void update(Long eventId, Long commentId, String commentText, String email) {
+        Event event = eventRepo.findById(eventId).orElseThrow(() -> new NotFoundException(ErrorMessage.EVENT_NOT_FOUND_BY_ID + eventId));
         EventComment comment = eventCommentRepo.findByIdAndStatusNot(commentId, CommentStatus.DELETED)
                 .orElseThrow(() -> new NotFoundException(ErrorMessage.EVENT_COMMENT_NOT_FOUND_BY_ID + commentId));
+        if (!comment.getEvent().getId().equals(eventId)) {
+            throw new BadRequestException("Comment with id " + commentId + " not found in comments of event with id " + eventId);
+        }
 
         UserVO currentUser = userService.findByEmail(email);
 
@@ -167,7 +230,13 @@ public class EventCommentServiceImpl implements EventCommentService {
 
         comment.setText(commentText);
         comment.setStatus(CommentStatus.EDITED);
-        eventCommentRepo.save(comment);
+        Set<User> mentionedUsers = mentionedUsers(commentText);
+        comment.setMentionedUsers(mentionedUsers);
+        EventComment savedComment = eventCommentRepo.save(comment);
+        mentionedUsers.forEach(
+                mentionedUser -> sendEmailNotificationToMentionedUser
+                        (getMessageDto(savedComment, savedComment.getEvent(), mentionedUser))
+        );
     }
 
     /**
@@ -177,9 +246,13 @@ public class EventCommentServiceImpl implements EventCommentService {
      */
     @Transactional
     @Override
-    public String delete(Long eventCommentId, String email) {
+    public String delete(Long eventId, Long eventCommentId, String email) {
+        Event event = eventRepo.findById(eventId).orElseThrow(() -> new NotFoundException(ErrorMessage.EVENT_NOT_FOUND_BY_ID + eventId));
         EventComment eventComment = eventCommentRepo.findByIdAndStatusNot(eventCommentId, CommentStatus.DELETED)
                 .orElseThrow(() -> new NotFoundException(ErrorMessage.EVENT_COMMENT_NOT_FOUND_BY_ID + eventCommentId));
+        if (!eventComment.getEvent().getId().equals(eventId)) {
+            throw new BadRequestException("Comment with id " + eventCommentId + " not found in comments of event with id " + eventId);
+        }
 
         UserVO currentUser = restClient.findByEmail(email);
 
@@ -195,5 +268,33 @@ public class EventCommentServiceImpl implements EventCommentService {
 
         eventCommentRepo.save(eventComment);
         return "Comment deleted successfully";
+    }
+
+    /**
+     * Method to find all user mentioned in comment text by @username or #username
+     * {@link EventComment}.
+     *
+     * @param commentText to specify comment text
+     * @return Set of mentioned users {@link User}.
+     */
+    private Set<User> mentionedUsers(String commentText) {
+        Set<User> mentionedUsers = new HashSet<>();
+        if (commentText.contains("@") || commentText.contains("#")) {
+            String[] textByWord = commentText.split(" ");
+            Pattern p1 = Pattern.compile("@\\w+");
+            Pattern p2 = Pattern.compile("#\\w+");
+            List<String> usernames = Arrays.stream(textByWord)
+                    .filter(word -> {
+                        Matcher m1 = p1.matcher(word);
+                        Matcher m2 = p2.matcher(word);
+                        return m1.matches() || m2.matches();
+                    })
+                    .map(username -> username.substring(1))
+                    .toList();
+            mentionedUsers = usernames.stream().map(userRepo::findByName)
+                    .filter(Optional::isPresent)
+                    .map(Optional::get).collect(Collectors.toSet());
+        }
+        return mentionedUsers;
     }
 }
