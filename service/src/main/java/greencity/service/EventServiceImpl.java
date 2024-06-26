@@ -104,7 +104,7 @@ public class EventServiceImpl implements EventService {
         Event event = eventRepo.findById(eventUpdateRequestDto.getId())
                 .orElseThrow(() -> new NotFoundException(ErrorMessage.EVENT_NOT_FOUND_BY_ID + eventUpdateRequestDto.getId()));
 
-        if (!event.getAuthor().getId().equals(userVO.getId()) && userVO.getRole() != Role.ROLE_ADMIN) {
+        if (!event.getAuthor().getId().equals(userVO.getId()) || userVO.getRole() != Role.ROLE_ADMIN) {
             throw new UserHasNoPermissionToAccessException("User has no permission to edit this event");
         }
 
