@@ -20,7 +20,7 @@ class EventCommentMentionedUserMapperTest {
 
     @Test
     void convert() {
-        User user = ModelUtils.getUser();
+        User user = ModelUtils.getUser(1L);
         EventCommentMentionedUserDto expected = EventCommentMentionedUserDto.builder()
                 .id(user.getId())
                 .name(user.getName())
@@ -30,7 +30,7 @@ class EventCommentMentionedUserMapperTest {
 
     @Test
     void mapAllToList() {
-        User user = ModelUtils.getUser();
+        User user = ModelUtils.getUser(1L);
         EventCommentMentionedUserDto expected = EventCommentMentionedUserDto.builder()
                 .id(user.getId())
                 .name(user.getName())
