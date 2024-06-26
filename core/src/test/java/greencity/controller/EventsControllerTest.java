@@ -277,4 +277,31 @@ class EventsControllerTest {
 
         verify(eventService, never()).delete(anyLong(), anyString());
     }
+
+    @Test
+    void getAllEventAttendersTest_ReturnsIsOk() throws Exception {
+        Long eventId = 1L;
+        mockMvc.perform(get(eventsLink + "/attender/{eventId}", eventId))
+                .andExpect(status().isOk());
+
+        verify(eventService).findAllAttendersByEvent(eventId);
+    }
+
+    @Test
+    void getAllEventAttenders_ReturnsBadRequest_WithNoValidId() throws Exception {
+        String notValidId = "id";
+        mockMvc.perform(get(eventsLink + "/attender/{eventId}", notValidId))
+                .andExpect(status().isBadRequest());
+    }
+
+    @Test
+    void getAllEventAttenders_ReturnsNotFound() throws Exception {
+        Long eventId = 1L;
+
+        when(eventService.findAllAttendersByEvent(eventId)).thenThrow(NotFoundException.class);
+
+        mockMvc.perform(get(eventsLink + "/attender/{userId}", eventId)
+                        .contentType(MediaType.APPLICATION_JSON))
+                .andExpect(status().isNotFound());
+    }
 }
