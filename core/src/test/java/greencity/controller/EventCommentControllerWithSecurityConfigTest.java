@@ -1,8 +1,12 @@
 package greencity.controller;
 
+import com.fasterxml.jackson.databind.ObjectMapper;
 import greencity.ModelUtils;
 import greencity.config.PageableConfig;
 import greencity.config.SecurityConfig;
+import greencity.dto.eventcomment.EventCommentRequestDto;
+import greencity.dto.eventcomment.EventCommentResponseDto;
+import greencity.dto.user.UserVO;
 import greencity.security.jwt.JwtTool;
 import greencity.service.EventCommentService;
 import greencity.service.UserService;
@@ -26,10 +30,12 @@ import org.springframework.test.web.servlet.setup.MockMvcBuilders;
 import org.springframework.web.context.WebApplicationContext;
 import org.springframework.web.servlet.config.annotation.EnableWebMvc;
 
+import static greencity.ModelUtils.getUserVO;
 import static org.mockito.ArgumentMatchers.anyString;
 import static org.mockito.Mockito.when;
 import static org.springframework.security.test.web.servlet.setup.SecurityMockMvcConfigurers.springSecurity;
 import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.patch;
+import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.post;
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.status;
 
 @ExtendWith(SpringExtension.class)
@@ -96,4 +102,37 @@ class EventCommentControllerWithSecurityConfigTest {
                 .andExpect(status().isNoContent());
     }
 
+    @Test
+    @WithAnonymousUser
+    void saveTest_ReturnsIsUnauthorized() throws Exception {
+        Long eventId = 1L;
+        String content = "{\n" +
+                "\"text\": \"some comment text\"\n" +
+                "}";
+
+        mockMvc.perform(post(eventsCommentLink + "/{eventId}", eventId)
+                        .contentType(MediaType.APPLICATION_JSON)
+                        .content(content))
+                .andExpect(status().isUnauthorized());
+    }
+
+    @Test
+    @WithMockUser(username = "test@mail.com", roles = "USER")
+    void saveTest_ReturnsIsCreated() throws Exception {
+        Long eventId = 1L;
+        String content = "{\n" +
+                "\"text\": \"some comment text\"\n" +
+                "}";
+        ObjectMapper mapper = new ObjectMapper();
+        EventCommentRequestDto request = mapper.readValue(content, EventCommentRequestDto.class);
+        EventCommentResponseDto response = EventCommentResponseDto.builder().eventId(eventId).text("some comment text").build();
+        UserVO userVO = getUserVO();
+        when(userService.findByEmail("test@mail.com")).thenReturn(userVO);
+        when(eventCommentService.save(eventId, request, userVO)).thenReturn(response);
+
+        mockMvc.perform(post(eventsCommentLink + "/{eventId}", eventId)
+                        .contentType(MediaType.APPLICATION_JSON)
+                        .content(content))
+                .andExpect(status().isCreated());
+    }
 }

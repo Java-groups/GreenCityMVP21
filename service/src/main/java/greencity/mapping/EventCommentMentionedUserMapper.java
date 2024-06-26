@@ -1,11 +1,7 @@
 package greencity.mapping;
 
-import greencity.dto.event.EventSaveDayInfoDto;
 import greencity.dto.eventcomment.EventCommentMentionedUserDto;
-import greencity.dto.eventcomment.EventCommentResponseDto;
-import greencity.entity.EventComment;
 import greencity.entity.User;
-import greencity.entity.event.EventDayInfo;
 import org.modelmapper.AbstractConverter;
 import org.springframework.stereotype.Component;
 
