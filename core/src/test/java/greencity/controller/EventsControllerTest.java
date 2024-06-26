@@ -86,12 +86,12 @@ class EventsControllerTest {
                 "  \"title\": \"string\",\n" +
                 "  \"daysInfo\": [\n" +
                 "    {\n" +
-                "      \"startDateTime\": \"2024-06-02T14:20:45.252Z\",\n" +
-                "      \"endDateTime\": \"2024-06-02T14:20:45.252Z\",\n" +
+                "      \"startDateTime\": \"2029-07-02T14:20:45.252Z\",\n" +
+                "      \"endDateTime\": \"2029-07-02T19:20:45.252Z\",\n" +
                 "      \"dayNumber\": 0,\n" +
-                "      \"allDay\": true,\n" +
+                "      \"allDay\": false,\n" +
                 "      \"status\": \"ONLINE\",\n" +
-                "      \"link\": \"string\",\n" +
+                "      \"link\": \"https://test-link.com\",\n" +
                 "      \"address\": null\n" +
                 "    }\n" +
                 "  ],\n" +
