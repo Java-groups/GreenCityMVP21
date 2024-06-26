@@ -6,6 +6,8 @@ import greencity.annotations.ImageArrayValidation;
 import greencity.constant.HttpStatuses;
 import greencity.constant.SwaggerExampleModel;
 import greencity.dto.PageableAdvancedDto;
+import greencity.dto.event.EventAttendanceDto;
+import greencity.dto.event.EventAuthorDto;
 import greencity.dto.event.EventRequestSaveDto;
 import greencity.dto.event.EventResponseDto;
 import greencity.dto.user.UserVO;
@@ -29,6 +31,7 @@ import org.springframework.web.bind.annotation.*;
 import org.springframework.web.multipart.MultipartFile;
 
 import java.security.Principal;
+import java.util.Set;
 
 @Validated
 @RestController
@@ -157,6 +160,21 @@ public class EventsController {
         eventService.addAttender(eventId, user);
     }
 
+    /**
+     * Method for getting all attenders of the event.
+     *
+     * @author Roman Kasarab
+     */
+    @Operation(summary = "Find all attenders of the event.")
+    @ApiResponses(value = {
+            @ApiResponse(responseCode = "200", description = HttpStatuses.OK),
+            @ApiResponse(responseCode = "400", description = HttpStatuses.BAD_REQUEST)
+    })
+    @GetMapping("/attender/{eventId}")
+    public ResponseEntity<Set<EventAttendanceDto>> getAttenders(@PathVariable Long eventId) {
+        return ResponseEntity.status(HttpStatus.OK).body(eventService.findAllAttendersByEvent(eventId));
+    }
+  
     /**
      * Method for removing an attender from the event.
      *

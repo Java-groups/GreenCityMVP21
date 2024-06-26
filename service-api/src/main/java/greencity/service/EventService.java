@@ -1,6 +1,7 @@
 package greencity.service;
 
 import greencity.dto.PageableAdvancedDto;
+import greencity.dto.event.EventAttendanceDto;
 import greencity.dto.event.EventRequestSaveDto;
 import greencity.dto.event.EventResponseDto;
 import greencity.dto.user.UserVO;
@@ -8,6 +9,7 @@ import org.springframework.data.domain.Pageable;
 import org.springframework.web.multipart.MultipartFile;
 
 import java.util.List;
+import java.util.Set;
 
 public interface EventService {
     EventResponseDto save(EventRequestSaveDto event, MultipartFile[] images, UserVO author);
@@ -37,6 +39,14 @@ public interface EventService {
     void addAttender(Long eventId, UserVO user);
 
     /**
+     * Get all attenders of the Event by eventId.
+     *
+     * @param eventId - event id.
+     * @return a Set of Event Attenders
+     */
+    Set<EventAttendanceDto> findAllAttendersByEvent(Long eventId);
+
+    /**
      * Remove an attender from the Event by id.
      *
      * @param eventId - event id.
@@ -44,4 +54,5 @@ public interface EventService {
      * @return
      */
     String removeAttender(Long eventId, String email);
+
 }
