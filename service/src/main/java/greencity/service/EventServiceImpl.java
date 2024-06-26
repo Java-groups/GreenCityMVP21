@@ -34,6 +34,7 @@ import org.springframework.web.multipart.MultipartFile;
 import java.util.*;
 import java.util.concurrent.Executors;
 import java.util.concurrent.ThreadPoolExecutor;
+import java.util.stream.Collectors;
 
 @Service
 @EnableCaching
@@ -165,6 +166,14 @@ public class EventServiceImpl implements EventService{
         if (event.getAttenders().stream().anyMatch(attender -> attender.getId().equals(user.getId()))) {
             throw new BadRequestException(ErrorMessage.YOU_HAVE_ALREADY_JOINED_TO_EVENT);
         }
+    }
+
+    @Override
+    public Set<EventAttendanceDto> findAllAttendersByEvent(Long eventId) {
+        Event event = eventRepo.findById(eventId).orElseThrow(() ->
+                new NotFoundException(ErrorMessage.EVENT_NOT_FOUND_BY_ID + eventId));
+        return event.getAttenders().stream().map(attender -> modelMapper.map(attender, EventAttendanceDto.class))
+                .collect(Collectors.toSet());
     }
 
     public void sendEmailNotification(EventEmailMessage eventEmailMessage) {

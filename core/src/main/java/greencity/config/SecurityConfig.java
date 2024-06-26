@@ -172,6 +172,7 @@ public class SecurityConfig {
                                 "/custom/shopping-list-items/{userId}/{habitId}",
                                 "/econews/count",
                                 "/econews/isLikedByUser",
+                                "/events/attender/{eventId}",
                                 "/shopping-list-items",
                                 "/habit/assign/allForCurrentUser",
                                 "/habit/assign/active/{date}",
