@@ -38,5 +38,21 @@ public interface EventService {
      */
     void addAttender(Long eventId, UserVO user);
 
+    /**
+     * Get all attenders of the Event by eventId.
+     *
+     * @param eventId - event id.
+     * @return a Set of Event Attenders
+     */
     Set<EventAttendanceDto> findAllAttendersByEvent(Long eventId);
+
+    /**
+     * Remove an attender from the Event by id.
+     *
+     * @param eventId - event id.
+     * @param email   - user`s email.
+     * @return
+     */
+    String removeAttender(Long eventId, String email);
+
 }

@@ -174,4 +174,21 @@ public class EventsController {
     public ResponseEntity<Set<EventAttendanceDto>> getAttenders(@PathVariable Long eventId) {
         return ResponseEntity.status(HttpStatus.OK).body(eventService.findAllAttendersByEvent(eventId));
     }
+  
+    /**
+     * Method for removing an attender from the event.
+     *
+     * @author Roman Kasarab
+     */
+    @Operation(summary = "Remove an attender from the event.")
+    @ApiResponses(value = {
+            @ApiResponse(responseCode = "200", description = HttpStatuses.OK),
+            @ApiResponse(responseCode = "400", description = HttpStatuses.BAD_REQUEST),
+            @ApiResponse(responseCode = "401", description = HttpStatuses.UNAUTHORIZED),
+            @ApiResponse(responseCode = "404", description = HttpStatuses.NOT_FOUND)
+    })
+    @DeleteMapping("/attender/{eventId}")
+    public ResponseEntity<Object> deleteAttender(@PathVariable Long eventId, @Parameter(hidden = true) @CurrentUser Principal principal) {
+        return ResponseEntity.status(HttpStatus.OK).body(eventService.removeAttender(eventId, principal.getName()));
+    }
 }
