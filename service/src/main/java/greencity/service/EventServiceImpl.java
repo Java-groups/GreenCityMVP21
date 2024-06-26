@@ -167,6 +167,31 @@ public class EventServiceImpl implements EventService{
         }
     }
 
+    @Override
+    public String removeAttender(Long eventId, String email) {
+        Event event = eventRepo.findById(eventId).orElseThrow(() ->
+                new NotFoundException(ErrorMessage.EVENT_NOT_FOUND_BY_ID + eventId));
+
+        User currentUser = userRepo.findByEmail(email).orElseThrow(() ->
+                new NotFoundException(ErrorMessage.USER_NOT_FOUND_BY_EMAIL + email));
+
+        checkingRemovingFromEvent(event, currentUser);
+        event.getAttenders().removeIf(user -> user.getId().equals(currentUser.getId()));
+        eventRepo.save(event);
+
+        EventEmailMessage eventEmailMessage = modelMapper.map(event, EventEmailMessage.class);
+        eventEmailMessage.setSubject(String.format("The user %s has been removed from your event", currentUser.getName()));
+        sendEmailNotification(eventEmailMessage);
+
+        return "User has been removed from your event";
+    }
+
+    private void checkingRemovingFromEvent(Event event, User user) {
+        if (event.getAttenders().stream().noneMatch(attender -> attender.getId().equals(user.getId()))) {
+            throw new BadRequestException(ErrorMessage.YOU_HAVE_NEVER_JOINED_TO_EVENT);
+        }
+    }
+
     public void sendEmailNotification(EventEmailMessage eventEmailMessage) {
         RequestAttributes originalRequestAttributes = RequestContextHolder.getRequestAttributes();
         emailThreadPool.submit(() -> {
