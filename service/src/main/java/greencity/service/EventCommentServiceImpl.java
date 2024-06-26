@@ -63,6 +63,7 @@ public class EventCommentServiceImpl implements EventCommentService {
         eventComment.setEvent(event);
         eventComment.setUser(modelMapper.map(user, User.class));
         Set<User> mentionedUsers = mentionedUsers(requestDto.getText());
+        setParentComment(eventId, eventComment, requestDto);
         eventComment.setMentionedUsers(mentionedUsers);
         eventComment.setStatus(CommentStatus.ORIGINAL);
         eventComment = eventCommentRepo.save(eventComment);
@@ -92,7 +93,30 @@ public class EventCommentServiceImpl implements EventCommentService {
                 .build();
     }
 
-    /**
+    private void setParentComment(Long eventId, EventComment eventComment, EventCommentRequestDto requestDto) {
+        if (requestDto.getParentCommentId() != null && requestDto.getParentCommentId() > 0) {
+            Long parentCommentId = requestDto.getParentCommentId();
+            EventComment parentEventComment = eventCommentRepo
+                    .findByIdAndStatusNot(parentCommentId, CommentStatus.DELETED)
+                    .orElseThrow(() ->
+                            new NotFoundException(ErrorMessage.EVENT_COMMENT_NOT_FOUND_BY_ID + parentCommentId));
+
+            if (!parentEventComment.getEvent().getId().equals(eventId)) {
+                throw new NotFoundException(ErrorMessage.EVENT_COMMENT_NOT_FOUND_BY_ID + parentCommentId
+                        + " in event with id: " + eventId);
+            }
+
+            if (parentEventComment.getParentComment() != null) {
+                throw new BadRequestException(ErrorMessage.CANNOT_REPLY_THE_REPLY);
+            }
+
+            eventComment.setParentComment(parentEventComment);
+        } else if (requestDto.getParentCommentId() == null) {
+            eventComment.setParentComment(null);
+        }
+    }
+  
+     /**
      * Method to send email notification to event author about comment on event.
      *
      * @param eventCommentMessageInfoDto with all necessary data about comment.
