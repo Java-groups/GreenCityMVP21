@@ -10,7 +10,6 @@ import greencity.exception.exceptions.NotFoundException;
 import greencity.exception.handler.CustomExceptionHandler;
 import greencity.service.EventService;
 import greencity.service.UserService;
-import greencity.validator.ClockWrapper;
 import org.junit.jupiter.api.Assertions;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
@@ -38,6 +37,7 @@ import org.springframework.web.method.annotation.MethodArgumentTypeMismatchExcep
 
 import java.security.Principal;
 import java.time.ZonedDateTime;
+import java.time.format.DateTimeFormatter;
 
 import static greencity.ModelUtils.getPrincipal;
 import static org.mockito.Mockito.*;
@@ -54,9 +54,6 @@ class EventsControllerTest {
 
     @InjectMocks
     private EventsController eventsController;
-
-    @Mock
-    private ClockWrapper clock;
 
     @Mock
     private EventService eventService;
@@ -82,8 +79,6 @@ class EventsControllerTest {
                         new UserArgumentResolver(userService, modelMapper))
                 .setControllerAdvice(new CustomExceptionHandler(errorAttributes, objectMapper))
                 .build();
-
-        when(clock.now()).thenReturn(ZonedDateTime.parse("2024-06-01T14:20:45.252Z"));
     }
 
     @Test
@@ -289,30 +284,37 @@ class EventsControllerTest {
 
     @Test
     void updateTest_ReturnsSuccess() throws Exception {
-        String json = """
-                {
-                    "id": 1,
-                    "title": "Test title",
-                    "description": "Test description Test description1",
-                    "dateTimes": [
-                        {
-                            "allDay": true,
-                            "startDateTime": "2024-06-02T00:00:00.000Z",
-                            "endDateTime": "2024-06-02T23:59:00.000Z",
-                            "dayNumber": 0,
-                            "status": "OFFLINE",
-                            "link": null,
-                            "address": {
-                                "latitude": -50,
-                                "longitude": 150,
-                                "addressUa": "Україна, Київ",
-                                "addressEn": "USA, New York"
-                            }
+        ZonedDateTime startDateTime = ZonedDateTime.now().plusDays(2);
+        ZonedDateTime endDateTime = startDateTime.plusHours(2);
+
+        DateTimeFormatter formatter = DateTimeFormatter.ISO_ZONED_DATE_TIME;
+        String json = String.format("""
+            {
+                "id": 1,
+                "title": "Test title",
+                "description": "Test description Test description1",
+                "dateTimes": [
+                    {
+                        "allDay": false,
+                        "startDateTime": "%s",
+                        "endDateTime": "%s",
+                        "dayNumber": 0,
+                        "status": "OFFLINE",
+                        "link": null,
+                        "address": {
+                            "latitude": -50,
+                            "longitude": 150,
+                            "addressUa": "Україна, Київ",
+                            "addressEn": "USA, New York"
                         }
-                    ],
-                    "tagNames": ["Environment", "Recycling"],
-                    "open": true
-                }""";
+                    }
+                ],
+                "tagNames": ["Environment", "Recycling"],
+                "open": true
+            }""",
+                formatter.format(startDateTime),
+                formatter.format(endDateTime)
+        );
 
         ObjectMapper objectMapper = new ObjectMapper();
         objectMapper.findAndRegisterModules();
