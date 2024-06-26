@@ -1,0 +1,17 @@
+<?xml version="1.0" encoding="UTF-8" standalone="no"?>
+<databaseChangeLog
+        xmlns="http://www.liquibase.org/xml/ns/dbchangelog"
+        xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+        xsi:schemaLocation="http://www.liquibase.org/xml/ns/dbchangelog
+        http://www.liquibase.org/xml/ns/dbchangelog/dbchangelog-3.4.xsd">
+
+    <changeSet id="changeColumnNameAtUsersTableHerchanivska-4" author="Viktoriia Hechanivska" >
+        <addUniqueConstraint columnNames="name" constraintName="UK_unique_name_users" tableName="users"/>
+    </changeSet>
+
+    <changeSet id="addIndexNameAtUsersHerchanivska-5" author="Viktoriia Hechanivska">
+        <createIndex indexName="index_name_at_users" tableName="users">
+            <column name="name"/>
+        </createIndex>
+    </changeSet>
+</databaseChangeLog>
