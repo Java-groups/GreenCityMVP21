@@ -82,6 +82,7 @@ public class EventCommentServiceImpl implements EventCommentService {
     private EventCommentMessageInfoDto getMessageDto(EventComment comment, Event event, User receiver) {
         return EventCommentMessageInfoDto.builder()
                 .receiverName(receiver.getName())
+                .eventId(event.getId())
                 .eventName(event.getTitle())
                 .commentAuthorName(comment.getUser().getName())
                 .commentCreatedDateTime(comment.getCreatedDate())

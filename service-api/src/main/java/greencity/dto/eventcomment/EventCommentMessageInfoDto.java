@@ -13,6 +13,7 @@ import java.time.LocalDateTime;
 @ToString
 public class EventCommentMessageInfoDto {
     String receiverName;
+    Long eventId;
     String eventName;
     String commentAuthorName;
     LocalDateTime commentCreatedDateTime;

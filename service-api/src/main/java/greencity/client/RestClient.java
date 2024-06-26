@@ -499,7 +499,7 @@ public class RestClient {
                 eventCommentMessageInfoDto.getCommentAuthorName(),
                 eventCommentMessageInfoDto.getCommentCreatedDateTime().format(DateTimeFormatter.ofPattern("dd.MM.yyyy HH:mm:ss")),
                 eventCommentMessageInfoDto.getCommentText(),
-                greenCityMvpServerAddress + "/events/comments/comment" + eventCommentMessageInfoDto.getCommentId()
+                greenCityMvpServerAddress + "/events/" + eventCommentMessageInfoDto.getEventId() + "/comments/" + eventCommentMessageInfoDto.getCommentId()
         );
         HttpHeaders headers = setHeader();
         headers.setContentType(MediaType.APPLICATION_JSON);
@@ -538,7 +538,7 @@ public class RestClient {
                 eventCommentMessageInfoDto.getCommentAuthorName(),
                 eventCommentMessageInfoDto.getCommentCreatedDateTime().format(DateTimeFormatter.ofPattern("dd.MM.yyyy HH:mm:ss")),
                 eventCommentMessageInfoDto.getCommentText(),
-                greenCityMvpServerAddress + "/events/comments/comment" + eventCommentMessageInfoDto.getCommentId()
+                greenCityMvpServerAddress + "/events/" + eventCommentMessageInfoDto.getEventId() + "/comments/" + eventCommentMessageInfoDto.getCommentId()
         );
         HttpHeaders headers = setHeader();
         headers.setContentType(MediaType.APPLICATION_JSON);
