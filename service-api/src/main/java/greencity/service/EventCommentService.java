@@ -19,9 +19,11 @@ public interface EventCommentService {
      */
     EventCommentResponseDto save(Long eventId, EventCommentRequestDto requestDto, UserVO user);
 
-    int countOfComments(Long ecoNewsId);
+    int countOfComments(Long eventId);
 
-    PageableDto<EventCommentResponseDto> getAllEventComments(Pageable pageable, Long eventId, UserVO userVO);
+    PageableDto<EventCommentResponseDto> getAllEventComments(Pageable pageable, Long eventId);
+
+    EventCommentResponseDto getByEventCommentId(Long eventId, Long commentId);
 
     /**
      * Method for updating the {@link EventComment} by id.
@@ -30,7 +32,7 @@ public interface EventCommentService {
      * @param commentText - {@link EventComment} text to update.
      * @param email           User who wants to update a comment.
      */
-    void update(Long commentId, String commentText, String email);
+    void update(Long eventId, Long commentId, String commentText, String email);
 
     /**
      * Method for deleting the {@link EventComment} by id.
@@ -38,5 +40,5 @@ public interface EventCommentService {
      * @param eventCommentId - {@link EventComment} instance id which will be deleted.
      * @param email           User who wants to delete a comment.
      */
-    String delete(Long eventCommentId, String email);
+    String delete(Long eventId, Long eventCommentId, String email);
 }

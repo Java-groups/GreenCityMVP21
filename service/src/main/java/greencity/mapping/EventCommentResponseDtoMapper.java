@@ -5,6 +5,9 @@ import greencity.entity.EventComment;
 import org.modelmapper.AbstractConverter;
 import org.springframework.stereotype.Component;
 
+import java.util.ArrayList;
+import java.util.List;
+
 @Component
 public class EventCommentResponseDtoMapper extends AbstractConverter<EventComment, EventCommentResponseDto> {
     private final EventCommentAuthorDtoMapper authorMapper = new EventCommentAuthorDtoMapper();
@@ -18,7 +21,13 @@ public class EventCommentResponseDtoMapper extends AbstractConverter<EventCommen
                 .author(authorMapper.convert(eventComment.getUser()))
                 .modifiedDate(eventComment.getModifiedDate())
                 .eventId(eventComment.getEvent().getId())
-                .mentionedUsers(mentionedUserMapper.mapAllToList(eventComment.getMentionedUsers()))
+                .mentionedUsers(eventComment.getMentionedUsers() != null &&
+                        !eventComment.getMentionedUsers().isEmpty() ?
+                        mentionedUserMapper.mapAllToList(eventComment.getMentionedUsers()) : new ArrayList<>())
                 .build();
+    }
+
+    public List<EventCommentResponseDto> mapAllToList(List<EventComment> comments) {
+        return comments.stream().map(this::convert).toList();
     }
 }

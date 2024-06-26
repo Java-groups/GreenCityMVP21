@@ -5,6 +5,10 @@ import greencity.dto.PageableAdvancedDto;
 import greencity.dto.econews.*;
 import greencity.dto.econewscomment.*;
 import greencity.dto.event.EventAddressDto;
+import greencity.dto.eventcomment.EventCommentAuthorDto;
+import greencity.dto.eventcomment.EventCommentMentionedUserDto;
+import greencity.dto.eventcomment.EventCommentRequestDto;
+import greencity.dto.eventcomment.EventCommentResponseDto;
 import greencity.dto.habit.*;
 import greencity.dto.habitfact.*;
 import greencity.dto.language.LanguageDTO;
@@ -806,6 +810,37 @@ public class ModelUtils {
                 .createdDate(LocalDateTime.now())
                 .user(getUser())
                 .event(getEvent())
+                .build();
+    }
+
+    public static EventCommentRequestDto getEventCommentRequestDto() {
+        return EventCommentRequestDto.builder().text("text").build();
+    }
+
+    public static EventCommentResponseDto getEventCommentResponseDto() {
+        return EventCommentResponseDto.builder()
+                .id(1L)
+                .eventId(1L)
+                .createdDate(LocalDateTime.now())
+                .modifiedDate(LocalDateTime.now())
+                .text("text")
+                .author(getEventCommentAuthorDto())
+                .mentionedUsers(List.of(getEventCommentMentionedUserDto()))
+                .build();
+    }
+
+    public static EventCommentAuthorDto getEventCommentAuthorDto() {
+        return EventCommentAuthorDto.builder()
+                .id(1L)
+                .name("Name")
+                .userProfilePicturePath("picture/path")
+                .build();
+    }
+
+    public static EventCommentMentionedUserDto getEventCommentMentionedUserDto() {
+        return EventCommentMentionedUserDto.builder()
+                .id(2L)
+                .name("Username")
                 .build();
     }
 }
