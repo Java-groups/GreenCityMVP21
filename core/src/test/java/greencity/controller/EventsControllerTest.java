@@ -1,7 +1,5 @@
 package greencity.controller;
 
-import com.fasterxml.jackson.core.JsonProcessingException;
-import com.fasterxml.jackson.databind.DeserializationFeature;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import com.fasterxml.jackson.datatype.jsr310.JavaTimeModule;
 import greencity.converters.UserArgumentResolver;
@@ -12,7 +10,7 @@ import greencity.exception.exceptions.NotFoundException;
 import greencity.exception.handler.CustomExceptionHandler;
 import greencity.service.EventService;
 import greencity.service.UserService;
-import lombok.SneakyThrows;
+import greencity.validator.ClockWrapper;
 import org.junit.jupiter.api.Assertions;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
@@ -31,7 +29,6 @@ import org.springframework.data.domain.Pageable;
 import org.springframework.data.web.PageableHandlerMethodArgumentResolver;
 import org.springframework.http.MediaType;
 import org.springframework.mock.web.MockMultipartFile;
-import org.springframework.security.test.web.servlet.request.SecurityMockMvcRequestPostProcessors;
 import org.springframework.test.web.servlet.MockMvc;
 import org.springframework.test.web.servlet.request.MockMultipartHttpServletRequestBuilder;
 import org.springframework.test.web.servlet.request.MockMvcRequestBuilders;
@@ -39,15 +36,12 @@ import org.springframework.test.web.servlet.setup.MockMvcBuilders;
 import org.springframework.web.multipart.MultipartFile;
 import org.springframework.web.method.annotation.MethodArgumentTypeMismatchException;
 
-import java.nio.charset.StandardCharsets;
 import java.security.Principal;
+import java.time.ZonedDateTime;
 
 import static greencity.ModelUtils.getPrincipal;
-import static org.junit.Assert.assertTrue;
 import static org.mockito.Mockito.*;
-import static org.springframework.security.test.web.servlet.request.SecurityMockMvcRequestPostProcessors.csrf;
 import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.*;
-import static org.springframework.test.web.servlet.result.MockMvcResultHandlers.print;
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.status;
 
 @ExtendWith(MockitoExtension.class)
@@ -60,6 +54,9 @@ class EventsControllerTest {
 
     @InjectMocks
     private EventsController eventsController;
+
+    @Mock
+    private ClockWrapper clock;
 
     @Mock
     private EventService eventService;
@@ -85,6 +82,8 @@ class EventsControllerTest {
                         new UserArgumentResolver(userService, modelMapper))
                 .setControllerAdvice(new CustomExceptionHandler(errorAttributes, objectMapper))
                 .build();
+
+        when(clock.now()).thenReturn(ZonedDateTime.parse("2024-06-01T14:20:45.252Z"));
     }
 
     @Test
@@ -288,114 +287,54 @@ class EventsControllerTest {
         verify(eventService, never()).delete(anyLong(), anyString());
     }
 
-//    @Test
-//    @SneakyThrows
-//    void updateTest_ReturnsSuccess() {
-//        EventUpdateRequestDto updateEventDto = getEventUpdateRequestDto();
-//
-//        ObjectMapper objectMapper = new ObjectMapper();
-//        objectMapper.findAndRegisterModules();
-//        String json = objectMapper.writeValueAsString(updateEventDto);
-//
-//        MockMultipartFile jsonFile = new MockMultipartFile("event", "", "application/json", json.getBytes());
-//        MockMultipartFile imageFile = new MockMultipartFile("images", "image.jpg", "image/jpeg", "Test image content".getBytes());
-//
-//        MockMultipartHttpServletRequestBuilder builder =
-//                MockMvcRequestBuilders.multipart(eventsLink);
-//        builder.with(request -> {
-//            request.setMethod("PUT");
-//            return request;
-//        });
-//
-//        mockMvc.perform(builder
-//                        .file(jsonFile)
-//                        .file(imageFile)
-//                        .principal(principal)
-//                        .accept(MediaType.APPLICATION_JSON)
-//                        .contentType(MediaType.MULTIPART_FORM_DATA_VALUE))
-//                .andExpect(status().isOk());
-//
-//        verify(eventService).update(eq(updateEventDto), any(MultipartFile[].class), eq(principal.getName()));
-//    }
-//
-//    @SneakyThrows
-//    private EventUpdateRequestDto getEventUpdateRequestDto() {
-//        String json = "{\n" +
-//                "    \"id\": 1,\n" +
-//                "    \"title\": \"Test title\",\n" +
-//                "    \"description\": \"Test description\",\n" +
-//                "    \"dateTimes\": [\n" +
-//                "        {\n" +
-//                "            \"allDay\": true,\n" +
-//                "            \"startDateTime\": \"2024-06-02T14:20:45.252Z\",\n" +
-//                "            \"endDateTime\": \"2024-06-02T14:20:45.252Z\",\n" +
-//                "            \"dayNumber\": 0,\n" +
-//                "            \"status\": \"ONLINE\",\n" +
-//                "            \"link\": \"http://example.com\",\n" +
-//                "            \"address\": {\n" +
-//                "                \"latitude\": 40.71427,\n" +
-//                "                \"longitude\": -74.00597,\n" +
-//                "                \"addressUa\": \"Україна, Київ\",\n" +
-//                "                \"addressEn\": \"USA, New York\"\n" +
-//                "            }\n" +
-//                "        }\n" +
-//                "    ],\n" +
-//                "    \"tagNames\": [\"Environment\", \"Recycling\"],\n" +
-//                "    \"open\": true\n" +
-//                "}";
-//
-//        ObjectMapper objectMapper = new ObjectMapper();
-//        objectMapper.findAndRegisterModules();
-//        objectMapper.configure(DeserializationFeature.READ_UNKNOWN_ENUM_VALUES_AS_NULL, true);
-//        return objectMapper.readValue(json, EventUpdateRequestDto.class);
-//    }
-
     @Test
-    void updateTest() throws Exception {
-        String json = "{\n" +
-                "  \"id\": 1,\n" +
-                "  \"title\": \"New Title\",\n" +
-                "  \"dateTimes\": [\n" +
-                "    {\n" +
-                "      \"startDateTime\": \"2024-06-02T14:20:45.252Z\",\n" +
-                "      \"endDateTime\": \"2024-06-02T14:20:45.252Z\",\n" +
-                "      \"dayNumber\": 0,\n" +
-                "      \"allDay\": true,\n" +
-                "      \"status\": \"ONLINE\",\n" +
-                "      \"link\": \"http://example.com\",\n" +
-                "      \"address\": null\n" +
-                "    }\n" +
-                "  ],\n" +
-                "  \"description\": \"New Description\",\n" +
-                "  \"tagNames\": [],\n" +
-                "  \"open\": true\n" +
-                "}";
+    void updateTest_ReturnsSuccess() throws Exception {
+        String json = """
+                {
+                    "id": 1,
+                    "title": "Test title",
+                    "description": "Test description Test description1",
+                    "dateTimes": [
+                        {
+                            "allDay": true,
+                            "startDateTime": "2024-06-02T00:00:00.000Z",
+                            "endDateTime": "2024-06-02T23:59:00.000Z",
+                            "dayNumber": 0,
+                            "status": "OFFLINE",
+                            "link": null,
+                            "address": {
+                                "latitude": -50,
+                                "longitude": 150,
+                                "addressUa": "Україна, Київ",
+                                "addressEn": "USA, New York"
+                            }
+                        }
+                    ],
+                    "tagNames": ["Environment", "Recycling"],
+                    "open": true
+                }""";
 
-        MockMultipartFile jsonFile = new MockMultipartFile(
-                "event",
-                "",
-                "application/json",
-                json.getBytes());
+        ObjectMapper objectMapper = new ObjectMapper();
+        objectMapper.findAndRegisterModules();
+        EventUpdateRequestDto updateEventDto = objectMapper.readValue(json, EventUpdateRequestDto.class);
 
-        MockMultipartHttpServletRequestBuilder builder =
-                MockMvcRequestBuilders.multipart(eventsLink);
+        MockMultipartFile jsonFile = new MockMultipartFile("event", "", "application/json", json.getBytes());
+        MockMultipartFile imageFile = new MockMultipartFile("images", "image.jpg", "image/jpeg", "Test image content".getBytes());
+
+        MockMultipartHttpServletRequestBuilder builder = MockMvcRequestBuilders.multipart(eventsLink);
         builder.with(request -> {
             request.setMethod("PUT");
             return request;
         });
 
-        mockMvc.perform(builder
-                        .file(jsonFile)
+        mockMvc.perform(builder.file(jsonFile)
+                        .file(imageFile)
                         .principal(principal)
                         .accept(MediaType.APPLICATION_JSON)
-                        .contentType(MediaType.APPLICATION_JSON))
+                        .contentType(MediaType.MULTIPART_FORM_DATA_VALUE))
                 .andExpect(status().isOk());
 
-        ObjectMapper mapper = new ObjectMapper();
-        mapper.registerModule(new JavaTimeModule());
-        EventUpdateRequestDto eventUpdateRequestDto = mapper.readValue(json, EventUpdateRequestDto.class);
-
-        verify(eventService).update(eq(eventUpdateRequestDto), any(), eq(principal.getName()));
+        verify(eventService).update(eq(updateEventDto), any(MultipartFile[].class), eq(principal.getName()));
     }
 
     @Test
