@@ -137,6 +137,7 @@ public class EventsController {
     })
     @PutMapping(consumes = {MediaType.MULTIPART_FORM_DATA_VALUE, MediaType.APPLICATION_JSON_VALUE})
     public ResponseEntity<EventResponseDto> update(
+            @Parameter(description = SwaggerExampleModel.UPDATE_EVENT, required = true)
             @RequestPart("event") @Valid EventUpdateRequestDto eventDto,
             @RequestPart(value = "images", required = false)
             @ImageArrayValidation @Size(max = 5, message = "Download up to 5 images") MultipartFile[] images,

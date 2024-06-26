@@ -4,29 +4,11 @@ import greencity.annotations.EventDateAfterOneHour;
 import greencity.dto.event.EventSaveDayInfoDto;
 import jakarta.validation.ConstraintValidator;
 import jakarta.validation.ConstraintValidatorContext;
-import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.context.ApplicationContext;
-import org.springframework.stereotype.Component;
 
 import java.time.ZonedDateTime;
 import java.util.List;
 
-@Component
 public class EventDateAfterOneHourValidator implements ConstraintValidator<EventDateAfterOneHour, List<EventSaveDayInfoDto>> {
-
-    private static ApplicationContext applicationContext;
-    private ClockWrapper clockWrapper;
-
-    @Autowired
-    public void setApplicationContext(ApplicationContext applicationContext) {
-        EventDateAfterOneHourValidator.applicationContext = applicationContext;
-    }
-
-    @Override
-    public void initialize(EventDateAfterOneHour constraintAnnotation) {
-        this.clockWrapper = applicationContext.getBean(ClockWrapper.class);
-    }
-
     /**
      * Validates a list of EventDayInfo objects to ensure the first event's start time is at least one hour
      * from the current time.
@@ -44,7 +26,7 @@ public class EventDateAfterOneHourValidator implements ConstraintValidator<Event
     @Override
     public boolean isValid(List<EventSaveDayInfoDto> value, ConstraintValidatorContext context) {
         //first dateTime of event should be at least in one hour after now
-        ZonedDateTime nowPlusOneHour = clockWrapper.now().plusHours(1);
+        ZonedDateTime nowPlusOneHour = ZonedDateTime.now().plusHours(1);
         if (value != null && value.size() > 0 && value.get(0).getStartDateTime().isBefore(nowPlusOneHour)) {
             return false;
         }
