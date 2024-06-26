@@ -90,12 +90,12 @@ class EventsControllerTest {
                 "  \"title\": \"string\",\n" +
                 "  \"daysInfo\": [\n" +
                 "    {\n" +
-                "      \"startDateTime\": \"2024-06-02T14:20:45.252Z\",\n" +
-                "      \"endDateTime\": \"2024-06-02T14:20:45.252Z\",\n" +
+                "      \"startDateTime\": \"2029-07-02T14:20:45.252Z\",\n" +
+                "      \"endDateTime\": \"2029-07-02T19:20:45.252Z\",\n" +
                 "      \"dayNumber\": 0,\n" +
-                "      \"allDay\": true,\n" +
+                "      \"allDay\": false,\n" +
                 "      \"status\": \"ONLINE\",\n" +
-                "      \"link\": \"string\",\n" +
+                "      \"link\": \"https://test-link.com\",\n" +
                 "      \"address\": null\n" +
                 "    }\n" +
                 "  ],\n" +
@@ -345,14 +345,41 @@ class EventsControllerTest {
                         .content("{}")
                         .accept(MediaType.APPLICATION_JSON)
                         .contentType(MediaType.APPLICATION_JSON))
-                .andExpect(status().isBadRequest());
+                         .andExpect(status().isBadRequest());
     }
-
+  
     @Test
     void updateTest_ReturnsUnsupportedMediaType() throws Exception {
         mockMvc.perform(MockMvcRequestBuilders.put(eventsLink)
                         .content("{}")
                         .accept(MediaType.APPLICATION_JSON))
                 .andExpect(status().isUnsupportedMediaType());
+    }
+  
+    @Test
+    void getAllEventAttendersTest_ReturnsIsOk() throws Exception {
+        Long eventId = 1L;
+        mockMvc.perform(get(eventsLink + "/attender/{eventId}", eventId))
+                .andExpect(status().isOk());
+
+        verify(eventService).findAllAttendersByEvent(eventId);
+    }
+
+    @Test
+    void getAllEventAttenders_ReturnsBadRequest_WithNoValidId() throws Exception {
+        String notValidId = "id";
+        mockMvc.perform(get(eventsLink + "/attender/{eventId}", notValidId))
+          .andExpect(status().isBadRequest());
+    }
+
+    @Test
+    void getAllEventAttenders_ReturnsNotFound() throws Exception {
+        Long eventId = 1L;
+
+        when(eventService.findAllAttendersByEvent(eventId)).thenThrow(NotFoundException.class);
+
+        mockMvc.perform(get(eventsLink + "/attender/{userId}", eventId)
+                        .contentType(MediaType.APPLICATION_JSON))
+                .andExpect(status().isNotFound());
     }
 }
