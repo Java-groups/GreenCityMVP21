@@ -35,4 +35,12 @@ public interface EventService {
      * @param user - user.
      */
     void addAttender(Long eventId, UserVO user);
+
+    /**
+     * Remove an attender from the Event by id.
+     *
+     * @param eventId - event id.
+     * @param email - user`s email.
+     */
+    void removeAttender(Long eventId, String email);
 }
