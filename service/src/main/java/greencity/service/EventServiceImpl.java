@@ -5,6 +5,7 @@ import greencity.constant.ErrorMessage;
 import greencity.dto.PageableAdvancedDto;
 import greencity.dto.event.*;
 import greencity.entity.Tag;
+import greencity.entity.event.EventDayInfo;
 import greencity.entity.event.EventImage;
 import greencity.entity.event.Event;
 import greencity.dto.tag.TagVO;
@@ -20,6 +21,7 @@ import greencity.exception.exceptions.WrongIdException;
 import greencity.message.EventEmailMessage;
 import greencity.repository.EventRepo;
 import greencity.repository.UserRepo;
+import jakarta.transaction.Transactional;
 import lombok.RequiredArgsConstructor;
 import org.modelmapper.ModelMapper;
 import org.modelmapper.TypeToken;
@@ -31,6 +33,7 @@ import org.springframework.web.context.request.RequestAttributes;
 import org.springframework.web.context.request.RequestContextHolder;
 import org.springframework.web.multipart.MultipartFile;
 
+import java.time.ZonedDateTime;
 import java.util.*;
 import java.util.concurrent.Executors;
 import java.util.concurrent.ThreadPoolExecutor;
@@ -39,11 +42,12 @@ import java.util.stream.Collectors;
 @Service
 @EnableCaching
 @RequiredArgsConstructor
-public class EventServiceImpl implements EventService{
+public class EventServiceImpl implements EventService {
     private final EventRepo eventRepo;
     private final ModelMapper modelMapper;
     private final FileService fileService;
     private final UserRepo userRepo;
+    private final UserService userService;
     private final RestClient restClient;
     private final TagsService tagsService;
     private final ThreadPoolExecutor emailThreadPool = (ThreadPoolExecutor) Executors.newFixedThreadPool(1);
@@ -60,7 +64,6 @@ public class EventServiceImpl implements EventService{
         if (images != null && images.length > 0) {
             for (int i = 0; i < uploadedImages.length; i++) {
                 eventImages.add(EventImage.builder().imagePath(uploadedImages[i]).isMain(false).build());
-
             }
             eventImages.get(event.getMainImageNumber() - 1).setMain(true);
         }
@@ -90,21 +93,49 @@ public class EventServiceImpl implements EventService{
         return modelMapper.map(eventToSave, EventResponseDto.class);
     }
 
+    @Override
+    @Transactional
+    public EventResponseDto update(
+            EventUpdateRequestDto eventUpdateRequestDto,
+            MultipartFile[] images,
+            String email
+    ) {
+        UserVO userVO = userService.findByEmail(email);
+        Event event = eventRepo.findById(eventUpdateRequestDto.getId())
+                .orElseThrow(() -> new NotFoundException(ErrorMessage.EVENT_NOT_FOUND_BY_ID + eventUpdateRequestDto.getId()));
+
+        if (!event.getAuthor().getId().equals(userVO.getId()) && userVO.getRole() != Role.ROLE_ADMIN) {
+            throw new UserHasNoPermissionToAccessException("User has no permission to edit this event");
+        }
+
+        if (event.getDayInfos().stream().anyMatch(d -> d.getStartDateTime().isBefore(ZonedDateTime.now()))) {
+            throw new IllegalArgumentException("Cannot edit past events");
+        }
+
+        event.setTitle(eventUpdateRequestDto.getTitle());
+        event.setDescription(eventUpdateRequestDto.getDescription());
+        event.setOpen(eventUpdateRequestDto.getIsOpen());
+
+        updateImages(event, images);
+        updateDayInfos(event, eventUpdateRequestDto.getDateTimes());
+        updateTags(event, eventUpdateRequestDto.getTagNames());
+
+        eventRepo.save(event);
+        return modelMapper.map(event, EventResponseDto.class);
+    }
+
+    @Override
+    @Transactional
     public void delete(Long id, String email) {
-        UserVO userVO = restClient.findByEmail(email);
+        UserVO userVO = userService.findByEmail(email);
         Event toDelete = eventRepo.findById(id)
-                .orElseThrow(() -> new NotFoundException(ErrorMessage.EVENT_NOT_FOUND));
+                .orElseThrow(() -> new NotFoundException(ErrorMessage.EVENT_NOT_FOUND_BY_ID + id));
 
         if (toDelete.getAuthor().getId().equals(userVO.getId()) || userVO.getRole() == Role.ROLE_ADMIN) {
             eventRepo.delete(toDelete);
         } else {
             throw new UserHasNoPermissionToAccessException(ErrorMessage.USER_HAS_NO_PERMISSION);
         }
-    }
-
-    @Override
-    public EventResponseDto update(EventRequestSaveDto event, List<MultipartFile> images, UserVO author) {
-        return null;
     }
 
     @Override
@@ -228,5 +259,37 @@ public class EventServiceImpl implements EventService{
                 eventPage.hasNext(),
                 eventPage.isFirst(),
                 eventPage.isLast());
+    }
+
+
+    private void updateDayInfos(Event event, List<EventSaveDayInfoDto> eventSaveDayInfoDto) {
+        List<EventDayInfo> dayInfos = eventSaveDayInfoDto.stream()
+                .map(dto -> modelMapper.map(dto, EventDayInfo.class))
+                .toList();
+
+        event.setDayInfos(new ArrayList<>(dayInfos));
+    }
+
+    private void updateImages(Event event, MultipartFile[] images) {
+        event.getImages().forEach(image -> fileService.delete(image.getImagePath()));
+
+        String[] uploadedImages = uploadImages(images);
+
+        List<EventImage> eventImages = Arrays.stream(uploadedImages)
+                .map(path -> EventImage.builder().imagePath(path).isMain(false).build())
+                .collect(Collectors.toList());
+        if (!eventImages.isEmpty()) {
+            eventImages.getFirst().setMain(true);
+        }
+
+        event.setImages(eventImages);
+    }
+
+    private void updateTags(Event event, List<String> tagNames) {
+        List<Tag> tags = modelMapper.map(
+                tagsService.findTagsByNamesAndType(tagNames, TagType.EVENT),
+                new TypeToken<List<Tag>>() {}.getType());
+
+        event.setTags(tags);
     }
 }

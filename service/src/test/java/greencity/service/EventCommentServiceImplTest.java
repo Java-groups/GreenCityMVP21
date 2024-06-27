@@ -1,10 +1,8 @@
 package greencity.service;
 
 import greencity.ModelUtils;
-import greencity.client.RestClient;
 import greencity.constant.ErrorMessage;
 import greencity.dto.PageableDto;
-import greencity.dto.event.EventResponseDto;
 import greencity.dto.eventcomment.EventCommentRequestDto;
 import greencity.dto.eventcomment.EventCommentResponseDto;
 import greencity.dto.user.UserVO;
@@ -70,7 +68,7 @@ class EventCommentServiceImplTest {
         UserVO currentUser = getUserVO();
         when(userService.findByEmail(email)).thenReturn(currentUser);
         EventComment eventComment = getEventComment();
-        Event event = getEvent();
+        Event event = getEvent(1L);
 
         when(eventRepo.findById(eventId)).thenReturn(Optional.of(event));
         when(eventCommentRepo.findByIdAndStatusNot(commentId, CommentStatus.DELETED)).thenReturn(Optional.ofNullable(eventComment));
@@ -88,7 +86,7 @@ class EventCommentServiceImplTest {
         String editedText = "Updated Comment";
         String email = "email@email.com";
 
-        Event event = getEvent();
+        Event event = getEvent(1L);
         when(eventRepo.findById(eventId)).thenReturn(Optional.of(event));
         when(eventCommentRepo.findByIdAndStatusNot(commentId, CommentStatus.DELETED)).thenReturn(Optional.empty());
 
@@ -99,7 +97,7 @@ class EventCommentServiceImplTest {
 
     @Test
     void updateCommentThatDoesntBelongsToUserThrowException() {
-        User user = ModelUtils.getUser();
+        User user = ModelUtils.getUser(1L);
         UserVO currentUser = getUserVO();
         user.setId(2L);
 
@@ -111,7 +109,7 @@ class EventCommentServiceImplTest {
         String email = "email@email.com";
         when(userService.findByEmail(email)).thenReturn(currentUser);
 
-        Event event = getEvent();
+        Event event = getEvent(1L);
         when(eventRepo.findById(eventId)).thenReturn(Optional.of(event));
         when(eventCommentRepo.findByIdAndStatusNot(commentId, CommentStatus.DELETED)).thenReturn(Optional.of(eventComment));
 
@@ -126,9 +124,9 @@ class EventCommentServiceImplTest {
         Long eventId = 1L;
         EventCommentRequestDto requestDto = getEventCommentRequestDto();
         UserVO userVO = getUserVO();
-        Event event = getEvent();
+        Event event = getEvent(1L);
         EventComment eventComment = getEventComment();
-        User user = getUser();
+        User user = getUser(1L);
         EventCommentResponseDto responseDto = getEventCommentResponseDto().setMentionedUsers(new ArrayList<>());
         when(eventRepo.findById(eventId)).thenReturn(Optional.of(event));
         when(modelMapper.map(requestDto, EventComment.class)).thenReturn(eventComment);
@@ -145,9 +143,9 @@ class EventCommentServiceImplTest {
         EventCommentRequestDto requestDto = getEventCommentRequestDto();
         requestDto.setText("text @username");
         UserVO userVO = getUserVO();
-        Event event = getEvent();
+        Event event = getEvent(1L);
         EventComment eventComment = getEventComment();
-        User user = getUser();
+        User user = getUser(1L);
         User mentionedUser = User.builder().id(2L).name("username").build();
         EventCommentResponseDto responseDto = getEventCommentResponseDto().setMentionedUsers(new ArrayList<>());
         when(eventRepo.findById(eventId)).thenReturn(Optional.of(event));
@@ -171,7 +169,7 @@ class EventCommentServiceImplTest {
     @Test
     void countOfComments() {
         Long eventId = 1L;
-        Event event = getEvent();
+        Event event = getEvent(1L);
         int expected = 5;
         when(eventRepo.findById(eventId)).thenReturn(Optional.of(event));
         when(eventCommentRepo.countByEvent(event)).thenReturn(expected);
@@ -191,7 +189,7 @@ class EventCommentServiceImplTest {
         int pageNumber = 0;
         int pageSize = 20;
         Pageable pageable = PageRequest.of(pageNumber, pageSize);
-        Event event = getEvent();
+        Event event = getEvent(1L);
         EventComment comment = getEventComment();
         EventCommentResponseDto responseDto = getEventCommentResponseDto();
         List<EventComment> expectedComments = List.of(comment);
@@ -219,7 +217,7 @@ class EventCommentServiceImplTest {
     void getByEventCommentId() {
         Long eventId = 1L;
         Long commentId = 1L;
-        Event event = getEvent();
+        Event event = getEvent(1L);
         EventComment comment = getEventComment();
         EventCommentResponseDto expected = getEventCommentResponseDto();
         when(eventRepo.findById(eventId)).thenReturn(Optional.of(event));
@@ -240,7 +238,7 @@ class EventCommentServiceImplTest {
     void getByEventCommentIdThrowsNotFoundComment() {
         Long eventId = 1L;
         Long commentId = 0L;
-        Event event = getEvent();
+        Event event = getEvent(1L);
         when(eventRepo.findById(eventId)).thenReturn(Optional.of(event));
         when(eventCommentRepo.findById(commentId)).thenReturn(Optional.empty());
         assertThrows(NotFoundException.class, () -> eventCommentService.getByEventCommentId(eventId, commentId));
@@ -250,7 +248,7 @@ class EventCommentServiceImplTest {
     void getByEventCommentIdThrowsBadRequest() {
         Long eventId = 1L;
         Long commentId = 1L;
-        Event event = getEvent();
+        Event event = getEvent(1L);
         EventComment comment = EventComment.builder()
                 .id(commentId)
                 .event(Event.builder()

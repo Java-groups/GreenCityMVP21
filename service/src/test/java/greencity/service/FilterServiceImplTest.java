@@ -40,7 +40,7 @@ class FilterServiceImplTest {
     void saveTest() {
         UserFilterDtoRequest dto = ModelUtils.getUserFilterDtoRequest();
         Filter filter = ModelUtils.getFilter();
-        User user = ModelUtils.getUser();
+        User user = ModelUtils.getUser(1L);
         when(modelMapper.map(dto, Filter.class)).thenReturn(filter);
         when(userRepo.findById(1L)).thenReturn(Optional.of(user));
         when(filterRepo.save(filter)).thenReturn(filter);

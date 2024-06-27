@@ -84,7 +84,7 @@ class UserServiceImplTest {
     void checkIfTheUserIsOnlineEqualsTrueTest() {
         ReflectionTestUtils.setField(userService, "timeAfterLastActivity", 300000);
         Timestamp userLastActivityTime = Timestamp.valueOf(LocalDateTime.now());
-        User user = ModelUtils.getUser();
+        User user = ModelUtils.getUser(1L);
 
         when(userRepo.findById(anyLong())).thenReturn(Optional.of(user));
         when(userRepo.findLastActivityTimeById(anyLong())).thenReturn(Optional.of(userLastActivityTime));
@@ -95,7 +95,7 @@ class UserServiceImplTest {
     @Test
     void checkIfTheUserIsOnlineEqualsFalseTest() {
         ReflectionTestUtils.setField(userService, "timeAfterLastActivity", 300000);
-        User user = ModelUtils.getUser();
+        User user = ModelUtils.getUser(1L);
 
         when(userRepo.findById(anyLong())).thenReturn(Optional.of(user));
         when(userRepo.findLastActivityTimeById(anyLong())).thenReturn(Optional.empty());
@@ -105,7 +105,7 @@ class UserServiceImplTest {
 
     @Test
     void checkUpdatableUserTest() {
-        when(userRepo.findByEmail(anyString())).thenReturn(Optional.of(ModelUtils.getUser()));
+        when(userRepo.findByEmail(anyString())).thenReturn(Optional.of(ModelUtils.getUser(1L)));
         when(modelMapper.map(any(), any())).thenReturn(userVO);
         Exception exception = assertThrows(BadUpdateRequestException.class, () -> {
             userService.checkUpdatableUser(1L, "email");
@@ -115,7 +115,7 @@ class UserServiceImplTest {
 
     @Test
     void getInitialsByIdTest() {
-        when(userRepo.findById(any())).thenReturn(Optional.of(ModelUtils.getUser()));
+        when(userRepo.findById(any())).thenReturn(Optional.of(ModelUtils.getUser(1L)));
         when(modelMapper.map(any(), any())).thenReturn(userVO);
         assertEquals("TT", userService.getInitialsById(12L));
         userVO.setName("Taras");

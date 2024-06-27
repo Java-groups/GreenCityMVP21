@@ -17,7 +17,7 @@ class EventCommentAuthorDtoMapperTest {
 
     @Test
     void convert() {
-        User user = ModelUtils.getUser();
+        User user = ModelUtils.getUser(1L);
         EventCommentAuthorDto expected = EventCommentAuthorDto.builder()
                 .id(user.getId())
                 .name(user.getName())

@@ -5,12 +5,10 @@ import lombok.*;
 
 import java.time.ZonedDateTime;
 
+@Data
+@Builder
 @NoArgsConstructor
 @AllArgsConstructor
-@Builder
-@Getter
-@Setter
-@EqualsAndHashCode
 public class EventSaveDayInfoDto {
     private boolean isAllDay;
 

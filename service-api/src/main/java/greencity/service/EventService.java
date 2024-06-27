@@ -4,6 +4,7 @@ import greencity.dto.PageableAdvancedDto;
 import greencity.dto.event.EventAttendanceDto;
 import greencity.dto.event.EventRequestSaveDto;
 import greencity.dto.event.EventResponseDto;
+import greencity.dto.event.EventUpdateRequestDto;
 import greencity.dto.user.UserVO;
 import org.springframework.data.domain.Pageable;
 import org.springframework.web.multipart.MultipartFile;
@@ -14,9 +15,9 @@ import java.util.Set;
 public interface EventService {
     EventResponseDto save(EventRequestSaveDto event, MultipartFile[] images, UserVO author);
 
-    void delete(Long id, String email);
+    EventResponseDto update(EventUpdateRequestDto eventUpdateRequestDto, MultipartFile[] images, String email);
 
-    EventResponseDto update(EventRequestSaveDto event, List<MultipartFile> images, UserVO author);
+    void delete(Long id, String email);
 
     //Pageable implements sorted criteria
     PageableAdvancedDto<EventResponseDto> findAll(Pageable pageable);

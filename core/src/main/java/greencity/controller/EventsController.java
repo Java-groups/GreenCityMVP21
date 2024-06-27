@@ -10,6 +10,7 @@ import greencity.dto.event.EventAttendanceDto;
 import greencity.dto.event.EventAuthorDto;
 import greencity.dto.event.EventRequestSaveDto;
 import greencity.dto.event.EventResponseDto;
+import greencity.dto.event.EventUpdateRequestDto;
 import greencity.dto.user.UserVO;
 import greencity.service.EventService;
 import io.swagger.v3.oas.annotations.Operation;
@@ -121,9 +122,39 @@ public class EventsController {
     }
 
     /**
-     * Method for deleting an event.
+     * Updates an existing event with new data provided via DTO.
+     * This method allows updating the event if the principal (current user) has appropriate permissions.
      *
-     * @author Max Bohonko.
+     * @param eventDto the DTO containing updated data for the event.
+     * @param principal the security principal representing the currently authenticated user.
+     * @return a {@link ResponseEntity} with {@link EventResponseDto}, reflecting the updated event data.
+     */
+    @Operation(summary = "Update an existing event")
+    @ApiResponses(value = {
+            @ApiResponse(responseCode = "200", description = "Successfully updated the event",
+                    content = @Content(schema = @Schema(implementation = EventResponseDto.class))),
+            @ApiResponse(responseCode = "400", description = "Bad request, possibly due to validation issues"),
+            @ApiResponse(responseCode = "401", description = "Unauthorized request, authentication required"),
+            @ApiResponse(responseCode = "403", description = "Forbidden, current user does not have permission to update this event"),
+            @ApiResponse(responseCode = "404", description = "The event with specified ID was not found")
+    })
+    @PutMapping(consumes = {MediaType.MULTIPART_FORM_DATA_VALUE, MediaType.APPLICATION_JSON_VALUE})
+    public ResponseEntity<EventResponseDto> update(
+            @Parameter(description = SwaggerExampleModel.UPDATE_EVENT, required = true)
+            @RequestPart("event") @Valid EventUpdateRequestDto eventDto,
+            @RequestPart(value = "images", required = false)
+            @ImageArrayValidation @Size(max = 5, message = "Download up to 5 images") MultipartFile[] images,
+            @Parameter(hidden = true) Principal principal) {
+
+        return ResponseEntity.ok().body(eventService.update(eventDto, images, principal.getName()));
+    }
+
+    /**
+     * Method for deleting an event by a given Event ID.
+     *
+     * @param eventId the ID of the event to be deleted.
+     * @param principal is automatically inserted via SecurityContextHolder, in this context - the user's name.
+     * @return ResponseEntity<Object> this returns server's response which denotes the status of the operation.
      */
     @Operation(summary = "Delete event")
     @ApiResponses(value = {
@@ -137,7 +168,7 @@ public class EventsController {
         @ApiResponse(responseCode = "404", description = HttpStatuses.NOT_FOUND,
             content = @Content(examples = @ExampleObject(HttpStatuses.NOT_FOUND)))
     })
-    @DeleteMapping("/delete/{eventId}")
+    @DeleteMapping("/{eventId}")
     public ResponseEntity<Object> delete(@PathVariable Long eventId, @Parameter(hidden = true) Principal principal) {
         eventService.delete(eventId, principal.getName());
         return ResponseEntity.status(HttpStatus.OK).build();

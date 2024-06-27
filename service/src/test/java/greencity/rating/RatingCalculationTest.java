@@ -35,7 +35,7 @@ class RatingCalculationTest {
     void ratingCalculation() {
 
         RatingCalculationEnum rating = RatingCalculationEnum.ADD_COMMENT;
-        User user = ModelUtils.getUser();
+        User user = ModelUtils.getUser(1L);
         user.setRating(1D);
         UserVO userVO = ModelUtils.getUserVO();
         userVO.setRating(1D);

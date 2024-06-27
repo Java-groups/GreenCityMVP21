@@ -17,7 +17,7 @@ class EcoNewsAuthorDtoMapperTest {
 
     @Test
     void convert() {
-        User userToBeConverted = ModelUtils.getUser();
+        User userToBeConverted = ModelUtils.getUser(1L);
         EcoNewsAuthorDto expected = EcoNewsAuthorDto.builder()
                 .id(userToBeConverted.getId())
                 .name(userToBeConverted.getName())
