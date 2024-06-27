@@ -181,6 +181,7 @@
     <include file="db/changelog/logs/ch-insert-into-users-friends_Koval.xml"/>
     <include file="db/changelog/logs/ch-insert-into-habit-assign-Koval.xml"/>
     <include file="db/changelog/logs/ch-insert-into-users-Koval.xml"/>
+    <include file="db/changelog/logs/ch-create-table-friendship-request-Koval.xml"/>
     <include file="db/changelog/logs/ch-add-table-events-Kasarab.xml"/>
     <include file="db/changelog/logs/ch-add-table-event-images-Kasarab.xml"/>
     <include file="db/changelog/logs/ch-add-table-event-day-infos-Kasarab.xml"/>

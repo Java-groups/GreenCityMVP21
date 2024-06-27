@@ -1,7 +1,7 @@
 package greencity.mapping;
 
-import greencity.entity.Friendship;
-import greencity.entity.FriendshipId;
+import greencity.entity.friend.Friendship;
+import greencity.entity.friend.FriendshipId;
 import org.springframework.stereotype.Component;
 import java.time.LocalDateTime;
 
