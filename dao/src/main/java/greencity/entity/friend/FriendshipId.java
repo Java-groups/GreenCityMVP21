@@ -1,4 +1,4 @@
-package greencity.entity;
+package greencity.entity.friend;
 
 import jakarta.persistence.Embeddable;
 

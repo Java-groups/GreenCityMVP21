@@ -1,0 +1,42 @@
+<?xml version="1.0" encoding="UTF-8" standalone="no"?>
+<databaseChangeLog xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+                   xmlns="http://www.liquibase.org/xml/ns/dbchangelog"
+                   xsi:schemaLocation="http://www.liquibase.org/xml/ns/dbchangelog http://www.liquibase.org/xml/ns/dbchangelog/dbchangelog-3.8.xsd">
+
+    <changeSet id="26-06-24-1" author="Dimon">
+        <createTable tableName="friendship_request">
+            <column name="user_id" type="BIGINT">
+                <constraints nullable="false"/>
+            </column>
+            <column name="friend_id" type="BIGINT">
+                <constraints nullable="false"/>
+            </column>
+            <column name="status" type="VARCHAR(50)">
+                <constraints nullable="false"/>
+            </column>
+            <column name="created_date" type="TIMESTAMP">
+                <constraints nullable="false"/>
+            </column>
+        </createTable>
+    </changeSet>
+
+    <changeSet id="26-06-24-2" author="Dimon">
+        <addPrimaryKey columnNames="user_id, friend_id" constraintName="PK_friendship_request" tableName="friendship_request"/>
+    </changeSet>
+
+    <changeSet id="26-06-24-3" author="Dimon">
+        <addForeignKeyConstraint baseColumnNames="user_id"
+                                 baseTableName="friendship_request"
+                                 constraintName="fk_friendship_user"
+                                 referencedColumnNames="id"
+                                 referencedTableName="users"/>
+    </changeSet>
+
+    <changeSet id="26-06-24-4" author="Dimon">
+        <addForeignKeyConstraint baseColumnNames="friend_id"
+                                 baseTableName="friendship_request"
+                                 constraintName="fk_friendship_friend"
+                                 referencedColumnNames="id"
+                                 referencedTableName="users"/>
+    </changeSet>
+</databaseChangeLog>

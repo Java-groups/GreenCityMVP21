@@ -11,6 +11,7 @@ import org.springframework.data.jpa.repository.JpaRepository;
 import org.springframework.data.jpa.repository.JpaSpecificationExecutor;
 import org.springframework.data.jpa.repository.Modifying;
 import org.springframework.data.jpa.repository.Query;
+import org.springframework.data.repository.query.Param;
 import org.springframework.stereotype.Repository;
 import org.springframework.transaction.annotation.Transactional;
 import java.sql.Timestamp;
@@ -142,4 +143,21 @@ public interface UserRepo extends JpaRepository<User, Long>, JpaSpecificationExe
         + "(SELECT user_id FROM users_friends WHERE friend_id = :userId and status = 'FRIEND')"
         + "UNION (SELECT friend_id FROM users_friends WHERE user_id = :userId and status = 'FRIEND'));")
     List<User> getAllUserFriends(Long userId);
+
+    /**
+     * Finds friendship requests by user ID and status.
+     *
+     * @param userId the ID of the user who is the friend in the friendship requests
+     * @param status the status of the friendship requests to filter by
+     * @param pageable the pagination information
+     * @return a page of users who have sent friendship requests to the specified user with the given status
+     *
+     * @author Dmytro.Koval
+     */
+    @Query(nativeQuery = true, value = "SELECT u.* FROM friendship_request fr "
+            + "JOIN users u ON fr.user_id = u.id "
+            + "WHERE fr.friend_id = :userId AND fr.status = :status")
+    Page<User> getFriendshipRequests(@Param("userId") Long userId,
+                                     @Param("status")String status,
+                                     Pageable pageable);
 }
