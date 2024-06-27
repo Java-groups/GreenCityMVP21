@@ -65,7 +65,7 @@ class EcoNewsCommentServiceImplTest {
     @Test
     void saveCommentWithNoParentCommentId() {
         UserVO userVO = getUserVO();
-        User user = getUser();
+        User user = getUser(1L);
         EcoNewsVO ecoNewsVO = ModelUtils.getEcoNewsVO();
         EcoNews ecoNews = ModelUtils.getEcoNews();
         AddEcoNewsCommentDtoRequest addEcoNewsCommentDtoRequest = ModelUtils.getAddEcoNewsCommentDtoRequest();
@@ -85,7 +85,7 @@ class EcoNewsCommentServiceImplTest {
 
     @Test
     void saveCommentWithParentCommentId() {
-        User user = getUser();
+        User user = getUser(1L);
         UserVO userVO = getUserVO();
         EcoNews ecoNews = ModelUtils.getEcoNews();
         EcoNewsVO ecoNewsVO = ModelUtils.getEcoNewsVO();
@@ -116,7 +116,7 @@ class EcoNewsCommentServiceImplTest {
 
     @Test
     void saveCommentThatHaveReplyWithAnotherReplyThrowException() {
-        User user = getUser();
+        User user = getUser(1L);
         UserVO userVO = getUserVO();
         EcoNews ecoNews = ModelUtils.getEcoNews();
         EcoNewsVO ecoNewsVO = ModelUtils.getEcoNewsVO();
@@ -165,7 +165,6 @@ class EcoNewsCommentServiceImplTest {
         int pageSize = 3;
         Pageable pageable = PageRequest.of(pageNumber, pageSize);
         UserVO userVO = getUserVO();
-        User user = getUser();
         Long ecoNewsId = 1L;
         EcoNewsComment ecoNewsComment = ModelUtils.getEcoNewsComment();
         ecoNewsComment.setUsersLiked(new HashSet<>());
@@ -192,7 +191,6 @@ class EcoNewsCommentServiceImplTest {
         int pageSize = 3;
         Pageable pageable = PageRequest.of(pageNumber, pageSize);
         UserVO userVO = getUserVO();
-        User user = getUser();
         Long parentCommentId = 1L;
         EcoNewsComment ecoNewsCommentChild = ModelUtils.getEcoNewsComment();
         ecoNewsCommentChild.setParentComment(ModelUtils.getEcoNewsComment());
@@ -215,7 +213,6 @@ class EcoNewsCommentServiceImplTest {
     @Test
     void userDeletesOwnComment() {
         UserVO userVO = getUserVO();
-        User user = ModelUtils.getUser();
         Long commentId = 1L;
 
         when(ecoNewsCommentRepo.findById(commentId))
@@ -227,7 +224,7 @@ class EcoNewsCommentServiceImplTest {
 
     @Test
     void moderatorDeletesComment() {
-        User user = ModelUtils.getUser();
+        User user = ModelUtils.getUser(1L);
         UserVO userVO = getUserVO();
         user.setRole(Role.ROLE_MODERATOR);
         Long commentId = 1L;
@@ -241,7 +238,7 @@ class EcoNewsCommentServiceImplTest {
 
     @Test
     void adminDeletesComment() {
-        User user = ModelUtils.getUser();
+        User user = ModelUtils.getUser(1L);
         UserVO userVO = getUserVO();
         user.setRole(Role.ROLE_ADMIN);
         Long commentId = 1L;
@@ -255,7 +252,7 @@ class EcoNewsCommentServiceImplTest {
 
     @Test
     void deleteCommentThatDoesntExistsThrowException() {
-        User user = ModelUtils.getUser();
+        User user = ModelUtils.getUser(1L);
         UserVO userVO = getUserVO();
         Long commentId = 1L;
 
@@ -268,9 +265,7 @@ class EcoNewsCommentServiceImplTest {
 
     @Test
     void deleteCommentUserHasNoPermissionThrowException() {
-        User user = ModelUtils.getUser();
-
-        User userToDelete = ModelUtils.getUser();
+        User user = ModelUtils.getUser(1L);
         UserVO userToDeleteVO = getUserVO();
         user.setId(2L);
         Long commentId = 1L;
@@ -312,7 +307,7 @@ class EcoNewsCommentServiceImplTest {
 
     @Test
     void updateCommentThatDoesntBelongsToUserThrowException() {
-        User user = ModelUtils.getUser();
+        User user = ModelUtils.getUser(1L);
         UserVO userToUpdateVO = getUserVO();
         user.setId(2L);
         Long commentId = 1L;
@@ -332,7 +327,7 @@ class EcoNewsCommentServiceImplTest {
     void likeComment() {
         EcoNewsComment ecoNewsComment = ModelUtils.getEcoNewsComment();
         EcoNewsCommentVO ecoNewsCommentVO = ModelUtils.getEcoNewsCommentVO();
-        User user = ModelUtils.getUser();
+        User user = ModelUtils.getUser(1L);
         UserVO userVO = getUserVO();
         userVO.setId(2L);
         Long commentId = 1L;
@@ -353,7 +348,7 @@ class EcoNewsCommentServiceImplTest {
     void unlikeComment() {
         EcoNewsComment ecoNewsComment = ModelUtils.getEcoNewsComment();
         EcoNewsCommentVO ecoNewsCommentVO = ModelUtils.getEcoNewsCommentVO();
-        User user = ModelUtils.getUser();
+        User user = ModelUtils.getUser(1L);
         UserVO userVO = getUserVO();
         Long commentId = 1L;
 
@@ -443,7 +438,7 @@ class EcoNewsCommentServiceImplTest {
     @Test
     void getAllActiveComments() {
         EcoNewsComment ecoNewsComment = ModelUtils.getEcoNewsComment();
-        ecoNewsComment.setUsersLiked(Collections.singleton(ModelUtils.getUser()));
+        ecoNewsComment.setUsersLiked(Collections.singleton(ModelUtils.getUser(1L)));
         UserVO userVO = ModelUtils.getUserVO();
 
         List<EcoNewsComment> ecoNewsComments = Collections.singletonList(ecoNewsComment);
@@ -468,7 +463,7 @@ class EcoNewsCommentServiceImplTest {
     @Test
     void findAllActiveReplies() {
         EcoNewsComment ecoNewsComment = ModelUtils.getEcoNewsComment();
-        ecoNewsComment.setUsersLiked(Collections.singleton(ModelUtils.getUser()));
+        ecoNewsComment.setUsersLiked(Collections.singleton(ModelUtils.getUser(1L)));
         UserVO userVO = ModelUtils.getUserVO();
 
         List<EcoNewsComment> ecoNewsComments = Collections.singletonList(ecoNewsComment);

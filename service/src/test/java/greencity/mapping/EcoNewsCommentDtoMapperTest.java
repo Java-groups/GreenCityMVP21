@@ -30,7 +30,7 @@ class EcoNewsCommentDtoMapperTest {
         ecoNewsComment.setDeleted(false);
         ecoNewsComment.setCreatedDate(dateTime);
         ecoNewsComment.setText("Sample text");
-        ecoNewsComment.setUser(ModelUtils.getUser());
+        ecoNewsComment.setUser(ModelUtils.getUser(1L));
         ecoNewsComment.setUsersLiked(Collections.emptySet());
         ecoNewsComment.setCurrentUserLiked(false);
 
@@ -57,7 +57,7 @@ class EcoNewsCommentDtoMapperTest {
         ecoNewsComment.setDeleted(false);
         ecoNewsComment.setCreatedDate(createdDate);
         ecoNewsComment.setText("Edited text");
-        ecoNewsComment.setUser(ModelUtils.getUser());
+        ecoNewsComment.setUser(ModelUtils.getUser(1L));
         ecoNewsComment.setUsersLiked(Collections.emptySet());
         ecoNewsComment.setCurrentUserLiked(false);
 

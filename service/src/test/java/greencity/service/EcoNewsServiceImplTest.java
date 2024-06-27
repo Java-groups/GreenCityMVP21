@@ -154,7 +154,7 @@ class EcoNewsServiceImplTest {
 
         when(modelMapper.map(addEcoNewsDtoRequest, EcoNews.class)).thenReturn(ecoNews);
         when(restClient.findByEmail(TestConst.EMAIL)).thenReturn(ModelUtils.getUserVO());
-        when(modelMapper.map(ModelUtils.getUserVO(), User.class)).thenReturn(ModelUtils.getUser());
+        when(modelMapper.map(ModelUtils.getUserVO(), User.class)).thenReturn(ModelUtils.getUser(1L));
         when(fileService.upload(any(MultipartFile.class))).thenReturn(ModelUtils.getUrl().toString());
         List<TagVO> tagVOList = Collections.singletonList(ModelUtils.getTagVO());
         List<Tag> tags = ModelUtils.getTags();
@@ -709,7 +709,7 @@ class EcoNewsServiceImplTest {
     void findUsersWhoLikedPost() {
         // given
         EcoNews ecoNews = ModelUtils.getEcoNews();
-        User user1 = ModelUtils.getUser();
+        User user1 = ModelUtils.getUser(1L);
         UserVO user1VO = ModelUtils.getUserVO();
         ecoNews.setUsersLikedNews(Set.of(user1));
         when(ecoNewsRepo.findById(anyLong())).thenReturn(Optional.of(ecoNews));
@@ -725,7 +725,7 @@ class EcoNewsServiceImplTest {
     void findUsersWhoDislikedPost() {
         // given
         EcoNews ecoNews = ModelUtils.getEcoNews();
-        User user1 = ModelUtils.getUser();
+        User user1 = ModelUtils.getUser(1L);
         UserVO user1VO = ModelUtils.getUserVO();
         ecoNews.setUsersDislikedNews(Set.of(user1));
         when(ecoNewsRepo.findById(anyLong())).thenReturn(Optional.of(ecoNews));

@@ -4,6 +4,7 @@ import com.fasterxml.jackson.databind.ObjectMapper;
 import com.fasterxml.jackson.datatype.jsr310.JavaTimeModule;
 import greencity.converters.UserArgumentResolver;
 import greencity.dto.event.EventRequestSaveDto;
+import greencity.dto.event.EventUpdateRequestDto;
 import greencity.exception.exceptions.BadRequestException;
 import greencity.exception.exceptions.NotFoundException;
 import greencity.exception.handler.CustomExceptionHandler;
@@ -28,14 +29,17 @@ import org.springframework.data.web.PageableHandlerMethodArgumentResolver;
 import org.springframework.http.MediaType;
 import org.springframework.mock.web.MockMultipartFile;
 import org.springframework.test.web.servlet.MockMvc;
+import org.springframework.test.web.servlet.request.MockMultipartHttpServletRequestBuilder;
+import org.springframework.test.web.servlet.request.MockMvcRequestBuilders;
 import org.springframework.test.web.servlet.setup.MockMvcBuilders;
 import org.springframework.web.multipart.MultipartFile;
 import org.springframework.web.method.annotation.MethodArgumentTypeMismatchException;
 
 import java.security.Principal;
+import java.time.ZonedDateTime;
+import java.time.format.DateTimeFormatter;
 
 import static greencity.ModelUtils.getPrincipal;
-import static org.junit.Assert.assertTrue;
 import static org.mockito.Mockito.*;
 import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.*;
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.status;
@@ -86,12 +90,12 @@ class EventsControllerTest {
                 "  \"title\": \"string\",\n" +
                 "  \"daysInfo\": [\n" +
                 "    {\n" +
-                "      \"startDateTime\": \"2024-06-02T14:20:45.252Z\",\n" +
-                "      \"endDateTime\": \"2024-06-02T14:20:45.252Z\",\n" +
+                "      \"startDateTime\": \"2029-07-02T14:20:45.252Z\",\n" +
+                "      \"endDateTime\": \"2029-07-02T19:20:45.252Z\",\n" +
                 "      \"dayNumber\": 0,\n" +
-                "      \"allDay\": true,\n" +
+                "      \"allDay\": false,\n" +
                 "      \"status\": \"ONLINE\",\n" +
-                "      \"link\": \"string\",\n" +
+                "      \"link\": \"https://test-link.com\",\n" +
                 "      \"address\": null\n" +
                 "    }\n" +
                 "  ],\n" +
@@ -235,7 +239,7 @@ class EventsControllerTest {
 
         when(principal.getName()).thenReturn("testUser@gmail.com");
 
-        mockMvc.perform(delete(eventsLink + "/delete/{eventId}", 1L)
+        mockMvc.perform(delete(eventsLink + "/{eventId}", 1L)
                         .principal(principal)
                         .contentType(MediaType.APPLICATION_JSON))
                 .andExpect(status().isOk());
@@ -250,7 +254,7 @@ class EventsControllerTest {
         when(principal.getName()).thenReturn("testUser@gmail.com");
         doThrow(new NotFoundException("Event not found")).when(eventService).delete(anyLong(), anyString());
 
-        mockMvc.perform(delete(eventsLink + "/delete/{eventId}", 1L)
+        mockMvc.perform(delete(eventsLink + "/{eventId}", 1L)
                         .principal(principal)
                         .contentType(MediaType.APPLICATION_JSON))
                 .andExpect(status().isNotFound())
@@ -267,7 +271,7 @@ class EventsControllerTest {
 
         when(principal.getName()).thenReturn("testUser@gmail.com");
 
-        mockMvc.perform(delete(eventsLink + "/delete/{eventId}", "not_number")
+        mockMvc.perform(delete(eventsLink + "/{eventId}", "not_number")
                         .principal(principal)
                         .contentType(MediaType.APPLICATION_JSON))
                 .andExpect(status().isBadRequest())
@@ -276,5 +280,106 @@ class EventsControllerTest {
                         result.getResolvedException()));
 
         verify(eventService, never()).delete(anyLong(), anyString());
+    }
+
+    @Test
+    void updateTest_ReturnsSuccess() throws Exception {
+        ZonedDateTime startDateTime = ZonedDateTime.now().plusDays(2);
+        ZonedDateTime endDateTime = startDateTime.plusHours(2);
+
+        DateTimeFormatter formatter = DateTimeFormatter.ISO_ZONED_DATE_TIME;
+        String json = String.format("""
+            {
+                "id": 1,
+                "title": "Test title",
+                "description": "Test description Test description1",
+                "dateTimes": [
+                    {
+                        "allDay": false,
+                        "startDateTime": "%s",
+                        "endDateTime": "%s",
+                        "dayNumber": 0,
+                        "status": "OFFLINE",
+                        "link": null,
+                        "address": {
+                            "latitude": -50,
+                            "longitude": 150,
+                            "addressUa": "Україна, Київ",
+                            "addressEn": "USA, New York"
+                        }
+                    }
+                ],
+                "tagNames": ["Environment", "Recycling"],
+                "open": true
+            }""",
+                formatter.format(startDateTime),
+                formatter.format(endDateTime)
+        );
+
+        ObjectMapper objectMapper = new ObjectMapper();
+        objectMapper.findAndRegisterModules();
+        EventUpdateRequestDto updateEventDto = objectMapper.readValue(json, EventUpdateRequestDto.class);
+
+        MockMultipartFile jsonFile = new MockMultipartFile("event", "", "application/json", json.getBytes());
+        MockMultipartFile imageFile = new MockMultipartFile("images", "image.jpg", "image/jpeg", "Test image content".getBytes());
+
+        MockMultipartHttpServletRequestBuilder builder = MockMvcRequestBuilders.multipart(eventsLink);
+        builder.with(request -> {
+            request.setMethod("PUT");
+            return request;
+        });
+
+        mockMvc.perform(builder.file(jsonFile)
+                        .file(imageFile)
+                        .principal(principal)
+                        .accept(MediaType.APPLICATION_JSON)
+                        .contentType(MediaType.MULTIPART_FORM_DATA_VALUE))
+                .andExpect(status().isOk());
+
+        verify(eventService).update(eq(updateEventDto), any(MultipartFile[].class), eq(principal.getName()));
+    }
+
+    @Test
+    void updateTest_ReturnsBadRequest() throws Exception {
+        mockMvc.perform(MockMvcRequestBuilders.put(eventsLink)
+                        .content("{}")
+                        .accept(MediaType.APPLICATION_JSON)
+                        .contentType(MediaType.APPLICATION_JSON))
+                         .andExpect(status().isBadRequest());
+    }
+  
+    @Test
+    void updateTest_ReturnsUnsupportedMediaType() throws Exception {
+        mockMvc.perform(MockMvcRequestBuilders.put(eventsLink)
+                        .content("{}")
+                        .accept(MediaType.APPLICATION_JSON))
+                .andExpect(status().isUnsupportedMediaType());
+    }
+  
+    @Test
+    void getAllEventAttendersTest_ReturnsIsOk() throws Exception {
+        Long eventId = 1L;
+        mockMvc.perform(get(eventsLink + "/attender/{eventId}", eventId))
+                .andExpect(status().isOk());
+
+        verify(eventService).findAllAttendersByEvent(eventId);
+    }
+
+    @Test
+    void getAllEventAttenders_ReturnsBadRequest_WithNoValidId() throws Exception {
+        String notValidId = "id";
+        mockMvc.perform(get(eventsLink + "/attender/{eventId}", notValidId))
+          .andExpect(status().isBadRequest());
+    }
+
+    @Test
+    void getAllEventAttenders_ReturnsNotFound() throws Exception {
+        Long eventId = 1L;
+
+        when(eventService.findAllAttendersByEvent(eventId)).thenThrow(NotFoundException.class);
+
+        mockMvc.perform(get(eventsLink + "/attender/{userId}", eventId)
+                        .contentType(MediaType.APPLICATION_JSON))
+                .andExpect(status().isNotFound());
     }
 }

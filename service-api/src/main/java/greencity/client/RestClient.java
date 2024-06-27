@@ -4,9 +4,11 @@ import com.google.gson.Gson;
 import greencity.constant.RestTemplateLinks;
 import greencity.dto.PageableAdvancedDto;
 import greencity.dto.econews.EcoNewsForSendEmailDto;
+import greencity.message.EventCommentMessage;
 import greencity.dto.user.*;
 import greencity.enums.EmailNotification;
 import greencity.enums.Role;
+import greencity.dto.eventcomment.EventCommentMessageInfoDto;
 import greencity.message.EventEmailMessage;
 import greencity.message.SendHabitNotification;
 import greencity.message.SendReportEmailMessage;
@@ -22,6 +24,8 @@ import org.springframework.web.client.RestTemplate;
 import org.springframework.web.util.UriComponentsBuilder;
 import jakarta.servlet.http.Cookie;
 import jakarta.servlet.http.HttpServletRequest;
+
+import java.time.format.DateTimeFormatter;
 import java.util.Arrays;
 import java.util.List;
 import java.util.Map;
@@ -35,6 +39,9 @@ public class RestClient {
     @Setter
     @Value("${greencityuser.server.address}")
     private String greenCityUserServerAddress;
+    @Setter
+    @Value("${greencitymvp.server.address}")
+    private String greenCityMvpServerAddress;
     private final HttpServletRequest httpServletRequest;
 
     /**
@@ -465,6 +472,84 @@ public class RestClient {
         HttpEntity<EventEmailMessage> entity = new HttpEntity<>(message, headers);
         restTemplate.exchange(greenCityUserServerAddress +
                 RestTemplateLinks.SEND_EVENT_CREATION_NOTIFICATION, HttpMethod.POST, entity, Object.class).getBody();
+    }
+
+    /**
+     * send SendEventCommentNotification to GreenCityUser.
+     *
+     * @param eventCommentMessageInfoDto with information for sending email to user
+     *                              that their event was commented.
+     */
+    public void sendEventCommentNotification(EventCommentMessageInfoDto eventCommentMessageInfoDto) {
+        String content = """
+                <html>
+                    <body>
+                        <p>Hi %s,</p>
+                        <p>You've got a new comment on your event %s.</p>
+                        <p>%s on %s</p>
+                        <p>Text of the comment: %s</p>
+                        <p><a href="%s">Go to comment</a></p>
+                        <p>Sincerely yours,</p>
+                        <p>GreenCity team</p>
+                    </body>
+                </html>
+                """.formatted(
+                eventCommentMessageInfoDto.getReceiverName(),
+                eventCommentMessageInfoDto.getEventName(),
+                eventCommentMessageInfoDto.getCommentAuthorName(),
+                eventCommentMessageInfoDto.getCommentCreatedDateTime().format(DateTimeFormatter.ofPattern("dd.MM.yyyy HH:mm:ss")),
+                eventCommentMessageInfoDto.getCommentText(),
+                greenCityMvpServerAddress + "/events/" + eventCommentMessageInfoDto.getEventId() + "/comments/" + eventCommentMessageInfoDto.getCommentId()
+        );
+        HttpHeaders headers = setHeader();
+        headers.setContentType(MediaType.APPLICATION_JSON);
+        HttpEntity<EventCommentMessage> entity = new HttpEntity<>(EventCommentMessage.builder()
+                .title("Your Event was commented")
+                .body(content)
+                .email(eventCommentMessageInfoDto.getEmailReceiver())
+                .build(),
+                headers);
+        restTemplate.exchange(greenCityUserServerAddress
+                        + RestTemplateLinks.SEND_EVENT_COMMENT_NOTIFICATION, HttpMethod.POST, entity, Object.class).getBody();
+    }
+
+    /**
+     * send SendEventCommentNotification to GreenCityUser.
+     *
+     * @param eventCommentMessageInfoDto with information for sending email to user
+     *                              that they were mentioned in comment to event.
+     */
+    public void sendMentionedInEventCommentNotification(EventCommentMessageInfoDto eventCommentMessageInfoDto) {
+        String content = """
+                <html>
+                    <body>
+                        <p>Hi %s,</p>
+                        <p>You have been mentioned in the comment to the %s.</p>
+                        <p>%s on %s</p>
+                        <p>Text of the comment: %s</p>
+                        <p><a href="%s">Go to comment</a></p>
+                        <p>Sincerely yours,</p>
+                        <p>GreenCity team</p>
+                    </body>
+                </html>
+                """.formatted(
+                eventCommentMessageInfoDto.getReceiverName(),
+                eventCommentMessageInfoDto.getEventName(),
+                eventCommentMessageInfoDto.getCommentAuthorName(),
+                eventCommentMessageInfoDto.getCommentCreatedDateTime().format(DateTimeFormatter.ofPattern("dd.MM.yyyy HH:mm:ss")),
+                eventCommentMessageInfoDto.getCommentText(),
+                greenCityMvpServerAddress + "/events/" + eventCommentMessageInfoDto.getEventId() + "/comments/" + eventCommentMessageInfoDto.getCommentId()
+        );
+        HttpHeaders headers = setHeader();
+        headers.setContentType(MediaType.APPLICATION_JSON);
+        HttpEntity<EventCommentMessage> entity = new HttpEntity<>(EventCommentMessage.builder()
+                .title("You have been mentioned in comment to Event")
+                .body(content)
+                .email(eventCommentMessageInfoDto.getEmailReceiver())
+                .build(),
+                headers);
+        restTemplate.exchange(greenCityUserServerAddress
+                + RestTemplateLinks.SEND_EVENT_COMMENT_NOTIFICATION, HttpMethod.POST, entity, Object.class).getBody();
     }
 
     /**

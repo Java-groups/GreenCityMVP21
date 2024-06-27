@@ -36,7 +36,7 @@ class EventEmailMessageMapperTest {
 
     @Test
     void convert() {
-        User author = ModelUtils.getUser();
+        User author = ModelUtils.getUser(1L);
         EventAddress address = ModelUtils.getEventAddress();
         EventDayInfo eventDayInfo = EventDayInfo.builder()
                 .id(1L)

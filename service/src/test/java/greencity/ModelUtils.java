@@ -5,6 +5,13 @@ import greencity.dto.PageableAdvancedDto;
 import greencity.dto.econews.*;
 import greencity.dto.econewscomment.*;
 import greencity.dto.event.EventAddressDto;
+import greencity.dto.event.EventResponseDayInfoDto;
+import greencity.dto.event.EventSaveDayInfoDto;
+import greencity.dto.event.EventUpdateRequestDto;
+import greencity.dto.eventcomment.EventCommentAuthorDto;
+import greencity.dto.eventcomment.EventCommentMentionedUserDto;
+import greencity.dto.eventcomment.EventCommentRequestDto;
+import greencity.dto.eventcomment.EventCommentResponseDto;
 import greencity.dto.habit.*;
 import greencity.dto.habitfact.*;
 import greencity.dto.language.LanguageDTO;
@@ -97,7 +104,7 @@ public class ModelUtils {
         return Collections.singletonList(getHabitTag());
     }
 
-    public static Event getEvent() {
+    public static Event getEvent(Long authorId) {
         return Event.builder()
                 .id(1L)
                 .title("title")
@@ -105,7 +112,7 @@ public class ModelUtils {
                 .description("description123456789012345678901234567890")
                 .isOpen(true)
                 .images(new ArrayList<>())
-                .author(getUser())
+                .author(getUser(authorId))
                 .tags(new ArrayList<>())
                 .attenders(new HashSet<>())
                 .build();
@@ -119,7 +126,7 @@ public class ModelUtils {
                 .description("description123456789012345678901234567890")
                 .isOpen(false)
                 .images(new ArrayList<>())
-                .author(getUser())
+                .author(getUser(1L))
                 .tags(new ArrayList<>())
                 .attenders(new HashSet<>())
                 .build();
@@ -144,7 +151,7 @@ public class ModelUtils {
                 .description("description123456789012345678901234567890")
                 .isOpen(true)
                 .images(new ArrayList<>())
-                .author(getUser())
+                .author(getUser(1L))
                 .build();
     }
 
@@ -191,9 +198,9 @@ public class ModelUtils {
                 .build();
     }
 
-    public static User getUser() {
+    public static User getUser(Long id) {
         return User.builder()
-            .id(1L)
+            .id(id)
             .email(TestConst.EMAIL)
             .name(TestConst.NAME)
             .role(Role.ROLE_USER)
@@ -280,13 +287,13 @@ public class ModelUtils {
         tag.setTagTranslations(
             List.of(TagTranslation.builder().name("Новини").language(Language.builder().code("ua").build()).build(),
                 TagTranslation.builder().name("News").language(Language.builder().code("en").build()).build()));
-        return new EcoNews(1L, zonedDateTime, TestConst.SITE, "source", "shortInfo", getUser(),
-            "title", "text", List.of(EcoNewsComment.builder().id(1L).text("test").user(getUser()).build()),
+        return new EcoNews(1L, zonedDateTime, TestConst.SITE, "source", "shortInfo", getUser(1L),
+            "title", "text", List.of(EcoNewsComment.builder().id(1L).text("test").user(getUser(1L)).build()),
             Collections.singletonList(tag), Collections.emptySet(), Collections.emptySet());
     }
 
     public static EcoNews getEcoNewsForFindDtoByIdAndLanguage() {
-        return new EcoNews(1L, null, TestConst.SITE, null, "shortInfo", getUser(),
+        return new EcoNews(1L, null, TestConst.SITE, null, "shortInfo", getUser(1L),
             "title", "text", null, Collections.singletonList(getTag()), Collections.emptySet(), Collections.emptySet());
     }
 
@@ -317,7 +324,7 @@ public class ModelUtils {
                     .language(getLanguage())
                     .build()))
                 .build())
-            .user(getUser())
+            .user(getUser(1L))
             .userShoppingListItems(new ArrayList<>())
             .workingDays(0)
             .duration(0)
@@ -534,16 +541,16 @@ public class ModelUtils {
             .text("text")
             .createdDate(LocalDateTime.now())
             .modifiedDate(LocalDateTime.now())
-            .user(getUser())
+            .user(getUser(1L))
             .ecoNews(getEcoNews())
             .build();
     }
 
     public static EcoNewsCommentAuthorDto getEcoNewsCommentAuthorDto() {
         return EcoNewsCommentAuthorDto.builder()
-            .id(getUser().getId())
-            .name(getUser().getName().trim())
-            .userProfilePicturePath(getUser().getProfilePicturePath())
+            .id(getUser(1L).getId())
+            .name(getUser(1L).getName().trim())
+            .userProfilePicturePath(getUser(1L).getProfilePicturePath())
             .build();
     }
 
@@ -756,7 +763,7 @@ public class ModelUtils {
             .habit(Habit.builder()
                 .id(3L)
                 .build())
-            .user(getUser())
+            .user(getUser(1L))
             .text("item")
             .status(ShoppingListItemStatus.INPROGRESS)
             .build();
@@ -791,10 +798,10 @@ public class ModelUtils {
                 .id(1L)
                 .text("text")
                 .createdDate(LocalDateTime.now())
-                .user(getUser())
-                .event(getEvent())
+                .user(getUser(1L))
+                .event(getEvent(1L))
                 .status(CommentStatus.ORIGINAL)
-                .comments(Arrays.asList(getSubEventComment()))
+                .comments(Collections.singletonList(getSubEventComment()))
                 .build();
     }
 
@@ -804,8 +811,93 @@ public class ModelUtils {
                 .text("SubEventComment")
                 .status(CommentStatus.ORIGINAL)
                 .createdDate(LocalDateTime.now())
-                .user(getUser())
-                .event(getEvent())
+                .user(getUser(1L))
+                .event(getEvent(1L))
+                .build();
+    }
+
+    public static EventUpdateRequestDto getEventUpdateRequestDto(
+            ZonedDateTime startDateTime,
+            ZonedDateTime endDateTime
+    ) {
+        return EventUpdateRequestDto.builder()
+                .id(1L)
+                .title("Sample Title")
+                .dateTimes(Collections.singletonList(getEventSaveDayInfoDto(startDateTime, endDateTime)))
+                .description("Sample Description")
+                .tagNames(Arrays.asList("Tag1", "Tag2", "Tag3"))
+                .isOpen(true)
+                .build();
+    }
+
+    public static EventSaveDayInfoDto getEventSaveDayInfoDto(
+            ZonedDateTime startDateTime,
+            ZonedDateTime endDateTime
+    ) {
+        return EventSaveDayInfoDto.builder()
+                .isAllDay(false)
+                .startDateTime(startDateTime)
+                .endDateTime(endDateTime)
+                .dayNumber(1)
+                .status(EventStatus.ONLINE)
+                .link("http://some.domain/event/1")
+                .address(getEventAddressDto())
+                .build();
+    }
+
+    public static Event getPastEvent() {
+        return Event.builder()
+                .id(1L)
+                .title("Past title")
+                .dayInfos(List.of(getPastEventDayInfo()))
+                .description("Past event description")
+                .isOpen(false)
+                .images(new ArrayList<>())
+                .author(getUser(1L))
+                .tags(new ArrayList<>())
+                .attenders(new HashSet<>())
+                .build();
+    }
+
+    public static EventDayInfo getPastEventDayInfo() {
+        return EventDayInfo.builder()
+                .id(1L)
+                .isAllDay(false)
+                .startDateTime(ZonedDateTime.of(LocalDateTime.now().minusDays(2), ZoneId.systemDefault()))
+                .endDateTime(ZonedDateTime.of(LocalDateTime.now().minusDays(1), ZoneId.systemDefault()))
+                .dayNumber(1)
+                .link("some past link")
+                .build();
+    }
+
+    public static EventCommentRequestDto getEventCommentRequestDto() {
+        return EventCommentRequestDto.builder().text("text").build();
+    }
+
+    public static EventCommentResponseDto getEventCommentResponseDto() {
+        return EventCommentResponseDto.builder()
+                .id(1L)
+                .eventId(1L)
+                .createdDate(LocalDateTime.now())
+                .modifiedDate(LocalDateTime.now())
+                .text("text")
+                .author(getEventCommentAuthorDto())
+                .mentionedUsers(List.of(getEventCommentMentionedUserDto()))
+                .build();
+    }
+
+    public static EventCommentAuthorDto getEventCommentAuthorDto() {
+        return EventCommentAuthorDto.builder()
+                .id(1L)
+                .name("Name")
+                .userProfilePicturePath("picture/path")
+                .build();
+    }
+
+    public static EventCommentMentionedUserDto getEventCommentMentionedUserDto() {
+        return EventCommentMentionedUserDto.builder()
+                .id(2L)
+                .name("Username")
                 .build();
     }
 }
