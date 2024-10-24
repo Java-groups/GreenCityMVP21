@@ -26,7 +26,6 @@ import org.springframework.data.domain.Pageable;
 import org.springframework.data.web.PageableHandlerMethodArgumentResolver;
 import org.springframework.mock.web.MockMultipartFile;
 import org.springframework.test.web.servlet.MockMvc;
-import org.springframework.test.web.servlet.ResultMatcher;
 import org.springframework.test.web.servlet.setup.MockMvcBuilders;
 
 import java.security.Principal;
@@ -93,10 +92,12 @@ public class HabitControllerTest {
         String languageCode = "en";
         UserVO userVO = ModelUtils.getUserVO();
         Pageable pageable = getPageable();
+        String id = "1";
 
         when(userService.findByEmail(anyString())).thenReturn(userVO);
 
-        mockMvc.perform(get(habitLink + "?id=1")
+        mockMvc.perform(get(habitLink)
+                        .param("id", id)
                         .principal(userVO::getEmail))
                 .andExpect(status().isOk());
 
@@ -118,16 +119,18 @@ public class HabitControllerTest {
     void getAllByTagsAndLanguageCodeTest() throws Exception {
         String languageCode = "en";
         List<String> tags = List.of("0", "1");
+        String tagsQueryParam = String.join(",", tags);
         Pageable pageable = getPageable();
 
-        mockMvc.perform(get(habitLink + "/tags/search?lang=en&tags=0,1"))
+        mockMvc.perform(get(habitLink + "/tags/search")
+                        .param("tags", tagsQueryParam))
                 .andExpect(status().isOk());
 
         verify(habitService).getAllByTagsAndLanguageCode(pageable, tags, languageCode);
     }
 
     @Test
-    void getAllByDifferentParametersTest() throws Exception {
+    void getAllByDifferentValidParametersTest() throws Exception {
         UserVO userVO = ModelUtils.getUserVO();
         String languageCode = "en";
         Pageable pageable = getPageable();
@@ -144,23 +147,42 @@ public class HabitControllerTest {
         Optional<Boolean> isCustomHabit = Optional.of(isCustomHabitBoolean);
         Optional<List<Integer>> complexities = Optional.of(complexitiesList);
 
-        ResultMatcher resultMatcher;
+        when(userService.findByEmail(anyString())).thenReturn(userVO);
 
-        if(isValid(tags, isCustomHabit, complexities)) {
-            resultMatcher = status().isOk();
-        } else {
-            resultMatcher = status().isBadRequest();
-        }
+        mockMvc.perform(get(habitLink + "/search")
+                        .param("tags", tagsStr)
+                        .param("isCustomHabit", isCustomHabitStr)
+                        .param("complexities", complexetiesStr)
+                        .principal(userVO::getEmail))
+                .andExpect(status().isOk());
 
-        String requestParams = "?tags=%s&isCustomHabit=%b&complexities=%s".formatted(tagsStr, isCustomHabitStr, complexetiesStr);
+        verify(habitService).getAllByDifferentParameters(userVO, pageable, tags, isCustomHabit, complexities, languageCode);
+    }
+
+    @Test
+    void getAllByDifferentInvalidParametersTest() throws Exception {
+        UserVO userVO = ModelUtils.getUserVO();
+        String languageCode = "en";
+        Pageable pageable = getPageable();
+
+        String tagsStr = "";
+        String isCustomHabitStr = "";
+        String complexetiesStr = "";
+
+        Optional<List<String>> tags = Optional.empty();
+        Optional<Boolean> isCustomHabit = Optional.empty();
+        Optional<List<Integer>> complexities = Optional.empty();
 
         when(userService.findByEmail(anyString())).thenReturn(userVO);
 
-        mockMvc.perform(get(habitLink + "/search" + requestParams)
+        mockMvc.perform(get(habitLink + "/search")
+                        .param("tags", tagsStr)
+                        .param("isCustomHabit", isCustomHabitStr)
+                        .param("complexities", complexetiesStr)
                         .principal(userVO::getEmail))
-                .andExpect(resultMatcher);
+                .andExpect(status().isBadRequest());
 
-        verify(habitService).getAllByDifferentParameters(userVO, pageable, tags, isCustomHabit, complexities, languageCode);
+        verify(habitService, times(0)).getAllByDifferentParameters(userVO, pageable, tags, isCustomHabit, complexities, languageCode);
     }
 
     @Test
@@ -230,12 +252,6 @@ public class HabitControllerTest {
                 .andExpect(status().isOk());
 
         verify(habitService).getFriendsAssignedToHabitProfilePictures(habitId, userVO.getId());
-    }
-
-    private boolean isValid(Optional<List<String>> tags, Optional<Boolean> isCustomHabit,
-                            Optional<List<Integer>> complexities) {
-        return ((tags.isPresent() && !tags.get().isEmpty()) || isCustomHabit.isPresent()
-                || (complexities.isPresent() && !complexities.get().isEmpty()));
     }
 
     private Pageable getPageable() {
