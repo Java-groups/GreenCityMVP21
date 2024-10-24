@@ -3,11 +3,13 @@ package greencity.controller;
 import greencity.config.SecurityConfig;
 import greencity.dto.shoppinglistitem.CustomShoppingListItemResponseDto;
 import greencity.service.CustomShoppingListItemService;
+import jakarta.persistence.EntityNotFoundException;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;
 import org.mockito.InjectMocks;
 import org.mockito.Mock;
+import org.mockito.Mockito;
 import org.mockito.junit.jupiter.MockitoExtension;
 import org.mockito.junit.jupiter.MockitoSettings;
 import org.mockito.quality.Strictness;
@@ -23,6 +25,7 @@ import java.util.Collections;
 import java.util.List;
 import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.mockito.Mockito.*;
+import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.patch;
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.jsonPath;
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.status;
 
@@ -64,7 +67,7 @@ class CustomShoppingListItemControllerTest {
 
         verify(customShoppingListItemService, times(1)).findAllAvailableCustomShoppingListItems(userId, habitId);
     }
-     @Test
+    @Test
     void testSaveUserCustomShoppingListItems() throws Exception {
         String requestJson = "{ \"items\": [] }";
 
@@ -78,6 +81,17 @@ class CustomShoppingListItemControllerTest {
                         .contentType(MediaType.APPLICATION_JSON)
                         .content(requestJson))
                 .andExpect(status().isCreated())
+                .andExpect(jsonPath("$").isNotEmpty());
+    }
+    @Test
+    void testUpdateItemStatus() throws Exception {
+        when(customShoppingListItemService.updateItemStatus(1L, 1L, "DONE"))
+                .thenReturn(new CustomShoppingListItemResponseDto());
+
+        mockMvc.perform(patch("/custom/shopping-list-items/{itemId}/custom-shopping-list-items", 1)
+                        .param("itemId", "1")
+                        .param("status", "DONE"))
+                .andExpect(status().isOk())
                 .andExpect(jsonPath("$").isNotEmpty());
     }
 }
