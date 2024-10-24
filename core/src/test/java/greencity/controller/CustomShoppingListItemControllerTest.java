@@ -60,4 +60,5 @@ class CustomShoppingListItemControllerTest {
 
         verify(customShoppingListItemService, times(1)).findAllAvailableCustomShoppingListItems(userId, habitId);
     }
+
 }
