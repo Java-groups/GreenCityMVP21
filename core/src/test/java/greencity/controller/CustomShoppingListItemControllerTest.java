@@ -94,4 +94,12 @@ class CustomShoppingListItemControllerTest {
                 .andExpect(status().isOk())
                 .andExpect(jsonPath("$").isNotEmpty());
     }
+    @Test
+    void testUpdateItemStatusToDone() throws Exception {
+        Mockito.doNothing().when(customShoppingListItemService).updateItemStatusToDone(1L, 1L);
+
+        mockMvc.perform(patch("/custom/shopping-list-items/{userId}/done",1)
+                        .param("itemId", "1"))
+                .andExpect(status().isOk());
+    }
 }
