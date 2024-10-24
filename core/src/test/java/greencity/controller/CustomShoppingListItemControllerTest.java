@@ -25,6 +25,8 @@ import org.springframework.test.web.servlet.setup.MockMvcBuilders;
 import java.security.Principal;
 import java.util.Collections;
 import java.util.List;
+
+import static greencity.ModelUtils.getCustomShoppingListItemResponseDto;
 import static greencity.ModelUtils.getPrincipal;
 import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.mockito.Mockito.*;
@@ -126,5 +128,18 @@ class CustomShoppingListItemControllerTest {
                         .param("ids", ids))
                 .andExpect(status().isOk());
         verify(customShoppingListItemService).bulkDelete(ids);
+    }
+
+    @Test
+    @DisplayName("Get all custom shopping items by status")
+    void getAllCustomShoppingItemsByStatus_ForSpecificUser_ReturnsOk() throws Exception {
+        responseDto = getCustomShoppingListItemResponseDto();
+        mockMvc.perform(get("/custom/shopping-list-items/{userId}/custom-shopping-list-items", 1L)
+                        .principal(principal))
+                .andExpect(status().isOk());
+        when(customShoppingListItemService.findAllUsersCustomShoppingListItemsByStatus(anyLong(), anyString()))
+                .thenReturn(List.of(responseDto));
+        assertEquals(responseDto, customShoppingListItemController.getAllCustomShoppingItemsByStatus(1L, "ACTIVE")
+                .getBody().getFirst());
     }
 }
