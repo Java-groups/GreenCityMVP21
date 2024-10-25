@@ -1,6 +1,5 @@
 package greencity.controller;
 
-import com.fasterxml.jackson.core.JsonProcessingException;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import greencity.converters.UserArgumentResolver;
 import greencity.dto.habitstatistic.*;
@@ -41,6 +40,11 @@ class HabitStatisticControllerTest {
                     .id(102L)
                     .build()
     );
+    private final ObjectMapper objectMapper = new ObjectMapper();
+    private final UserVO userVO = UserVO.builder()
+            .id(101L)
+            .email("email@email.com")
+            .build();
     private MockMvc mockMvc;
 
     @InjectMocks
@@ -105,14 +109,13 @@ class HabitStatisticControllerTest {
     void saveHabitStatistic() throws Exception {
 
         AddHabitStatisticDto addHabitStatisticDto = new AddHabitStatisticDto();
-        UserVO userVO = new UserVO().setId(101L).setEmail("email@email.com");
 
         when(habitStatisticService.saveByHabitIdAndUserId(anyLong(), anyLong(), any(AddHabitStatisticDto.class))).thenReturn(HABIT_STATISTIC_DTOS.getFirst());
         when(userService.findByEmail(anyString())).thenReturn(userVO);
 
         mockMvc.perform(post(HABIT_STATISTIC_CONTROLLER_URL + "/102")
                         .contentType(MediaType.APPLICATION_JSON)
-                        .content(new ObjectMapper().writeValueAsString(addHabitStatisticDto))
+                        .content(objectMapper.writeValueAsString(addHabitStatisticDto))
                         .principal(userVO::getEmail)
                         .accept(MediaType.APPLICATION_JSON))
                 .andExpect(status().isCreated())
@@ -124,13 +127,9 @@ class HabitStatisticControllerTest {
 
     @Test
     void updateStatistic() throws Exception {
-        UpdateHabitStatisticDto updateHabitStatisticDto =  UpdateHabitStatisticDto.builder()
+        UpdateHabitStatisticDto updateHabitStatisticDto = UpdateHabitStatisticDto.builder()
                 .amountOfItems(103)
                 .habitRate(HabitRate.DEFAULT)
-                .build();
-        UserVO userVO = UserVO.builder()
-                .id(101L)
-                .email("email@email.com")
                 .build();
 
         when(habitStatisticService.update(anyLong(), anyLong(), any(UpdateHabitStatisticDto.class))).thenReturn(updateHabitStatisticDto);
@@ -138,7 +137,7 @@ class HabitStatisticControllerTest {
 
         mockMvc.perform(put(HABIT_STATISTIC_CONTROLLER_URL + "/102")
                         .contentType(MediaType.APPLICATION_JSON)
-                        .content(new ObjectMapper().writeValueAsString(updateHabitStatisticDto))
+                        .content(objectMapper.writeValueAsString(updateHabitStatisticDto))
                         .principal(userVO::getEmail)
                         .accept(MediaType.APPLICATION_JSON))
                 .andExpect(status().isOk())
