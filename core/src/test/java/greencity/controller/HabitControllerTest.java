@@ -18,6 +18,7 @@ import org.mockito.junit.jupiter.MockitoExtension;
 import org.mockito.junit.jupiter.MockitoSettings;
 import org.mockito.quality.Strictness;
 import org.springframework.context.annotation.Import;
+import org.springframework.data.domain.PageRequest;
 import org.springframework.data.domain.Pageable;
 import org.springframework.data.web.PageableHandlerMethodArgumentResolver;
 import org.springframework.http.HttpStatus;
@@ -122,5 +123,34 @@ public class HabitControllerTest {
                 .andExpect(jsonPath("$.length()").value(shoppingListItems.size()));
 
         verify(habitService, times(1)).getShoppingListForHabit(habitId, language);
+    }
+
+    @Test
+    @DisplayName("Get all habits by tags and language code")
+    void testGetAllByTagsAndLanguageCode() throws Exception {
+        Locale locale = Locale.ENGLISH;
+        List<String> tags = List.of("eco", "health");
+
+        Pageable pageable = PageRequest.of(0, 20);
+
+        List<HabitDto> habitDtos = new ArrayList<>();
+        habitDtos.add(new HabitDto());
+        long totalElements = 1;
+        int totalPages = 1;
+        int size = 1;
+
+        PageableDto<HabitDto> pageableDto = new PageableDto<>(habitDtos, totalElements, totalPages, size);
+
+        when(habitService.getAllByTagsAndLanguageCode(pageable, tags, locale.getLanguage()))
+                .thenReturn(pageableDto);
+
+        mockMvc.perform(get("/habit/tags/search")
+                        .header("Accept-Language", locale.getLanguage())
+                        .param("tags", "eco", "health")
+                        .header("Accept", "application/json")
+                        .contentType(MediaType.APPLICATION_JSON))
+                .andExpect(status().isOk());
+
+        verify(habitService, times(1)).getAllByTagsAndLanguageCode(pageable, tags, locale.getLanguage());
     }
 }
