@@ -4,6 +4,7 @@ import greencity.config.SecurityConfig;
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.jsonPath;
 import greencity.dto.PageableDto;
 import greencity.dto.habit.HabitDto;
+import greencity.dto.shoppinglistitem.ShoppingListItemDto;
 import greencity.dto.user.UserVO;
 import greencity.service.HabitService;
 import greencity.service.TagsService;
@@ -100,5 +101,26 @@ public class HabitControllerTest {
         assertEquals(HttpStatus.OK, response.getStatusCode());
         assertEquals(pageableDto, response.getBody());
         verify(habitService, times(1)).getAllHabitsByLanguageCode(userVO, pageable, locale.getLanguage());
+    }
+
+    @Test
+    @DisplayName("Get shopping list items for a specific habit")
+    void testGetShoppingListItems() throws Exception {
+        Long habitId = 1L;
+        String language = "en";
+        List<ShoppingListItemDto> shoppingListItems = new ArrayList<>();
+        shoppingListItems.add(new ShoppingListItemDto());
+
+        when(habitService.getShoppingListForHabit(habitId, language)).thenReturn(shoppingListItems);
+
+        mockMvc.perform(get("/habit/{id}/shopping-list", habitId)
+                        .header("Accept-Language", language)
+                        .header("Accept", "application/json")
+                        .contentType(MediaType.APPLICATION_JSON))
+                .andExpect(status().isOk())
+                .andExpect(jsonPath("$").isArray())
+                .andExpect(jsonPath("$.length()").value(shoppingListItems.size()));
+
+        verify(habitService, times(1)).getShoppingListForHabit(habitId, language);
     }
 }
