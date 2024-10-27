@@ -11,7 +11,9 @@ import org.mockito.InjectMocks;
 import org.mockito.junit.jupiter.MockitoExtension;
 
 import java.util.Collections;
-import java.util.List;
+import java.util.stream.Stream;
+
+import static greencity.constant.ServiceValidationConstants.MAX_AMOUNT_OF_TAGS;
 
 @ExtendWith(MockitoExtension.class)
 public class EcoNewsDtoRequestValidatorSecondaryTest {
@@ -47,7 +49,9 @@ public class EcoNewsDtoRequestValidatorSecondaryTest {
     void testOverflowingTagList() {
         boolean hasPassed = false;
         try {
-            addEcoNewsDtoRequest.setTags(List.of("tag1", "tag2", "tag3", "tag4"));
+            addEcoNewsDtoRequest.setTags(
+                    Stream.iterate(0, n -> n < MAX_AMOUNT_OF_TAGS + 1, n -> n + 1).map(x -> "tag" + x).toList()
+            );
             Assertions.assertTrue(validator.isValid(addEcoNewsDtoRequest, null));
         } catch (WrongCountOfTagsException e) {
             hasPassed = true;
