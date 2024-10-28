@@ -1,11 +1,13 @@
 package greencity.controller;
 
 import greencity.config.SecurityConfig;
+import static org.junit.jupiter.api.Assertions.*;
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.jsonPath;
 import greencity.dto.PageableDto;
 import greencity.dto.habit.HabitDto;
 import greencity.dto.shoppinglistitem.ShoppingListItemDto;
 import greencity.dto.user.UserVO;
+import greencity.exception.exceptions.BadRequestException;
 import greencity.service.HabitService;
 import greencity.service.TagsService;
 import org.junit.jupiter.api.BeforeEach;
@@ -27,13 +29,13 @@ import org.springframework.http.ResponseEntity;
 import org.springframework.test.context.ContextConfiguration;
 import org.springframework.test.web.servlet.MockMvc;
 import org.springframework.test.web.servlet.setup.MockMvcBuilders;
-import java.util.ArrayList;
-import java.util.List;
-import java.util.Locale;
-import static org.junit.jupiter.api.Assertions.assertEquals;
-import static org.mockito.Mockito.*;
-import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.*;
+
+import java.util.*;
+
+import static org.mockito.Mockito.when;
+import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.get;
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.status;
+import static org.mockito.Mockito.*;
 
 @ExtendWith(MockitoExtension.class)
 @MockitoSettings(strictness = Strictness.LENIENT)
@@ -64,20 +66,20 @@ public class HabitControllerTest {
     @DisplayName("Get habit by ID in specified language")
     void testGetHabitById() throws Exception {
         Long habitId = 1L;
-        String language = "en";
+        Locale locale = Locale.ENGLISH;
         HabitDto habitDto = new HabitDto();
         habitDto.setId(habitId);
 
-        when(habitService.getByIdAndLanguageCode(habitId, language)).thenReturn(habitDto);
+        when(habitService.getByIdAndLanguageCode(habitId, locale.getLanguage())).thenReturn(habitDto);
 
         mockMvc.perform(get("/habit/{id}", habitId)
-                        .header("Accept-Language", language)
+                        .header("Accept-Language", locale.getLanguage())
                         .header("Accept", "application/json")
                         .contentType(MediaType.APPLICATION_JSON))
                 .andExpect(status().isOk())
                 .andExpect(jsonPath("$.id").value(habitId));
 
-        verify(habitService, times(1)).getByIdAndLanguageCode(habitId, language);
+        verify(habitService, times(1)).getByIdAndLanguageCode(habitId, locale.getLanguage());
     }
 
     @Test
@@ -108,21 +110,21 @@ public class HabitControllerTest {
     @DisplayName("Get shopping list items for a specific habit")
     void testGetShoppingListItems() throws Exception {
         Long habitId = 1L;
-        String language = "en";
+        Locale locale = Locale.ENGLISH;
         List<ShoppingListItemDto> shoppingListItems = new ArrayList<>();
         shoppingListItems.add(new ShoppingListItemDto());
 
-        when(habitService.getShoppingListForHabit(habitId, language)).thenReturn(shoppingListItems);
+        when(habitService.getShoppingListForHabit(habitId, locale.getLanguage())).thenReturn(shoppingListItems);
 
         mockMvc.perform(get("/habit/{id}/shopping-list", habitId)
-                        .header("Accept-Language", language)
+                        .header("Accept-Language", locale.getLanguage())
                         .header("Accept", "application/json")
                         .contentType(MediaType.APPLICATION_JSON))
                 .andExpect(status().isOk())
                 .andExpect(jsonPath("$").isArray())
                 .andExpect(jsonPath("$.length()").value(shoppingListItems.size()));
 
-        verify(habitService, times(1)).getShoppingListForHabit(habitId, language);
+        verify(habitService, times(1)).getShoppingListForHabit(habitId, locale.getLanguage());
     }
 
     @Test
@@ -146,11 +148,54 @@ public class HabitControllerTest {
 
         mockMvc.perform(get("/habit/tags/search")
                         .header("Accept-Language", locale.getLanguage())
-                        .param("tags", "eco", "health")
-                        .header("Accept", "application/json")
-                        .contentType(MediaType.APPLICATION_JSON))
+                        .param("tags", "eco", "health"))
                 .andExpect(status().isOk());
 
         verify(habitService, times(1)).getAllByTagsAndLanguageCode(pageable, tags, locale.getLanguage());
     }
+
+    @Test
+    @DisplayName("Successful query with all parameters specified")
+    void testGetAllByDifferentParameters_AllParametersPresent() throws Exception {
+        Locale locale = Locale.ENGLISH;
+        Pageable pageable = PageRequest.of(0, 20);
+
+        Optional<List<String>> tags = Optional.of(List.of("eco", "health"));
+        Optional<Boolean> isCustomHabit = Optional.of(true);
+        Optional<List<Integer>> complexities = Optional.of(List.of(1, 2, 3));
+
+        List<HabitDto> habitDtos = List.of(new HabitDto(), new HabitDto());
+        PageableDto<HabitDto> expectedResponse = new PageableDto<>(habitDtos, habitDtos.size(), 1, habitDtos.size());
+
+        when(habitService.getAllByDifferentParameters(any(UserVO.class), eq(pageable), eq(tags), eq(isCustomHabit), eq(complexities), eq(locale.getLanguage())))
+                .thenReturn(expectedResponse);
+
+        mockMvc.perform(get("/habit/search")
+                        .header("Accept-Language", locale.getLanguage())
+                        .param("tags", "eco", "health")
+                        .param("isCustomHabit", String.valueOf(isCustomHabit.get()))
+                        .param("complexities", "1", "2", "3")
+                )
+                .andExpect(status().isOk());
+
+        verify(habitService).getAllByDifferentParameters(any(UserVO.class), eq(pageable), eq(tags), eq(isCustomHabit), eq(complexities), eq(locale.getLanguage()));
+    }
+
+    @Test
+    @DisplayName("BadRequestException when no parameters are provided")
+    void testGetAllByDifferentParameters_MissingRequiredParameters() {
+        Pageable pageable = PageRequest.of(0, 20);
+        Locale locale = Locale.ENGLISH;
+        Optional<List<String>> tags = Optional.empty();
+        Optional<Boolean> isCustomHabit = Optional.empty();
+        Optional<List<Integer>> complexities = Optional.empty();
+
+        BadRequestException exception = org.junit.jupiter.api.Assertions.assertThrows(
+                BadRequestException.class,
+                () -> habitController.getAllByDifferentParameters(userVO, locale, tags, isCustomHabit, complexities, pageable)
+        );
+
+        assertEquals("You should enter at least one parameter", exception.getMessage());
+    }
 }
+
