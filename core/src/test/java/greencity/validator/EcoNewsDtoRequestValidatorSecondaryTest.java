@@ -18,7 +18,7 @@ import static greencity.constant.ServiceValidationConstants.MAX_AMOUNT_OF_TAGS;
 @ExtendWith(MockitoExtension.class)
 public class EcoNewsDtoRequestValidatorSecondaryTest {
     @InjectMocks
-    EcoNewsDtoRequestValidator validator;
+    private EcoNewsDtoRequestValidator validator;
 
     AddEcoNewsDtoRequest addEcoNewsDtoRequest;
 
