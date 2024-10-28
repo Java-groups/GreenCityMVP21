@@ -1,6 +1,5 @@
 package greencity.mapping;
 
-import greencity.dto.category.CategoryDto;
 import greencity.dto.category.CategoryDtoResponse;
 import greencity.entity.Category;
 import org.junit.jupiter.api.BeforeEach;

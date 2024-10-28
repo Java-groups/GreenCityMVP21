@@ -41,7 +41,7 @@ class CustomShoppingListMapperTest {
 
     @Test
     void mapAllToList_emptyList() {
-        assertTrue(customShoppingListMapper.mapAllToList(new ArrayList<CustomShoppingListItemResponseDto>()).isEmpty());
+        assertTrue(customShoppingListMapper.mapAllToList(new ArrayList<>()).isEmpty());
     }
 
     @Test
