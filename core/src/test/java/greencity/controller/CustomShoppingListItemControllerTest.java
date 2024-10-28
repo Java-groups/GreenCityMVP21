@@ -25,7 +25,6 @@ import org.springframework.test.web.servlet.setup.MockMvcBuilders;
 import java.security.Principal;
 import java.util.Collections;
 import java.util.List;
-
 import static greencity.ModelUtils.getCustomShoppingListItemResponseDto;
 import static greencity.ModelUtils.getPrincipal;
 import static org.junit.jupiter.api.Assertions.assertEquals;
@@ -47,8 +46,8 @@ class CustomShoppingListItemControllerTest {
 
     @InjectMocks
     private CustomShoppingListItemController customShoppingListItemController;
-    private CustomShoppingListItemResponseDto responseDto;
-    private Principal principal = getPrincipal();
+    CustomShoppingListItemResponseDto responseDto;
+    Principal principal = getPrincipal();
 
     @BeforeEach
     void setup() {
