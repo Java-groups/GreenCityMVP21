@@ -1,6 +1,8 @@
 package greencity.controller;
 
 import greencity.config.SecurityConfig;
+
+import static org.hamcrest.Matchers.hasSize;
 import static org.junit.jupiter.api.Assertions.*;
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.jsonPath;
 import greencity.dto.PageableDto;
@@ -29,9 +31,7 @@ import org.springframework.http.ResponseEntity;
 import org.springframework.test.context.ContextConfiguration;
 import org.springframework.test.web.servlet.MockMvc;
 import org.springframework.test.web.servlet.setup.MockMvcBuilders;
-
 import java.util.*;
-
 import static org.mockito.Mockito.when;
 import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.get;
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.status;
@@ -196,6 +196,27 @@ public class HabitControllerTest {
         );
 
         assertEquals("You should enter at least one parameter", exception.getMessage());
+    }
+
+    @Test
+    @DisplayName("Find all habits tags")
+    void testFindAllHabitsTags() throws Exception {
+        Locale locale = Locale.ENGLISH;
+        List<String> expectedTags = List.of("health", "eco");
+
+        when(tagsService.findAllHabitsTags(locale.getLanguage())).thenReturn(expectedTags);
+
+        mockMvc.perform(get("/habit/tags")
+                        .header("Accept-Language", locale.getLanguage())
+                        .header("Accept", "application/json")
+                        .contentType(MediaType.APPLICATION_JSON))
+                .andExpect(status().isOk())
+                .andExpect(jsonPath("$").isArray())
+                .andExpect(jsonPath("$", hasSize(expectedTags.size())))
+                .andExpect(jsonPath("$[0]").value(expectedTags.get(0)))
+                .andExpect(jsonPath("$[1]").value(expectedTags.get(1)));
+
+        verify(tagsService, times(1)).findAllHabitsTags(locale.getLanguage());
     }
 }
 
