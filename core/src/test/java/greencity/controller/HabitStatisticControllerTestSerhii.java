@@ -30,7 +30,7 @@ import static org.springframework.test.web.servlet.request.MockMvcRequestBuilder
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.*;
 
 @ExtendWith(MockitoExtension.class)
-class HabitStatisticControllerTest {
+class HabitStatisticControllerTestSerhii {
     private final String HABIT_STATISTIC_CONTROLLER_URL = "/habit/statistic";
     private final List<HabitStatisticDto> HABIT_STATISTIC_DTOS = List.of(
             HabitStatisticDto.builder()
