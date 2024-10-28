@@ -20,7 +20,7 @@ public class EcoNewsDtoRequestValidatorSecondaryTest {
     @InjectMocks
     private EcoNewsDtoRequestValidator validator;
 
-    AddEcoNewsDtoRequest addEcoNewsDtoRequest;
+    private AddEcoNewsDtoRequest addEcoNewsDtoRequest;
 
     @BeforeEach
     void setup() {
