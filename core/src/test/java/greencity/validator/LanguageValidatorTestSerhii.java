@@ -38,11 +38,16 @@ class LanguageValidatorTestSerhii {
     }
 
     @Test
-    void isValid() {
+    void isValid_whenValidLanguage_returnsTrue() {
         Locale validLocale = Locale.ENGLISH;
-        Locale invalidLocale = Locale.FRANCE;
 
         assertTrue(languageValidator.isValid(validLocale, null));
+    }
+
+    @Test
+    void isValid_whenInvalidLanguage_returnsFalse() {
+        Locale invalidLocale = Locale.FRANCE;
+
         assertFalse(languageValidator.isValid(invalidLocale, null));
     }
 }
