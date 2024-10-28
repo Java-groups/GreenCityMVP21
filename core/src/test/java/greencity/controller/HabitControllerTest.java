@@ -1,11 +1,14 @@
 package greencity.controller;
 
+import com.fasterxml.jackson.databind.ObjectMapper;
 import greencity.config.SecurityConfig;
-
 import static org.hamcrest.Matchers.hasSize;
 import static org.junit.jupiter.api.Assertions.*;
+import static org.springframework.test.web.servlet.result.MockMvcResultHandlers.print;
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.jsonPath;
 import greencity.dto.PageableDto;
+import greencity.dto.habit.AddCustomHabitDtoRequest;
+import greencity.dto.habit.AddCustomHabitDtoResponse;
 import greencity.dto.habit.HabitDto;
 import greencity.dto.shoppinglistitem.ShoppingListItemDto;
 import greencity.dto.user.UserVO;
@@ -28,9 +31,13 @@ import org.springframework.data.web.PageableHandlerMethodArgumentResolver;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.MediaType;
 import org.springframework.http.ResponseEntity;
+import org.springframework.mock.web.MockMultipartFile;
 import org.springframework.test.context.ContextConfiguration;
 import org.springframework.test.web.servlet.MockMvc;
+import org.springframework.test.web.servlet.request.MockMvcRequestBuilders;
 import org.springframework.test.web.servlet.setup.MockMvcBuilders;
+import org.springframework.web.multipart.MultipartFile;
+import java.security.Principal;
 import java.util.*;
 import static org.mockito.Mockito.when;
 import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.get;
@@ -54,6 +61,9 @@ public class HabitControllerTest {
 
     @Mock
     private UserVO userVO;
+
+    @Mock
+    private Principal principal;
 
     @BeforeEach
     void setup() {
@@ -217,6 +227,30 @@ public class HabitControllerTest {
                 .andExpect(jsonPath("$[1]").value(expectedTags.get(1)));
 
         verify(tagsService, times(1)).findAllHabitsTags(locale.getLanguage());
+    }
+
+    @Test
+    @DisplayName("Add new custom habit")
+    void testAddCustomHabit() throws Exception {
+        AddCustomHabitDtoRequest requestDto = new AddCustomHabitDtoRequest();
+        requestDto.setImage("Test image");
+        requestDto.setComplexity(1);
+
+        AddCustomHabitDtoResponse responseDto = new AddCustomHabitDtoResponse();
+        responseDto.setId(1L);
+
+        MockMultipartFile image = new MockMultipartFile("image", "test-image.jpg", MediaType.IMAGE_JPEG_VALUE, "test-image-content".getBytes());
+
+        when(habitService.addCustomHabit(any(AddCustomHabitDtoRequest.class), any(MultipartFile.class), anyString()))
+                .thenReturn(responseDto);
+
+        mockMvc.perform(MockMvcRequestBuilders.multipart("/habit/custom")
+                        .file(image)
+                        .file(new MockMultipartFile("request", "", "application/json", new ObjectMapper().writeValueAsString(requestDto).getBytes()))
+                        .principal(principal)
+                        .contentType(MediaType.MULTIPART_FORM_DATA))
+                .andDo(print())
+                .andExpect(status().isCreated());
     }
 }
 
