@@ -60,7 +60,7 @@ import static org.mockito.Mockito.*;
 @MockitoSettings(strictness = Strictness.LENIENT)
 @Import(SecurityConfig.class)
 public class HabitControllerTest {
-    MockMvc mockMvc;
+    private MockMvc mockMvc;
     @Mock
     private HabitService habitService;
 
