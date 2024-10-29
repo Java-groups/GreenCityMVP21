@@ -18,8 +18,8 @@ import static org.junit.jupiter.api.Assertions.*;
 class EcoNewsCommentVOMapperTest {
     private EcoNewsCommentVOMapper mapper;
     private LocalDateTime now;
-    EcoNewsComment parentEcoNewsComment;
-    EcoNewsCommentVO expectedParentEcoNewsCommentVO;
+    private EcoNewsComment parentEcoNewsComment;
+    private EcoNewsCommentVO expectedParentEcoNewsCommentVO;
 
     @BeforeEach
     void setUp() {
