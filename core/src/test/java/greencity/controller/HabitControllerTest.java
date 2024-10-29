@@ -76,7 +76,7 @@ public class HabitControllerTest {
     @Mock
     private Principal principal;
 
-    Locale locale = Locale.ENGLISH;
+    private final Locale locale = Locale.ENGLISH;
     Long habitId = 1L;
 
     @BeforeEach
