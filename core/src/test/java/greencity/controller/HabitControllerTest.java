@@ -108,7 +108,7 @@ public class HabitControllerTest {
     }
 
     @Test
-    @DisplayName("Get all habits for a specific user and language")
+    @DisplayName("Get all habits ")
     void testGetAll() {
 
         Pageable pageable = Pageable.unpaged();
