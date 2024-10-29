@@ -59,7 +59,6 @@ import static org.mockito.Mockito.*;
 @ExtendWith(MockitoExtension.class)
 @MockitoSettings(strictness = Strictness.LENIENT)
 @Import(SecurityConfig.class)
-@RestController
 public class HabitControllerTest {
     MockMvc mockMvc;
     @Mock
