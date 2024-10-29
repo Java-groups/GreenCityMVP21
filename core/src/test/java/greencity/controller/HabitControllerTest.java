@@ -1,7 +1,6 @@
 package greencity.controller;
 
 import com.fasterxml.jackson.databind.ObjectMapper;
-import greencity.ModelUtils;
 import greencity.config.SecurityConfig;
 
 import static org.hamcrest.Matchers.hasSize;
