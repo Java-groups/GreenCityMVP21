@@ -46,8 +46,8 @@ class CustomShoppingListItemControllerTest {
 
     @InjectMocks
     private CustomShoppingListItemController customShoppingListItemController;
-    CustomShoppingListItemResponseDto responseDto;
-    Principal principal = getPrincipal();
+    private CustomShoppingListItemResponseDto responseDto;
+    private Principal principal = getPrincipal();
 
     @BeforeEach
     void setup() {
