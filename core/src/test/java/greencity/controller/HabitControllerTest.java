@@ -1,6 +1,7 @@
 package greencity.controller;
 
 import com.fasterxml.jackson.databind.ObjectMapper;
+
 import greencity.config.SecurityConfig;
 
 import static org.hamcrest.Matchers.hasSize;
@@ -61,6 +62,7 @@ import static org.mockito.Mockito.*;
 @Import(SecurityConfig.class)
 public class HabitControllerTest {
     private MockMvc mockMvc;
+
     @Mock
     private HabitService habitService;
 
