@@ -58,7 +58,7 @@ public class HabitFactController {
      *
      * @param languageId id of language to display the {@link HabitFactVO}.
      * @return {@link LanguageTranslationDTO} of today's {@link HabitFactVO} of the
-     * day.
+     *     day.
      */
     @Operation(summary = "Get habit fact of the day")
     @ApiResponses(value = {
