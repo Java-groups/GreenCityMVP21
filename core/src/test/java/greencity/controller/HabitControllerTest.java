@@ -58,7 +58,6 @@ import static org.mockito.Mockito.*;
 
 @ExtendWith(MockitoExtension.class)
 @MockitoSettings(strictness = Strictness.LENIENT)
-@ContextConfiguration
 @Import(SecurityConfig.class)
 @RestController
 public class HabitControllerTest {
