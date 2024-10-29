@@ -77,7 +77,7 @@ public class HabitControllerTest {
     private Principal principal;
 
     private final Locale locale = Locale.ENGLISH;
-    Long habitId = 1L;
+    private final Long habitId = 1L;
 
     @BeforeEach
     void setup() {
