@@ -249,14 +249,6 @@ public class EcoNewsController {
     @DeleteMapping("/{econewsId}")
     public ResponseEntity<Object> delete(@PathVariable Long econewsId,
                                          @Parameter(hidden = true) @CurrentUser UserVO user) {
-
-        EcoNewsDto ecoNewsDto = ecoNewsService.getById(econewsId);
-        EcoNewsAuthorDto ecoNewsAuthorDto = ecoNewsDto.getAuthor();
-        boolean requestFromCurrentUser = ecoNewsAuthorDto.getId().equals(user.getId());
-        if(!requestFromCurrentUser) {
-            return ResponseEntity.status(HttpStatus.FORBIDDEN).build();
-        }
-
         ecoNewsService.delete(econewsId, user);
         return ResponseEntity.status(HttpStatus.OK).build();
     }
