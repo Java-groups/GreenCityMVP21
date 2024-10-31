@@ -388,6 +388,7 @@ public class EcoNewsController {
                     content = @Content(schema = @Schema(implementation = NotFoundException.class)))
     })
     @GetMapping("/contentAndSourceForEcoNews/{id}")
+    @ApiResponse(responseCode = "403", description = HttpStatuses.FORBIDDEN)
     public ResponseEntity<EcoNewContentSourceDto> getContentAndSourceForEcoNewsById(@PathVariable Long id) {
         return ResponseEntity.status(HttpStatus.OK)
                 .body(ecoNewsService.getContentAndSourceForEcoNewsById(id));
