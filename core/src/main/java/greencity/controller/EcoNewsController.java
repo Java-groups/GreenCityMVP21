@@ -224,6 +224,7 @@ public class EcoNewsController {
         @ApiResponse(responseCode = "400", description = HttpStatuses.BAD_REQUEST)
     })
     @GetMapping("/byUserPage")
+    @ApiResponse(responseCode = "401", description = HttpStatuses.UNAUTHORIZED)
     @ApiPageable
     public ResponseEntity<PageableAdvancedDto<EcoNewsGenericDto>> getEcoNewsByUserByPage(
             @Parameter(hidden = true) @CurrentUser UserVO user,
