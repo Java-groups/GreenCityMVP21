@@ -374,8 +374,7 @@ public class EcoNewsController {
             @ApiResponse(responseCode = "200", description = HttpStatuses.OK),
             @ApiResponse(responseCode = "401", description = HttpStatuses.UNAUTHORIZED,
             content = @Content(schema = @Schema(implementation = HttpClientErrorException.Unauthorized.class))),
-            @ApiResponse(responseCode = "404", description = HttpStatuses.NOT_FOUND,
-            content = @Content(schema = @Schema(implementation = NotFoundException.class))),
+            @ApiResponse(responseCode = "404", description = HttpStatuses.NOT_FOUND),
     })
     public ResponseEntity<Boolean> checkNewsIsLikedByUser(@RequestParam("econewsId") Long econewsId,
                                                           @Parameter(hidden = true) @CurrentUser UserVO user) {
