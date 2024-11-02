@@ -137,7 +137,7 @@ public class SecurityConfig {
                                 "/econews/tags",
                                 "/econews/tags/all",
                                 "/econews/recommended",
-                                "/econews/{id}",
+                                "/econews/{id:\\d+}",
                                 "/econews/countLikes/{econewsId}",
                                 "/econews/comments/count/comments/{ecoNewsId}",
                                 "/econews/comments/count/replies/{parentCommentId}",
