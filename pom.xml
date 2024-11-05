@@ -56,9 +56,8 @@
                 <version>${formatter.maven.plugin.version}</version>
                 <executions>
                     <execution>
-                        <goals>
-                            <goal>validate</goal>
-                        </goals>
+                         <id>format</id>
+                         <phase>none</phase>
                     </execution>
                 </executions>
                 <configuration>
