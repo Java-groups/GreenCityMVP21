@@ -221,7 +221,8 @@ public class SecurityConfig {
                                 "/custom/shopping-list-items/{userId}/{habitId}/custom-shopping-list-items")
                         .hasAnyRole(USER, ADMIN, MODERATOR, UBS_EMPLOYEE)
                         .requestMatchers(HttpMethod.POST,
-                                "/newsSubscriber").permitAll()
+                                "/newsSubscriber")
+                        .permitAll()
                         .requestMatchers(HttpMethod.PUT,
                                 "/habit/statistic/{id}",
                                 "/econews/update",
