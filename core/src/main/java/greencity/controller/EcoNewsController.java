@@ -9,6 +9,7 @@ import greencity.dto.tag.TagDto;
 import greencity.dto.tag.TagVO;
 import greencity.dto.user.UserVO;
 import greencity.exception.exceptions.NotFoundException;
+import greencity.exception.handler.ExceptionResponse;
 import greencity.service.EcoNewsService;
 import greencity.service.FileService;
 import greencity.service.TagsService;
@@ -24,6 +25,7 @@ import org.springframework.http.HttpStatus;
 import org.springframework.http.MediaType;
 import org.springframework.http.ResponseEntity;
 import org.springframework.validation.annotation.Validated;
+import org.springframework.web.ErrorResponse;
 import org.springframework.web.bind.annotation.*;
 import org.springframework.web.multipart.MultipartFile;
 import jakarta.validation.Valid;
@@ -47,8 +49,11 @@ public class EcoNewsController {
      * @author Yuriy Olkhovskyi.
      */
     @Operation(summary = "Get three last eco news.")
-    @ApiResponses(value = {@ApiResponse(responseCode = "200", description = HttpStatuses.OK),
-        @ApiResponse(responseCode = "404", description = HttpStatuses.NOT_FOUND)
+    @ApiResponses(value = {
+            @ApiResponse(responseCode = "201", description = HttpStatuses.CREATED,
+                    content = @Content(schema = @Schema(implementation = EcoNewsGenericDto.class))),
+            @ApiResponse(responseCode = "400", description = HttpStatuses.BAD_REQUEST),
+            @ApiResponse(responseCode = "401", description = HttpStatuses.UNAUTHORIZED)
     })
     @GetMapping("/newest")
     public ResponseEntity<List<EcoNewsDto>> getThreeLastEcoNews() {
@@ -60,24 +65,25 @@ public class EcoNewsController {
      *
      * @param addEcoNewsDtoRequest - dto for {@link EcoNewsVO} entity.
      * @return dto {@link AddEcoNewsDtoResponse} instance.
-     * @author Yuriy Olkhovskyi & Kovaliv Taras.
      */
     @Operation(summary = "Add new eco news.")
     @ResponseStatus(value = HttpStatus.CREATED)
-    @ApiResponses(value = {@ApiResponse(responseCode = "201", description = HttpStatuses.CREATED,
-            content = @Content(schema = @Schema(implementation = EcoNewsGenericDto.class))),
+    @ApiResponses(value = {
+            @ApiResponse(responseCode = "201", description = "Created",
+                    content = @Content(schema = @Schema(implementation = EcoNewsGenericDto.class))),
+            @ApiResponse(responseCode = "400", description = "Bad Request",
+                    content = @Content(schema = @Schema(implementation = ExceptionResponse.class))),
+            @ApiResponse(responseCode = "401", description = "Unauthorized",
+                    content = @Content(schema = @Schema(implementation = ExceptionResponse.class)))
     })
-    @PostMapping(consumes = {MediaType.MULTIPART_FORM_DATA_VALUE, MediaType.APPLICATION_JSON_VALUE})
+    @PostMapping(consumes = MediaType.APPLICATION_JSON_VALUE)
     public ResponseEntity<EcoNewsGenericDto> save(
             @Parameter(description = SwaggerExampleModel.ADD_ECO_NEWS_REQUEST,
-                    required = true) @RequestPart @ValidEcoNewsDtoRequest AddEcoNewsDtoRequest addEcoNewsDtoRequest,
-            @Parameter(description = "Image of eco news") @ImageValidation
-            @RequestPart(required = false) MultipartFile image,
+                    required = true) @RequestBody @Valid AddEcoNewsDtoRequest addEcoNewsDtoRequest,
             @Parameter(hidden = true) Principal principal) {
         return ResponseEntity.status(HttpStatus.CREATED).body(
-                ecoNewsService.saveEcoNews(addEcoNewsDtoRequest, image, principal.getName()));
+                ecoNewsService.saveEcoNews(addEcoNewsDtoRequest, null, principal.getName()));
     }
-
     /**
      * Method for uploading eco news image.
      *

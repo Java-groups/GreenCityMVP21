@@ -22,9 +22,5 @@ public class AddEcoNewsDtoRequest {
     @NotEmpty
     private List<String> tags;
 
-    private String source;
-
-    private String image;
-
-    private String shortInfo;
+    private String source;  // Це поле не є обов'язковим
 }
