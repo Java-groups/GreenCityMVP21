@@ -51,6 +51,21 @@
     <build>
         <plugins>
             <plugin>
+                <groupId>net.revelc.code.formatter</groupId>
+                <artifactId>formatter-maven-plugin</artifactId>
+                <version>${formatter.maven.plugin.version}</version>
+                <executions>
+                    <execution>
+                         <id>format</id>
+                         <phase>none</phase>
+                    </execution>
+                </executions>
+                <configuration>
+                    <configFile>${project.basedir}/../formatter.xml</configFile>
+                    <lineEnding>LF</lineEnding>
+                </configuration>
+            </plugin>
+            <plugin>
                 <groupId>org.jacoco</groupId>
                 <artifactId>jacoco-maven-plugin</artifactId>
                 <version>${jacoco.maven.plugin.version}</version>
