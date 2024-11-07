@@ -3,6 +3,7 @@ package greencity.controller;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import greencity.converters.UserArgumentResolver;
 import greencity.dto.econews.AddEcoNewsDtoRequest;
+import greencity.dto.econews.UpdateEcoNewsDto;
 import greencity.dto.user.UserVO;
 import greencity.exception.exceptions.NotFoundException;
 import greencity.exception.handler.CustomExceptionHandler;
@@ -10,6 +11,7 @@ import greencity.service.EcoNewsService;
 import greencity.service.TagsService;
 import greencity.service.UserService;
 import lombok.SneakyThrows;
+import org.jetbrains.annotations.NotNull;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;
@@ -26,9 +28,12 @@ import org.springframework.data.domain.PageRequest;
 import org.springframework.data.domain.Pageable;
 import org.springframework.data.web.PageableHandlerMethodArgumentResolver;
 import org.springframework.http.MediaType;
+import org.springframework.mock.web.MockHttpServletRequest;
 import org.springframework.mock.web.MockMultipartFile;
 import org.springframework.test.web.servlet.MockMvc;
+import org.springframework.test.web.servlet.request.MockMultipartHttpServletRequestBuilder;
 import org.springframework.test.web.servlet.request.MockMvcRequestBuilders;
+import org.springframework.test.web.servlet.request.RequestPostProcessor;
 import org.springframework.test.web.servlet.setup.MockMvcBuilders;
 
 import java.security.Principal;
@@ -89,6 +94,54 @@ class EcoNewsControllerTest {
         mockMvc.perform(MockMvcRequestBuilders.multipart(ecoNewsLink + uploadImageLink)
             .file(image)).andExpect(status().isCreated());
         verify(ecoNewsService).uploadImage(isNull());
+    }
+
+    @Test
+    void updateTest() throws Exception {
+        UserVO userVO = getUserVO();
+
+        when(userService.findByEmail(anyString())).thenReturn(userVO);
+
+        String updateEcoNewsDtoJson = """
+                {
+                    "id": 2,
+                    "title": "title",
+                    "content": "loooooooooooooooooooooooooooooaaaadaddaadadadooooooooooooooongtext",
+                    "shortInfo": "info",
+                    "tags": [
+                      "News",
+                      "Events"
+                    ],
+                    "image": null,
+                    "source": "https://example.org/"
+                }
+                """;
+
+        MockMultipartFile updateEcoNewsDtoFile = new MockMultipartFile("updateEcoNewsDto", "", "application/json", updateEcoNewsDtoJson.getBytes());
+        MockMultipartFile image = new MockMultipartFile("image", "", "image/png", "".getBytes());
+
+        MockMultipartHttpServletRequestBuilder mockMultipartHttpServletRequestBuilder = MockMvcRequestBuilders.multipart(ecoNewsLink + "/update");
+        mockMultipartHttpServletRequestBuilder.with(
+                new RequestPostProcessor() {
+                    @NotNull
+                    @Override
+                    public MockHttpServletRequest postProcessRequest(@NotNull MockHttpServletRequest request) {
+                        request.setMethod("PUT");
+                        return request;
+                    }
+                }
+        );
+        mockMvc.perform(mockMultipartHttpServletRequestBuilder
+                .file(updateEcoNewsDtoFile)
+                .file(image)
+                .principal(userVO::getEmail)
+                .contentType(MediaType.MULTIPART_FORM_DATA))
+                .andExpect(status().isOk());
+
+        ObjectMapper objectMapper = new ObjectMapper();
+        UpdateEcoNewsDto updateEcoNewsDto = objectMapper.readValue(updateEcoNewsDtoJson, UpdateEcoNewsDto.class);
+
+        verify(ecoNewsService).update(updateEcoNewsDto, image, userVO);
     }
 
     @Test
