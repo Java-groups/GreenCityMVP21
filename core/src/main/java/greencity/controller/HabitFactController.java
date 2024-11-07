@@ -13,14 +13,14 @@ import io.swagger.v3.oas.annotations.Operation;
 import io.swagger.v3.oas.annotations.Parameter;
 import io.swagger.v3.oas.annotations.responses.ApiResponse;
 import io.swagger.v3.oas.annotations.responses.ApiResponses;
+import jakarta.validation.Valid;
+import java.util.Locale;
 import lombok.AllArgsConstructor;
 import org.modelmapper.ModelMapper;
 import org.springframework.data.domain.Pageable;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
-import jakarta.validation.Valid;
-import java.util.Locale;
 
 @RestController
 @RequestMapping("/facts")
@@ -58,7 +58,7 @@ public class HabitFactController {
      *
      * @param languageId id of language to display the {@link HabitFactVO}.
      * @return {@link LanguageTranslationDTO} of today's {@link HabitFactVO} of the
-     *         day.
+     *     day.
      */
     @Operation(summary = "Get habit fact of the day")
     @ApiResponses(value = {
@@ -89,7 +89,8 @@ public class HabitFactController {
     @GetMapping
     @ApiPageableWithLocale
     public ResponseEntity<PageableDto<LanguageTranslationDTO>> getAll(@Parameter(hidden = true) Pageable page,
-        @Parameter(hidden = true) @ValidLanguage Locale locale) {
+                                                                      @Parameter(hidden = true) @ValidLanguage
+                                                                      Locale locale) {
         return ResponseEntity.status(HttpStatus.OK)
             .body(habitFactService.getAllHabitFacts(page, locale.getLanguage()));
     }
@@ -154,7 +155,11 @@ public class HabitFactController {
     })
     @DeleteMapping("/{id}")
     public ResponseEntity<Object> delete(@PathVariable Long id) {
-        habitFactService.delete(id);
-        return ResponseEntity.ok().build();
+        try {
+            habitFactService.delete(id);
+            return ResponseEntity.ok().build();
+        } catch (IllegalArgumentException e) {
+            return ResponseEntity.status(HttpStatus.BAD_REQUEST).build();
+        }
     }
 }
