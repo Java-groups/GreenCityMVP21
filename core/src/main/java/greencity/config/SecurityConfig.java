@@ -180,7 +180,6 @@ public class SecurityConfig {
                                 "/facts",
                                 "/facts/random/{habitId}",
                                 "/facts/dayFact/{languageId}",
-                                "/newsSubscriber/unsubscribe",
                                 "/social-networks/image",
                                 "/user",
                                 "/user/shopping-list-items/habits/{habitId}/shopping-list",
@@ -222,6 +221,9 @@ public class SecurityConfig {
                         .hasAnyRole(USER, ADMIN, MODERATOR, UBS_EMPLOYEE)
                         .requestMatchers(HttpMethod.POST,
                                 "/newsSubscriber")
+                        .permitAll()
+                        .requestMatchers(HttpMethod.GET,
+                                "/newsSubscriber/unsubscribe")
                         .permitAll()
                         .requestMatchers(HttpMethod.PUT,
                                 "/habit/statistic/{id}",

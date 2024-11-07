@@ -43,5 +43,11 @@ public interface SubscriberService {
      * @return a NewsSubscriberVO by email.
      */
     NewsSubscriberVO findByEmail(String email);
-
+    /**
+     * Unsubscribes user if email and unsubscribe token are present in DB.
+     *
+     * @param email to find by.
+     * @return id of unsubscribed user.
+     */
+    Long unsubscribe(String email, String unsubscribeToken);
 }

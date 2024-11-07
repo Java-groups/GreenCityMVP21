@@ -4,6 +4,8 @@ import greencity.constant.ValidationConstant;
 import jakarta.validation.constraints.Email;
 import lombok.*;
 
+import java.util.UUID;
+
 @Data
 @NoArgsConstructor
 @AllArgsConstructor
@@ -14,6 +16,7 @@ public class NewsSubscriberDto {
     private String email;
 
     public static NewsSubscriberVO toNewsSubscriberVO(NewsSubscriberDto newsSubscriber) {
-        return NewsSubscriberVO.builder().email(newsSubscriber.email).build();
+        return NewsSubscriberVO.builder().email(newsSubscriber.email)
+                .unsubscribeToken(UUID.randomUUID().toString()).build();
     }
 }

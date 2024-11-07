@@ -135,6 +135,7 @@ public final class ErrorMessage {
     public static final String INVALID_DURATION = "The duration for such habit is lower than previously set";
     public static final String SUBSCRIBER_NOT_FOUND_BY_ID = "Subscriber with such id does not exist!";
     public static final String SUBSCRIBER_NOT_FOUND_BY_EMAIL = "Subscriber with such email does not exist!";
+    public static final String SUBSCRIBER_NOT_FOUND_BY_EMAIL_AND_TOKEN = "Subscriber with such email and token does not exist!";
 
     private ErrorMessage() {
     }
