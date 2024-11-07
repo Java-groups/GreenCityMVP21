@@ -27,7 +27,6 @@ import java.util.Locale;
 import static org.mockito.ArgumentMatchers.*;
 import static org.mockito.Mockito.*;
 import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.*;
-import static org.springframework.test.web.servlet.result.MockMvcResultHandlers.print;
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.jsonPath;
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.status;
 
@@ -70,7 +69,7 @@ class ShoppingListItemControllerTest {
         when(shoppingListItemService.findInProgressByUserIdAndLanguageCode(anyLong(), anyString())).thenReturn(listItemDtos);
         mockMvc.perform(get(ENDPOINT + "/{userId}/get-all-inprogress", 1L).param("lang", "en")
                         .locale(DEFAULT_LOCALE)
-                        .accept(MediaType.APPLICATION_JSON)).andExpect(status().isOk()).andDo(print())
+                        .accept(MediaType.APPLICATION_JSON)).andExpect(status().isOk())
                 .andExpect(jsonPath("$.length()").value(2L))
                 .andExpect(jsonPath("$[0].id").value(1L))
                 .andExpect(jsonPath("$[0].text").value("Item1"))
@@ -91,8 +90,7 @@ class ShoppingListItemControllerTest {
         mockMvc.perform(delete(ENDPOINT).principal(userVO::getEmail)
                         .param("habitId", String.valueOf(DEFAULT_HABIT_ID))
                         .param("shoppingListItemId", String.valueOf(shoppingListItemId)))
-                .andExpect(status().isOk())
-                .andDo(print());
+                .andExpect(status().isOk());
         verify(shoppingListItemService, atMost(1))
                 .deleteUserShoppingListItemByItemIdAndUserIdAndHabitId(
                         eq(shoppingListItemId), eq(userVO.getId()), eq(DEFAULT_HABIT_ID)
@@ -108,7 +106,6 @@ class ShoppingListItemControllerTest {
                         .principal(userVO::getEmail)
                         .param("DEFAULT_HABIT_ID", "1")
                         .param("lang", "en"))
-                .andDo(print())
                 .andExpect(status().isOk());
         verify(shoppingListItemService).getUserShoppingList(userVO.getId(), DEFAULT_HABIT_ID, DEFAULT_LOCALE.getLanguage());
     }
@@ -130,7 +127,7 @@ class ShoppingListItemControllerTest {
                         .content(json)
                         .accept(MediaType.APPLICATION_JSON)
                         .contentType(MediaType.APPLICATION_JSON))
-                .andExpect(status().isCreated()).andDo(print());
+                .andExpect(status().isCreated());
         verify(shoppingListItemService, times(1)).saveUserShoppingListItems(eq(userVO.getId()),
                 eq(DEFAULT_HABIT_ID),
                 anyList(),
@@ -147,8 +144,7 @@ class ShoppingListItemControllerTest {
                 eq(DEFAULT_LOCALE.getLanguage()))
         ).thenReturn(List.of(ModelUtils.getUserShoppingListItemResponseDto()));
         mockMvc.perform(get(ENDPOINT + "/habits/{DEFAULT_HABIT_ID}/shopping-list", DEFAULT_HABIT_ID)
-                        .principal(userVO::getEmail)).andExpect(status().isOk())
-                .andDo(print());
+                        .principal(userVO::getEmail)).andExpect(status().isOk());
     }
 
     /*
@@ -184,8 +180,7 @@ class ShoppingListItemControllerTest {
                         .param("userShoppingListItemId", "1")
                         .accept(MediaType.APPLICATION_JSON)
                         .principal(userVO::getEmail))
-                .andExpect(status().isOk())
-                .andDo(print());
+                .andExpect(status().isOk());
         verify(shoppingListItemService, times(1)).updateUserShoppingListItemStatus(
                 anyLong(),
                 anyLong(),
@@ -228,8 +223,7 @@ class ShoppingListItemControllerTest {
                         .param("lang", "en")
                         .accept(MediaType.APPLICATION_JSON)
                         .principal(userVO::getEmail))
-                .andExpect(status().isOk())
-                .andDo(print());
+                .andExpect(status().isOk());
         verify(shoppingListItemService, times(1)).updateUserShoppingListItemStatus(
                 anyLong(),
                 anyLong(),
@@ -269,8 +263,7 @@ class ShoppingListItemControllerTest {
                         .param("lang", "en")
                         .accept(MediaType.APPLICATION_JSON)
                         .principal(userVO::getEmail))
-                .andExpect(status().isCreated())
-                .andDo(print());
+                .andExpect(status().isCreated());
         verify(shoppingListItemService, times(1)).updateUserShopingListItemStatus(
                 anyLong(),
                 anyLong(),
@@ -285,7 +278,6 @@ class ShoppingListItemControllerTest {
         mockMvc.perform(delete(ENDPOINT + "/user-shopping-list-items")
                         .principal(userVO::getEmail)
                         .param("ids", "1,2,3,4,5,6"))
-                .andExpect(status().isOk())
-                .andDo(print());
+                .andExpect(status().isOk());
     }
 }
