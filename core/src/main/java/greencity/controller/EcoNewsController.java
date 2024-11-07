@@ -27,6 +27,7 @@ import org.springframework.http.ResponseEntity;
 import org.springframework.validation.annotation.Validated;
 import org.springframework.web.bind.annotation.*;
 import org.springframework.web.multipart.MultipartFile;
+import jakarta.validation.Valid;
 
 import java.security.Principal;
 import java.util.List;
@@ -145,6 +146,7 @@ public class EcoNewsController {
     @ApiResponses(value = {
             @ApiResponse(responseCode = "200", description = HttpStatuses.OK,
                     content = @Content(schema = @Schema(implementation = EcoNewsGenericDto.class))),
+            @ApiResponse(responseCode = "303", description = HttpStatuses.SEE_OTHER),
             @ApiResponse(responseCode = "403", description = HttpStatuses.FORBIDDEN)
     })
     @PutMapping(path = "/update", consumes = {MediaType.APPLICATION_JSON_VALUE,
@@ -245,6 +247,7 @@ public class EcoNewsController {
     @ApiResponses(value = {
             @ApiResponse(responseCode = "200", description = HttpStatuses.OK),
             @ApiResponse(responseCode = "401", description = HttpStatuses.UNAUTHORIZED),
+            @ApiResponse(responseCode = "403", description = HttpStatuses.FORBIDDEN),
             @ApiResponse(responseCode = "404", description = HttpStatuses.NOT_FOUND)
     })
     @DeleteMapping("/{econewsId}")
@@ -314,6 +317,9 @@ public class EcoNewsController {
      * @author Mamchuk Orest
      */
     @Operation(summary = "Find count of published eco news")
+    @ApiResponses(value = {
+            @ApiResponse(responseCode = "400", description = HttpStatuses.BAD_REQUEST)
+    })
     @GetMapping("/count")
     public ResponseEntity<Long> findAmountOfPublishedNews(@RequestParam Long userId) {
         return ResponseEntity.status(HttpStatus.OK).body(ecoNewsService.getAmountOfPublishedNewsByUserId(userId));
@@ -371,6 +377,9 @@ public class EcoNewsController {
      */
     @Operation(summary = "Check if user liked news")
     @GetMapping("/isLikedByUser")
+    @ApiResponses(
+            @ApiResponse(responseCode = "404", description = HttpStatuses.NOT_FOUND)
+    )
     public ResponseEntity<Boolean> checkNewsIsLikedByUser(@RequestParam("econewsId") Long econewsId,
                                                           @Parameter(hidden = true) @CurrentUser UserVO user) {
         return ResponseEntity.status(HttpStatus.OK).body(ecoNewsService.checkNewsIsLikedByUser(econewsId, user));
