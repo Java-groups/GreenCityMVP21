@@ -149,7 +149,7 @@ public interface UserRepo extends JpaRepository<User, Long>, JpaSpecificationExe
      *
      * @return list of {@link User}.
      */
-    @Query(nativeQuery = true, value = "SELECT u.* FROM users u JOIN users_friends uf ON u.id = uf.user_id WHERE uf.friend_id = :userId;")
+    @Query(nativeQuery = true, value = "SELECT u.* FROM users u JOIN users_friends uf ON u.id = uf.friend_id where uf.user_id = :userId")
     Page<User> getAllUserFriends(Long userId, Pageable pageable);
 }
 
