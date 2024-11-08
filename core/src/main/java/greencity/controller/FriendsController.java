@@ -41,6 +41,6 @@ public class FriendsController {
             @RequestParam(required = false) String name,
             @Parameter(hidden = true) @CurrentUser UserVO currentUser,
             @Parameter(hidden = true) Pageable page) {
-        return ResponseEntity.status(HttpStatus.OK).body(friendsService.findFriends(currentUser.getId(), page));
+        return ResponseEntity.status(HttpStatus.OK).body(friendsService.findFriends(name, currentUser.getId(), page));
     }
 }

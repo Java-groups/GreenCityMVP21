@@ -19,8 +19,8 @@ public class FriendsServiceImpl implements FriendsService {
     private final ModelMapper modelMapper;
 
     @Override
-    public PageableAdvancedDto<UserFriendDto> findFriends(Long userId, Pageable page) {
-        Page<User> friendsPage = userRepo.getAllUserFriends(userId, page);
+    public PageableAdvancedDto<UserFriendDto> findFriends(String name, Long userId, Pageable page) {
+        Page<User> friendsPage = userRepo.getAllUserFriends(name, userId, page);
         List<UserFriendDto> friendsList = friendsPage.stream()
                 .map(user -> modelMapper.map(user, UserFriendDto.class))
                 .toList();
