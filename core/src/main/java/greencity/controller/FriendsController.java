@@ -7,7 +7,6 @@ import greencity.dto.PageableAdvancedDto;
 import greencity.dto.friends.UserFriendDto;
 import greencity.dto.user.UserVO;
 import greencity.service.FriendsService;
-import greencity.service.SearchService;
 import io.swagger.v3.oas.annotations.Operation;
 import io.swagger.v3.oas.annotations.Parameter;
 import io.swagger.v3.oas.annotations.responses.ApiResponse;
