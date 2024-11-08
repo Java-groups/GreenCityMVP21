@@ -140,4 +140,16 @@ public interface UserRepo extends JpaRepository<User, Long>, JpaSpecificationExe
         + "(SELECT user_id FROM users_friends WHERE friend_id = :userId and status = 'FRIEND')"
         + "UNION (SELECT friend_id FROM users_friends WHERE user_id = :userId and status = 'FRIEND'));")
     List<User> getAllUserFriends(Long userId);
+
+    /**
+     * Get all user friends.
+     *
+     * @param userId The ID of the user.
+     * @param pageable pagination
+     *
+     * @return list of {@link User}.
+     */
+    @Query(nativeQuery = true, value = "SELECT u.* FROM users u JOIN users_friends uf ON u.id = uf.user_id WHERE uf.friend_id = :userId;")
+    Page<User> getAllUserFriends(Long userId, Pageable pageable);
 }
+
