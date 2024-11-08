@@ -18,6 +18,7 @@ import org.springframework.http.ResponseEntity;
 import org.springframework.validation.annotation.Validated;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.RequestMapping;
+import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.RestController;
 
 @Validated
@@ -37,6 +38,7 @@ public class FriendsController {
     @ApiPageable
     @GetMapping("")
     public ResponseEntity<PageableAdvancedDto<UserFriendDto>> findAllFriendsOfUser(
+            @RequestParam(required = false) String name,
             @Parameter(hidden = true) @CurrentUser UserVO currentUser,
             @Parameter(hidden = true) Pageable page) {
         return ResponseEntity.status(HttpStatus.OK).body(friendsService.findFriends(currentUser.getId(), page));
