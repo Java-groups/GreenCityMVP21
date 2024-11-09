@@ -185,15 +185,12 @@ public interface UserRepo extends JpaRepository<User, Long>, JpaSpecificationExe
     /**
      * Get all user friends.
      *
-     * @param name for search if partially exists in user.name
      * @param userId The ID of the user.
      * @param pageable pagination
      *
      * @return list of {@link User}.
      */
     @Query(nativeQuery = true, value = "SELECT u.* FROM users u JOIN friends_requests fr "
-            + "ON u.id = fr.friend_id OR u.id = fr.user_id "
-            + "WHERE (u.id = fr.friend_id AND fr.user_id = :userId) "
-            + "OR (u.id = fr.user_id AND fr.friend_id = :userId)")
+            + "ON u.id = fr.user_id WHERE fr.friend_id  = :userId")
     Page<User> getAllUserFriendsRequests(Long userId, Pageable pageable);
 }
