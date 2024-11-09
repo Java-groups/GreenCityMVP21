@@ -6,4 +6,5 @@ import org.springframework.data.domain.Pageable;
 
 public interface FriendsService {
     public PageableAdvancedDto<UserFriendDto> findFriends(String name, Long userId, Pageable page);
+    public PageableAdvancedDto<UserFriendDto> findFriendsRequests(Long userId, Pageable page);
 }
