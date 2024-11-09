@@ -20,49 +20,20 @@ public class FriendsServiceImpl implements FriendsService {
 
     @Override
     public PageableAdvancedDto<UserFriendDto> findFriends(String name, Long userId, Pageable page) {
-        Page<User> friendsPage = userRepo.getAllUserFriends(name, userId, page);
-        List<UserFriendDto> friendsList = friendsPage.stream()
-                .map(user -> modelMapper.map(user, UserFriendDto.class))
-                .peek(userFriendDto -> userFriendDto.setMutualFriends(
-                        userRepo.getMutualFriendsCount(userId, userFriendDto.getId())))
-                .toList();
-        return new PageableAdvancedDto<>(
-                friendsList,
-                friendsPage.getTotalElements(),
-                friendsPage.getNumber(),
-                friendsPage.getTotalPages(),
-                friendsPage.getNumber(),
-                friendsPage.hasPrevious(),
-                friendsPage.hasNext(),
-                friendsPage.isFirst(),
-                friendsPage.isLast()
-        );
+        return getPageableAdvancedDtoOfUserFriendDto(userId, userRepo.getAllUserFriends(name, userId, page));
     }
 
     @Override
     public PageableAdvancedDto<UserFriendDto> findFriendRequests(Long userId, Pageable page) {
-        Page<User> friendsPage = userRepo.getAllUserFriendRequests(userId, page);
-        List<UserFriendDto> friendsList = friendsPage.stream()
-                .map(user -> modelMapper.map(user, UserFriendDto.class))
-                .peek(userFriendDto -> userFriendDto.setMutualFriends(
-                        userRepo.getMutualFriendsCount(userId, userFriendDto.getId())))
-                .toList();
-        return new PageableAdvancedDto<>(
-                friendsList,
-                friendsPage.getTotalElements(),
-                friendsPage.getNumber(),
-                friendsPage.getTotalPages(),
-                friendsPage.getNumber(),
-                friendsPage.hasPrevious(),
-                friendsPage.hasNext(),
-                friendsPage.isFirst(),
-                friendsPage.isLast()
-        );
+        return getPageableAdvancedDtoOfUserFriendDto(userId, userRepo.getAllUserFriendRequests(userId, page));
     }
 
     @Override
     public PageableAdvancedDto<UserFriendDto> findNotFriendsYet(String name, Long userId, Pageable page) {
-        Page<User> friendsPage = userRepo.getAllUserNotFriendsYet(name, userId, page);
+        return getPageableAdvancedDtoOfUserFriendDto(userId, userRepo.getAllUserNotFriendsYet(name, userId, page));
+    }
+
+    private PageableAdvancedDto<UserFriendDto> getPageableAdvancedDtoOfUserFriendDto(Long userId, Page<User> friendsPage) {
         List<UserFriendDto> friendsList = friendsPage.stream()
                 .map(user -> modelMapper.map(user, UserFriendDto.class))
                 .peek(userFriendDto -> userFriendDto.setMutualFriends(
