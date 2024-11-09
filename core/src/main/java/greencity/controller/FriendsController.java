@@ -52,7 +52,7 @@ public class FriendsController {
             @ApiResponse(responseCode = "403", description = HttpStatuses.FORBIDDEN)
     })
     @ApiPageable
-    @GetMapping("/requests")
+    @GetMapping("/friendRequests")
     public ResponseEntity<PageableAdvancedDto<UserFriendDto>> findAllFriendsRequestsOfUser(
             @Parameter(hidden = true) @CurrentUser UserVO currentUser,
             @Parameter(hidden = true) Pageable page) {
