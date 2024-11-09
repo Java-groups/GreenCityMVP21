@@ -53,9 +53,9 @@ public class FriendsController {
     })
     @ApiPageable
     @GetMapping("/friendRequests")
-    public ResponseEntity<PageableAdvancedDto<UserFriendDto>> findAllFriendsRequestsOfUser(
+    public ResponseEntity<PageableAdvancedDto<UserFriendDto>> findAllFriendRequestsOfUser(
             @Parameter(hidden = true) @CurrentUser UserVO currentUser,
             @Parameter(hidden = true) Pageable page) {
-        return ResponseEntity.status(HttpStatus.OK).body(friendsService.findFriendsRequests(currentUser.getId(), page));
+        return ResponseEntity.status(HttpStatus.OK).body(friendsService.findFriendRequests(currentUser.getId(), page));
     }
 }

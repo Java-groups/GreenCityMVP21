@@ -183,14 +183,14 @@ public interface UserRepo extends JpaRepository<User, Long>, JpaSpecificationExe
     Long getMutualFriendsCount(Long userId, Long friendId);
 
     /**
-     * Get all user friends.
+     * Get all user friend requests.
      *
      * @param userId The ID of the user.
      * @param pageable pagination
      *
      * @return list of {@link User}.
      */
-    @Query(nativeQuery = true, value = "SELECT u.* FROM users u JOIN friends_requests fr "
+    @Query(nativeQuery = true, value = "SELECT u.* FROM users u JOIN friend_requests fr "
             + "ON u.id = fr.user_id WHERE fr.friend_id  = :userId")
-    Page<User> getAllUserFriendsRequests(Long userId, Pageable pageable);
+    Page<User> getAllUserFriendRequests(Long userId, Pageable pageable);
 }

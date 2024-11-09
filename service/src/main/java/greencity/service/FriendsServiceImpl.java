@@ -40,8 +40,8 @@ public class FriendsServiceImpl implements FriendsService {
     }
 
     @Override
-    public PageableAdvancedDto<UserFriendDto> findFriendsRequests(Long userId, Pageable page) {
-        Page<User> friendsPage = userRepo.getAllUserFriendsRequests(userId, page);
+    public PageableAdvancedDto<UserFriendDto> findFriendRequests(Long userId, Pageable page) {
+        Page<User> friendsPage = userRepo.getAllUserFriendRequests(userId, page);
         List<UserFriendDto> friendsList = friendsPage.stream()
                 .map(user -> modelMapper.map(user, UserFriendDto.class))
                 .peek(userFriendDto -> userFriendDto.setMutualFriends(
