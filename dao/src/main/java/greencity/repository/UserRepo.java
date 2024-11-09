@@ -149,8 +149,10 @@ public interface UserRepo extends JpaRepository<User, Long>, JpaSpecificationExe
      *
      * @return list of {@link User}.
      */
-    @Query(nativeQuery = true, value = "SELECT u.* FROM users u JOIN users_friends uf ON u.id = uf.friend_id "
-            + "WHERE uf.user_id = :userId AND u.name LIKE CONCAT('%', :name, '%')")
+    @Query(nativeQuery = true, value = "SELECT u.* FROM users u JOIN users_friends uf "
+            + "ON u.id = uf.friend_id OR u.id = uf.user_id "
+            + "WHERE u.name LIKE CONCAT('%', :name, '%') "
+            + "AND ((u.id = uf.friend_id AND uf.user_id = :userId) "
+            + "OR (u.id = uf.user_id AND uf.friend_id = :userId))")
     Page<User> getAllUserFriends(String name, Long userId, Pageable pageable);
 }
-
