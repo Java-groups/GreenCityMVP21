@@ -59,4 +59,25 @@ public class FriendsServiceImpl implements FriendsService {
                 friendsPage.isLast()
         );
     }
+
+    @Override
+    public PageableAdvancedDto<UserFriendDto> findNotFriendsYet(String name, Long userId, Pageable page) {
+        Page<User> friendsPage = userRepo.getAllUserNotFriendsYet(name, userId, page);
+        List<UserFriendDto> friendsList = friendsPage.stream()
+                .map(user -> modelMapper.map(user, UserFriendDto.class))
+                .peek(userFriendDto -> userFriendDto.setMutualFriends(
+                        userRepo.getMutualFriendsCount(userId, userFriendDto.getId())))
+                .toList();
+        return new PageableAdvancedDto<>(
+                friendsList,
+                friendsPage.getTotalElements(),
+                friendsPage.getNumber(),
+                friendsPage.getTotalPages(),
+                friendsPage.getNumber(),
+                friendsPage.hasPrevious(),
+                friendsPage.hasNext(),
+                friendsPage.isFirst(),
+                friendsPage.isLast()
+        );
+    }
 }

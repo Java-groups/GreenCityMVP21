@@ -58,4 +58,20 @@ public class FriendsController {
             @Parameter(hidden = true) Pageable page) {
         return ResponseEntity.status(HttpStatus.OK).body(friendsService.findFriendRequests(currentUser.getId(), page));
     }
+
+    @Operation(summary = "Get all users except main user and users friends")
+    @ApiResponses(value = {
+            @ApiResponse(responseCode = "200", description = HttpStatuses.OK),
+            @ApiResponse(responseCode = "400", description = HttpStatuses.BAD_REQUEST),
+            @ApiResponse(responseCode = "401", description = HttpStatuses.UNAUTHORIZED),
+            @ApiResponse(responseCode = "403", description = HttpStatuses.FORBIDDEN)
+    })
+    @ApiPageable
+    @GetMapping("/not-friends-yet")
+    public ResponseEntity<PageableAdvancedDto<UserFriendDto>> findAllNotFriendsYetOfUser(
+            @RequestParam(required = false) String name,
+            @Parameter(hidden = true) @CurrentUser UserVO currentUser,
+            @Parameter(hidden = true) Pageable page) {
+        return ResponseEntity.status(HttpStatus.OK).body(friendsService.findNotFriendsYet(name, currentUser.getId(), page));
+    }
 }
