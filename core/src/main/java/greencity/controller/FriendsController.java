@@ -43,4 +43,19 @@ public class FriendsController {
             @Parameter(hidden = true) Pageable page) {
         return ResponseEntity.status(HttpStatus.OK).body(friendsService.findFriends(name, currentUser.getId(), page));
     }
+
+    @Operation(summary = "Get all friends requests of user")
+    @ApiResponses(value = {
+            @ApiResponse(responseCode = "200", description = HttpStatuses.OK),
+            @ApiResponse(responseCode = "400", description = HttpStatuses.BAD_REQUEST),
+            @ApiResponse(responseCode = "401", description = HttpStatuses.UNAUTHORIZED),
+            @ApiResponse(responseCode = "403", description = HttpStatuses.FORBIDDEN)
+    })
+    @ApiPageable
+    @GetMapping("/friendRequests")
+    public ResponseEntity<PageableAdvancedDto<UserFriendDto>> findAllFriendRequestsOfUser(
+            @Parameter(hidden = true) @CurrentUser UserVO currentUser,
+            @Parameter(hidden = true) Pageable page) {
+        return ResponseEntity.status(HttpStatus.OK).body(friendsService.findFriendRequests(currentUser.getId(), page));
+    }
 }
