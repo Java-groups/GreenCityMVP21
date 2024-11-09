@@ -144,6 +144,7 @@ public interface UserRepo extends JpaRepository<User, Long>, JpaSpecificationExe
     /**
      * Get all user friends.
      *
+     * @param name for search if partially exists in user.name
      * @param userId The ID of the user.
      * @param pageable pagination
      *
