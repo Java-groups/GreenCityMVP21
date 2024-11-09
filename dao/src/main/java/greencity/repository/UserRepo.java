@@ -156,4 +156,29 @@ public interface UserRepo extends JpaRepository<User, Long>, JpaSpecificationExe
             + "AND ((u.id = uf.friend_id AND uf.user_id = :userId) "
             + "OR (u.id = uf.user_id AND uf.friend_id = :userId))")
     Page<User> getAllUserFriends(String name, Long userId, Pageable pageable);
+
+    /**
+     * Get user and his friend mutual friends count.
+     *
+     * @param userId The ID of the user
+     * @param friendId The ID of user's friend
+     *
+     * @return Long
+     */
+    @Query(nativeQuery = true, value = "SELECT COUNT(*) FROM ("
+            + "SELECT user_id FROM ("
+            + "SELECT friend_id AS user_id FROM users_friends "
+            + "WHERE user_id = :userId "
+            + "UNION "
+            + "SELECT user_id AS user_id FROM users_friends "
+            + "WHERE friend_id = :userId) AS user1_friends "
+            + "INTERSECT "
+            + "SELECT user_id FROM ("
+            + "SELECT friend_id AS user_id FROM users_friends "
+            + "WHERE user_id = :friendId "
+            + "UNION "
+            + "SELECT user_id AS user_id FROM users_friends "
+            + "WHERE friend_id = :friendId) AS user2_friends) "
+            + "AS common_friends")
+    Long getMutualFriendsCount(Long userId, Long friendId);
 }
