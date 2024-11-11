@@ -12,6 +12,7 @@ import io.swagger.v3.oas.annotations.Operation;
 import io.swagger.v3.oas.annotations.Parameter;
 import io.swagger.v3.oas.annotations.responses.ApiResponse;
 import io.swagger.v3.oas.annotations.responses.ApiResponses;
+import java.util.List;
 import lombok.AllArgsConstructor;
 import org.springframework.data.domain.Pageable;
 import org.springframework.http.HttpStatus;
@@ -96,7 +97,7 @@ public class FriendsController {
         @ApiResponse(responseCode = "404", description = HttpStatuses.FORBIDDEN)
     })
     @GetMapping("/user/{userId}")
-    public ResponseEntity<UserManagementDto[]> findUserFriendsByUserId(
+    public ResponseEntity<List<UserManagementDto>> findUserFriendsByUserId(
         @RequestParam() Long userId
     ) {
         return ResponseEntity.status(HttpStatus.OK).body(friendsService.findFriends(userId));
