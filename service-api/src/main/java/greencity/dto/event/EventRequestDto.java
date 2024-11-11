@@ -43,8 +43,9 @@ public class EventRequestDto {
     @Schema(hidden = true)
     private String image;
 
+    @Schema(hidden = true)
+    @NotNull
+    private List<String> additionalImages = new ArrayList<>();
 
-//    private List<String> additionalImages;
 //    private List<String> tags;
-
 }

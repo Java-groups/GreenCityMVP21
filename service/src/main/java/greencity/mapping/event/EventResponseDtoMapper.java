@@ -2,6 +2,7 @@ package greencity.mapping.event;
 
 import greencity.dto.event.EventResponseDto;
 import greencity.entity.Event;
+import greencity.entity.EventImages;
 import lombok.RequiredArgsConstructor;
 import org.modelmapper.AbstractConverter;
 import org.springframework.stereotype.Component;
@@ -23,6 +24,9 @@ public class EventResponseDtoMapper extends AbstractConverter<Event, EventRespon
                 .type(source.getType())
                 .isOpen(source.getIsOpen())
                 .image(source.getImage())
+                .additionalImages(source.getAdditionalImages().stream()
+                        .map(EventImages::getLink)
+                        .toList())
                 .build();
     }
 }

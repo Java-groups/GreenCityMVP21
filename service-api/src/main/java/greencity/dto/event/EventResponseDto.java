@@ -22,4 +22,5 @@ public class EventResponseDto {
     private EventType type;
     private String image;
     private List<EventDayDto> dayList;
+    private List<String> additionalImages;
 }
