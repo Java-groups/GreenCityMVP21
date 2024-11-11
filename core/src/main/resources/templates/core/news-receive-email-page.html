@@ -1,5 +1,5 @@
 <!DOCTYPE html>
-<html xmlns:th="http://www.thymeleaf.org" xmlns="http://www.w3.org/1999/xhtml">
+<html xmlns:th="http://www.thymeleaf.org" xmlns="http://www.w3.org/1999/xhtml" xmlns="http://www.w3.org/1999/html">
 <head>
     <meta charset="utf-8">
     <meta http-equiv="x-ua-compatible" content="ie=edge">
@@ -165,7 +165,7 @@
                             <br>
                             <span th:text="${news.text}"></span>
                             <br>
-                            <span th:href="${ecoNewsLink}" class="gCity-link">Read more</span>
+                            <a th:href="${ecoNewsLink}"><span class="gCity-link">Read more</span></a>
                             <br>
                             </ul>
                         </div>
@@ -205,7 +205,7 @@
                         <p style="margin: 0;">
                             You received this email because you subscribed for notifications about news via e-mail.
                             If you didn't request this action you can unsubscribe from next news clicking on this
-                            <span th:href="${unsubscribeLink}" class="gCity-link">LINK</span>
+                            <a th:href="${unsubscribeLink}"><span class="gCity-link">LINK</span></a>
                             or copy this link (<span style="margin: 0;" th:text="${unsubscribeLink}">
                 </span>) on browser.
                         </p>
