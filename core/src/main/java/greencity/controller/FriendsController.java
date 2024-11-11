@@ -5,12 +5,14 @@ import greencity.annotations.CurrentUser;
 import greencity.constant.HttpStatuses;
 import greencity.dto.PageableAdvancedDto;
 import greencity.dto.friends.UserFriendDto;
+import greencity.dto.user.UserManagementDto;
 import greencity.dto.user.UserVO;
 import greencity.service.FriendsService;
 import io.swagger.v3.oas.annotations.Operation;
 import io.swagger.v3.oas.annotations.Parameter;
 import io.swagger.v3.oas.annotations.responses.ApiResponse;
 import io.swagger.v3.oas.annotations.responses.ApiResponses;
+import java.util.List;
 import lombok.AllArgsConstructor;
 import org.springframework.data.domain.Pageable;
 import org.springframework.http.HttpStatus;
@@ -85,5 +87,18 @@ public class FriendsController {
             @Parameter(hidden = true) @CurrentUser UserVO currentUser) {
         friendsService.acceptFriendRequest(currentUser.getId(), friendId);
         return ResponseEntity.status(HttpStatus.OK).build();
+    @Operation(summary = "Get all user friends")
+
+    @ApiResponses(value = {
+        @ApiResponse(responseCode = "200", description = HttpStatuses.OK),
+        @ApiResponse(responseCode = "400", description = HttpStatuses.BAD_REQUEST),
+        @ApiResponse(responseCode = "401", description = HttpStatuses.UNAUTHORIZED),
+        @ApiResponse(responseCode = "404", description = HttpStatuses.FORBIDDEN)
+    })
+    @GetMapping("/friends/user/{userId}")
+    public ResponseEntity<List<UserManagementDto>> findUserFriendsByUserId(
+        @RequestParam() Long userId
+    ) {
+        return ResponseEntity.status(HttpStatus.OK).body(friendsService.findFriends(userId));
     }
 }

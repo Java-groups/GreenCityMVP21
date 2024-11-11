@@ -199,7 +199,8 @@ public class SecurityConfig {
                                 "/habit/{habitId}/friends/profile-pictures",
                                 "/friends",
                                 "/friends/friendRequests",
-                                "/friends/not-friends-yet")
+                            "/friends/not-friends-yet",
+                            "/friends/user/{userId}")
                         .hasAnyRole(USER, ADMIN, MODERATOR, UBS_EMPLOYEE)
                         .requestMatchers(HttpMethod.POST,
                                 "/category",
