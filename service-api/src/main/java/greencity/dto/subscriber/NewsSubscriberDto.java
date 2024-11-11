@@ -16,7 +16,7 @@ public class NewsSubscriberDto {
     private String email;
 
     public static NewsSubscriberVO toNewsSubscriberVO(NewsSubscriberDto newsSubscriber) {
-        return NewsSubscriberVO.builder().email(newsSubscriber.email)
+        return NewsSubscriberVO.builder().email(newsSubscriber.email.toLowerCase())
                 .unsubscribeToken(UUID.randomUUID().toString()).build();
     }
 }

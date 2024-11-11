@@ -23,6 +23,9 @@ public class SubscriberServiceImpl implements SubscriberService {
 
     @Override
     public NewsSubscriberVO save(NewsSubscriberVO newsSubscriberVO) {
+        if (subscriberRepo.findByEmail(newsSubscriberVO.getEmail()).isPresent()) {
+            throw new RuntimeException(ErrorMessage.SUBSCRIBER_ALREADY_EXISTS);
+        }
         log.info(LogMessage.IN_SAVE, newsSubscriberVO);
         NewsSubscriber newsSubscriber = modelMapper.map(newsSubscriberVO, NewsSubscriber.class);
         return modelMapper.map(subscriberRepo.save(newsSubscriber), NewsSubscriberVO.class);
@@ -42,7 +45,8 @@ public class SubscriberServiceImpl implements SubscriberService {
     @Override
     public List<NewsSubscriberVO> findAll() {
         log.info(LogMessage.IN_FIND_ALL);
-        return modelMapper.map(subscriberRepo.findAll(), new TypeToken<List<NewsSubscriberVO>>() {}.getType());
+        return modelMapper.map(subscriberRepo.findAll(), new TypeToken<List<NewsSubscriberVO>>() {
+        }.getType());
     }
 
     @Override
@@ -54,7 +58,7 @@ public class SubscriberServiceImpl implements SubscriberService {
     @Override
     public NewsSubscriberVO findByEmail(String email) {
         return modelMapper.map(subscriberRepo.findByEmail(email).orElseThrow(
-                () -> new NotFoundException(ErrorMessage.SUBSCRIBER_NOT_FOUND_BY_EMAIL)),
+                        () -> new NotFoundException(ErrorMessage.SUBSCRIBER_NOT_FOUND_BY_EMAIL)),
                 NewsSubscriberVO.class
         );
     }
@@ -63,6 +67,8 @@ public class SubscriberServiceImpl implements SubscriberService {
     public Long unsubscribe(String email, String unsubscribeToken) {
         NewsSubscriber newsSubscriber = subscriberRepo.findByEmailAndUnsubscribeToken(email, unsubscribeToken)
                 .orElseThrow(() -> new NotFoundException(ErrorMessage.SUBSCRIBER_NOT_FOUND_BY_EMAIL_AND_TOKEN));
-        return newsSubscriber.getId();
+        long id = newsSubscriber.getId();
+        subscriberRepo.deleteById(id);
+        return id;
     }
 }
