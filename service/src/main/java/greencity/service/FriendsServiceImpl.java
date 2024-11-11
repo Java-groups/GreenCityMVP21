@@ -6,7 +6,6 @@ import greencity.entity.User;
 import greencity.exception.exceptions.BadRequestException;
 import greencity.exception.exceptions.NotFoundException;
 import greencity.repository.UserRepo;
-import jakarta.persistence.EntityNotFoundException;
 import lombok.RequiredArgsConstructor;
 import org.modelmapper.ModelMapper;
 import org.springframework.data.domain.Page;
@@ -40,14 +39,14 @@ public class FriendsServiceImpl implements FriendsService {
     @Transactional
     @Override
     public void acceptFriendRequest(Long userId, Long friendId) {
-        User user = userRepo.findById(userId).orElseThrow(() -> new NotFoundException("User not found!"));
+        userRepo.findById(userId).orElseThrow(() -> new NotFoundException("User not found!"));
         User friend = userRepo.findById(friendId).orElseThrow(() -> new NotFoundException("Friend not found!"));
         if (userRepo.getAllUserFriends(userId).contains(friend)) {
             throw new BadRequestException("Friend already accepted!");
         }
         if (userRepo.deleteFriendRequest(userId, friendId) == 0) {
             throw new NotFoundException("Friend request not found!");
-        };
+        }
         userRepo.addFriend(userId, friendId);
     }
 
