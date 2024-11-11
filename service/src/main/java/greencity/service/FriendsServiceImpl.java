@@ -27,10 +27,10 @@ public class FriendsServiceImpl implements FriendsService {
     }
 
     @Override
-    public List<UserManagementDto> findFriends(Long userId) {
+    public UserManagementDto[] findFriends(Long userId) {
         return userRepo.getAllUserFriends(userId).stream()
             .map(item -> modelMapper.map(item, UserManagementDto.class))
-            .toList();
+                .toArray(UserManagementDto[]::new);
     }
 
     @Override
