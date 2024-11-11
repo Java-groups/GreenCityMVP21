@@ -211,4 +211,32 @@ public interface UserRepo extends JpaRepository<User, Long>, JpaSpecificationExe
             + "WHERE u.id <> :userId and uf1.friend_id IS NULL AND uf2.user_id IS null "
             + "AND u.name LIKE CONCAT('%', :name, '%')")
     Page<User> getAllUserNotFriendsYet(String name, Long userId, Pageable pageable);
+
+    /**
+     * Delete friend request of sender with friendId and recipient with userId
+     *
+     * @param userId The ID of the friend request recipient
+     * @param friendId The ID of the friend request sender
+     *
+     * @return int count of deleted rows
+     */
+    @Modifying
+    @Transactional
+    @Query(nativeQuery = true, value = "DELETE FROM friend_requests "
+            + "WHERE user_id = :friendId AND friend_id = :userId")
+    int deleteFriendRequest(Long userId, Long friendId);
+
+    /**
+     * Add friendship between 2 users
+     *
+     * @param userId The ID of the first friend
+     * @param friendId The ID of the second friend
+     *
+     */
+    @Modifying
+    @Transactional
+    @Query(nativeQuery = true, value = "INSERT INTO users_friends "
+            + "(user_id, friend_id, status, created_date) "
+            + "VALUES (:userId, :friendId, 'FRIEND', NOW())")
+    void addFriend(Long userId, Long friendId);
 }
