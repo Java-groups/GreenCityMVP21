@@ -194,8 +194,9 @@ public interface UserRepo extends JpaRepository<User, Long>, JpaSpecificationExe
             + "ON u.id = fr.user_id WHERE fr.friend_id  = :userId")
     Page<User> getAllUserFriendRequests(Long userId, Pageable pageable);
 
+
     /**
-     * Get all users except main user and users friends
+     * Get all users except main user and users friends.
      *
      * @param name for search if partially exists in user.name
      * @param userId The ID of the user.
