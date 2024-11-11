@@ -63,7 +63,6 @@ public class SubscriberServiceImpl implements SubscriberService {
     public Long unsubscribe(String email, String unsubscribeToken) {
         NewsSubscriber newsSubscriber = subscriberRepo.findByEmailAndUnsubscribeToken(email, unsubscribeToken)
                 .orElseThrow(() -> new NotFoundException(ErrorMessage.SUBSCRIBER_NOT_FOUND_BY_EMAIL_AND_TOKEN));
-        System.out.println(newsSubscriber);
         return newsSubscriber.getId();
     }
 }

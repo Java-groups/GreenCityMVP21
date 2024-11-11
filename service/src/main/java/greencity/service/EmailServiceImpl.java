@@ -26,7 +26,6 @@ import java.util.concurrent.Executor;
 public class EmailServiceImpl implements EmailService {
     private final JavaMailSender javaMailSender;
     private final ITemplateEngine templateEngine;
-    private final SubscriberService subscriberService;
     private final Executor executor;
     private final String ecoNewsLink;
     private final String serverLink;
@@ -39,8 +38,7 @@ public class EmailServiceImpl implements EmailService {
             @Qualifier("emailServiceExecutor") Executor executor,
             @Value("econews.address") String ecoNewsLink,
             @Value("address") String serverLink,
-            @Value("sender.email.address") String senderEmailAddress,
-            SubscriberService subscriberService
+            @Value("sender.email.address") String senderEmailAddress
     ) {
         this.javaMailSender = javaMailSender;
         this.templateEngine = templateEngine;
@@ -48,7 +46,6 @@ public class EmailServiceImpl implements EmailService {
         this.ecoNewsLink = ecoNewsLink;
         this.serverLink = serverLink;
         this.senderEmailAddress = senderEmailAddress;
-        this.subscriberService = subscriberService;
     }
 
     @Override

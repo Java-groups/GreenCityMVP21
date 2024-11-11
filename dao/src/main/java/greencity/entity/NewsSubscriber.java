@@ -10,7 +10,7 @@ import static greencity.constant.ValidationConstants.VALIDATION_EMAIL;
 
 
 @Entity
-@Table(name = "subscribers")
+@Table(name = "news_subscribers")
 @Data
 @NoArgsConstructor
 @AllArgsConstructor

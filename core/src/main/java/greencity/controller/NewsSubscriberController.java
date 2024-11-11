@@ -52,8 +52,8 @@ public class NewsSubscriberController {
     public ResponseEntity<Long> unsubscribe(@Valid @RequestParam("email") String email,
                                             @RequestParam("unsubscribeToken") String unsubscribeToken) {
         long unsubscribeId = subscriberService.unsubscribe(email, unsubscribeToken);
-        log.info("Successfully unsubscribed user from newsletter.");
-        return ResponseEntity.status(HttpStatus.OK).body(unsubscribeId);
+        log.info("Successfully unsubscribed with id: {} user from newsletter.", unsubscribeId);
+        return ResponseEntity.status(HttpStatus.OK).build();
     }
 
     @Operation(summary = "Sends eco news to all subscribers")
