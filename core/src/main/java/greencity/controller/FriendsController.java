@@ -87,8 +87,9 @@ public class FriendsController {
             @Parameter(hidden = true) @CurrentUser UserVO currentUser) {
         friendsService.acceptFriendRequest(currentUser.getId(), friendId);
         return ResponseEntity.status(HttpStatus.OK).build();
-    @Operation(summary = "Get all user friends")
+    }
 
+    @Operation(summary = "Get all user friends")
     @ApiResponses(value = {
         @ApiResponse(responseCode = "200", description = HttpStatuses.OK),
         @ApiResponse(responseCode = "400", description = HttpStatuses.BAD_REQUEST),
