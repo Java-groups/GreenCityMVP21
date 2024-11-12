@@ -32,7 +32,7 @@ public class FriendsController {
             @ApiResponse(responseCode = "200", description = HttpStatuses.OK),
             @ApiResponse(responseCode = "400", description = HttpStatuses.BAD_REQUEST),
             @ApiResponse(responseCode = "401", description = HttpStatuses.UNAUTHORIZED),
-            @ApiResponse(responseCode = "403", description = HttpStatuses.FORBIDDEN)
+            @ApiResponse(responseCode = "404", description = HttpStatuses.NOT_FOUND)
     })
     @ApiPageable
     @GetMapping("")
@@ -48,7 +48,7 @@ public class FriendsController {
             @ApiResponse(responseCode = "200", description = HttpStatuses.OK),
             @ApiResponse(responseCode = "400", description = HttpStatuses.BAD_REQUEST),
             @ApiResponse(responseCode = "401", description = HttpStatuses.UNAUTHORIZED),
-            @ApiResponse(responseCode = "403", description = HttpStatuses.FORBIDDEN)
+            @ApiResponse(responseCode = "404", description = HttpStatuses.FORBIDDEN)
     })
     @ApiPageable
     @GetMapping("/friendRequests")
@@ -63,7 +63,7 @@ public class FriendsController {
             @ApiResponse(responseCode = "200", description = HttpStatuses.OK),
             @ApiResponse(responseCode = "400", description = HttpStatuses.BAD_REQUEST),
             @ApiResponse(responseCode = "401", description = HttpStatuses.UNAUTHORIZED),
-            @ApiResponse(responseCode = "403", description = HttpStatuses.FORBIDDEN)
+            @ApiResponse(responseCode = "404", description = HttpStatuses.NOT_FOUND)
     })
     @ApiPageable
     @GetMapping("/not-friends-yet")
@@ -109,7 +109,7 @@ public class FriendsController {
         @ApiResponse(responseCode = "200", description = HttpStatuses.OK),
         @ApiResponse(responseCode = "400", description = HttpStatuses.BAD_REQUEST),
         @ApiResponse(responseCode = "401", description = HttpStatuses.UNAUTHORIZED),
-        @ApiResponse(responseCode = "403", description = HttpStatuses.FORBIDDEN)
+        @ApiResponse(responseCode = "404", description = HttpStatuses.NOT_FOUND)
     })
     @GetMapping("/user/{userId}")
     public ResponseEntity<List<UserManagementDto>> findUserFriendsByUserId(
