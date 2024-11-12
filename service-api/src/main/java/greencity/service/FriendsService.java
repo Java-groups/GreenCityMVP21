@@ -6,6 +6,7 @@ import greencity.dto.user.UserManagementDto;
 import org.springframework.data.domain.Pageable;
 import java.util.List;
 
+
 public interface FriendsService {
     List<UserManagementDto> findFriends(Long userId);
 
