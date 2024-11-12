@@ -14,6 +14,8 @@ import lombok.EqualsAndHashCode;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
 import lombok.Setter;
+import lombok.ToString;
+
 import java.time.LocalDate;
 import java.time.LocalTime;
 
@@ -24,6 +26,7 @@ import java.time.LocalTime;
 @Getter @Setter
 @Builder
 @EqualsAndHashCode
+@ToString
 public class EventDay {
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)

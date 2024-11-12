@@ -16,6 +16,8 @@ public class EventDayToDtoMapper extends AbstractConverter<EventDay, EventDayDto
                 .eventEndTime(source.getEventEndTime())
                 .latitude(source.getLatitude())
                 .longitude(source.getLongitude())
+                .isOnline(source.getIsOnline())
+                .onlineLink(source.getOnlineLink())
                 .build();
     }
 }

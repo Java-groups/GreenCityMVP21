@@ -3,6 +3,7 @@ package greencity.entity;
 import greencity.enums.EventType;
 import jakarta.persistence.*;
 import jakarta.validation.constraints.NotNull;
+import jakarta.validation.constraints.Size;
 import lombok.AllArgsConstructor;
 import lombok.EqualsAndHashCode;
 import lombok.Getter;
@@ -36,6 +37,7 @@ public class Event {
     private String image;
 
     @OneToMany(mappedBy = "event", cascade = CascadeType.ALL)
+    @Size(max = 4)
     private List<EventImages> additionalImages = new ArrayList<>();
 
     @Enumerated(EnumType.STRING)
