@@ -89,12 +89,27 @@ public class FriendsController {
         return ResponseEntity.status(HttpStatus.OK).build();
     }
 
+    @Operation(summary = "Decline friend request to user")
+    @ApiResponses(value = {
+            @ApiResponse(responseCode = "200", description = HttpStatuses.OK),
+            @ApiResponse(responseCode = "400", description = HttpStatuses.BAD_REQUEST),
+            @ApiResponse(responseCode = "401", description = HttpStatuses.UNAUTHORIZED),
+            @ApiResponse(responseCode = "404", description = HttpStatuses.NOT_FOUND)
+    })
+    @DeleteMapping("/{friendId}/declineFriend")
+    public ResponseEntity<?>  declineFriendRequest(
+            @PathVariable(name = "friendId") Long friendId,
+            @Parameter(hidden = true) @CurrentUser UserVO currentUser) {
+        friendsService.declineFriendRequest(currentUser.getId(), friendId);
+        return ResponseEntity.status(HttpStatus.OK).build();
+    }
+
     @Operation(summary = "Get all user friends")
     @ApiResponses(value = {
         @ApiResponse(responseCode = "200", description = HttpStatuses.OK),
         @ApiResponse(responseCode = "400", description = HttpStatuses.BAD_REQUEST),
         @ApiResponse(responseCode = "401", description = HttpStatuses.UNAUTHORIZED),
-        @ApiResponse(responseCode = "404", description = HttpStatuses.FORBIDDEN)
+        @ApiResponse(responseCode = "403", description = HttpStatuses.FORBIDDEN)
     })
     @GetMapping("/user/{userId}")
     public ResponseEntity<List<UserManagementDto>> findUserFriendsByUserId(

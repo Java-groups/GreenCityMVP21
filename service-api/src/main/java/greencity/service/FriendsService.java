@@ -12,6 +12,8 @@ public interface FriendsService {
 
     public void acceptFriendRequest(Long userId, Long friendId);
 
+    public void declineFriendRequest(Long userId, Long friendId);
+
     PageableAdvancedDto<UserFriendDto> findFriends(String name, Long userId, Pageable page);
 
     PageableAdvancedDto<UserFriendDto> findFriendRequests(Long userId, Pageable page);
