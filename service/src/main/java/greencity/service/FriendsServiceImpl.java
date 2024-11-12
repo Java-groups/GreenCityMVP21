@@ -57,6 +57,14 @@ public class FriendsServiceImpl implements FriendsService {
         userRepo.addFriend(userId, friendId);
     }
 
+    @Transactional
+    @Override
+    public void declineFriendRequest(Long userId, Long friendId) {
+        if (userRepo.deleteFriendRequest(userId, friendId) == 0) {
+            throw new NotFoundException("Friend request not found!");
+        }
+    }
+
     private PageableAdvancedDto<UserFriendDto> getPageableAdvancedDtoOfUserFriendDto(
         Long userId, Page<User> friendsPage) {
         List<UserFriendDto> friendsList = friendsPage.stream()
