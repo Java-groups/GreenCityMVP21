@@ -11,15 +11,14 @@ import io.swagger.v3.oas.annotations.Operation;
 import io.swagger.v3.oas.annotations.responses.ApiResponse;
 import io.swagger.v3.oas.annotations.responses.ApiResponses;
 import jakarta.validation.Valid;
-import lombok.AllArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Value;
+import org.springframework.http.HttpHeaders;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.validation.annotation.Validated;
 import org.springframework.web.bind.annotation.*;
 
-import java.net.URI;
 import java.util.List;
 
 @Validated
@@ -65,12 +64,12 @@ public class NewsSubscriberController {
     @ApiResponses(value = {
             @ApiResponse(responseCode = "200", description = HttpStatuses.OK),
             @ApiResponse(responseCode = "400", description = HttpStatuses.BAD_REQUEST),
-            @ApiResponse(responseCode = "404", description = HttpStatuses.BAD_REQUEST)
+            @ApiResponse(responseCode = "404", description = HttpStatuses.NOT_FOUND)
     })
     @GetMapping("/unsubscribe")
     public ResponseEntity<Void> unsubscribe(@Valid @RequestParam("email") String email,
                                             @RequestParam("unsubscribeToken") String unsubscribeToken) {
-        HttpStatus status = HttpStatus.OK;
+        HttpStatus status = HttpStatus.SEE_OTHER;
         try {
             long unsubscribeId = subscriberService.unsubscribe(email, unsubscribeToken);
             log.info("Successfully unsubscribed with id: {} user from newsletter.", unsubscribeId);
@@ -78,9 +77,11 @@ public class NewsSubscriberController {
             log.error("User with email {} not found.", email);
             status = HttpStatus.NOT_FOUND;
         }
-        System.out.println(REDIRECT_URL);
-        return ResponseEntity.status(status).location(URI.create(REDIRECT_URL)).build();
+        return ResponseEntity.status(status)
+                .header(HttpHeaders.LOCATION, REDIRECT_URL)
+                .build();
     }
+
 
     @Operation(summary = "Sends eco news to all subscribers")
     @ApiResponses(value = {
