@@ -5,7 +5,7 @@ import greencity.dto.friends.UserFriendDto;
 import greencity.dto.user.UserManagementDto;
 import java.util.List;
 
-import org.springframework.transaction.annotation.Transactional;  // Замість jakarta.transaction
+import org.springframework.transaction.annotation.Transactional;  // Замість jakarta.transactionа
 import org.springframework.data.domain.Pageable;
 
 public interface FriendsService {
