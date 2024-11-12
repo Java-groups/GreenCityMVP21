@@ -29,8 +29,8 @@ public class FriendsServiceImpl implements FriendsService {
     @Override
     public List<UserManagementDto> findFriends(Long userId) {
         return userRepo.getAllUserFriends(userId).stream()
-            .map(item -> modelMapper.map(item, UserManagementDto.class))
-            .toList();
+                .map(item -> modelMapper.map(item, UserManagementDto.class))
+                .toList();
     }
 
     @Override
@@ -57,8 +57,39 @@ public class FriendsServiceImpl implements FriendsService {
         userRepo.addFriend(userId, friendId);
     }
 
+    @Transactional
+    @Override
+    public void sendFriendRequest(Long userId, Long friendId) {
+        User user = userRepo.findById(userId).orElseThrow(() -> new NotFoundException("User not found!"));
+        User friend = userRepo.findById(friendId).orElseThrow(() -> new NotFoundException("Friend not found!"));
+        if (userRepo.getAllUserFriends(userId).contains(friend)) {
+            throw new BadRequestException("User is already your friend!");
+        }
+        if (userRepo.countFriendRequest(userId, friendId) > 0) {
+            throw new BadRequestException("Friend request already sent!");
+        }
+        userRepo.addFriendRequest(userId, friendId);
+}
+
+
+    @Transactional
+    @Override
+    public void cancelFriendRequest(Long userId, Long friendId) {
+        User user = userRepo.findById(userId).orElseThrow(() -> new NotFoundException("User not found!"));
+        User friend = userRepo.findById(friendId).orElseThrow(() -> new NotFoundException("Friend not found!"));
+        if (userRepo.deleteFriendRequest(userId, friendId) == 0) {
+            throw new NotFoundException("Friend request not found!");
+        }
+    }
+
+    @Transactional
+    @Override
+    public void declineFriendRequest(Long userId, Long friendId) {
+        cancelFriendRequest(userId, friendId);
+    }
+
     private PageableAdvancedDto<UserFriendDto> getPageableAdvancedDtoOfUserFriendDto(
-        Long userId, Page<User> friendsPage) {
+            Long userId, Page<User> friendsPage) {
         List<UserFriendDto> friendsList = friendsPage.stream()
                 .map(user -> modelMapper.map(user, UserFriendDto.class))
                 .peek(userFriendDto -> userFriendDto.setMutualFriends(

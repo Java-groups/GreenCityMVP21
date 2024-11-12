@@ -239,4 +239,25 @@ public interface UserRepo extends JpaRepository<User, Long>, JpaSpecificationExe
             + "(user_id, friend_id, status, created_date) "
             + "VALUES (:userId, :friendId, 'FRIEND', NOW())")
     void addFriend(Long userId, Long friendId);
+
+    /**
+     * Add a friend request.
+     *
+     * @param userId The ID of the user who sends the request.
+     * @param friendId The ID of the user who receives the request.
+     */
+    @Modifying
+    @Transactional
+    @Query(nativeQuery = true, value = "INSERT INTO friend_requests (user_id, friend_id) VALUES (:userId, :friendId)")
+    void addFriendRequest(Long userId, Long friendId);
+
+
+
+    @Query(nativeQuery = true, value = "SELECT COUNT(*) FROM friend_requests WHERE user_id = :userId AND friend_id = :friendId")
+    int countFriendRequest(Long userId, Long friendId);
+
+
 }
+
+
+
