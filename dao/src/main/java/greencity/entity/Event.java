@@ -11,6 +11,8 @@ import lombok.NoArgsConstructor;
 import lombok.Setter;
 import java.util.ArrayList;
 import java.util.List;
+import java.util.HashSet;
+import java.util.Set;
 
 @Entity
 @Table(name = "events")
@@ -40,6 +42,18 @@ public class Event {
     @Size(max = 4)
     private List<EventImages> additionalImages = new ArrayList<>();
 
+    @ManyToMany
+    @JoinTable(name = "events_attendants",
+        joinColumns = @JoinColumn(name = "event_id"),
+        inverseJoinColumns = @JoinColumn(name = "user_id"))
+    private Set<User> attendants = new HashSet<>();
+
+    @ManyToMany
+    @JoinTable(name = "events_tags",
+            joinColumns = @JoinColumn(name = "event_id"),
+            inverseJoinColumns = @JoinColumn(name = "tag_id"))
+    private List<Tag> tags;
+
     @Enumerated(EnumType.STRING)
     private EventType type;
 
@@ -49,14 +63,3 @@ public class Event {
     @Column(name = "is_open")
     private Boolean isOpen = true;
 }
-//    @ManyToMany
-//    @JoinTable(name = "events_attendants",
-//        joinColumns = @JoinColumn(name = "event_id"),
-//        inverseJoinColumns = @JoinColumn(name = "user_id"))
-//    private Set<User> attendants = new HashSet<>();
-//
-//    @ManyToMany
-//    @JoinTable(name = "events_tags",
-//            joinColumns = @JoinColumn(name = "event_id"),
-//            inverseJoinColumns = @JoinColumn(name = "tag_id"))
-//    private List<Tag> tags;

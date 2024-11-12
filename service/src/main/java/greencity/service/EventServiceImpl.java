@@ -7,14 +7,17 @@ import greencity.dto.event.EventRequestDto;
 import greencity.entity.Event;
 import greencity.entity.EventDay;
 import greencity.entity.EventImages;
+import greencity.entity.Tag;
 import greencity.entity.User;
 import greencity.enums.Role;
+import greencity.enums.TagType;
 import greencity.exception.exceptions.NotFoundException;
 import greencity.exception.exceptions.UserHasNoPermissionToAccessException;
 import greencity.repository.EventImagesRepository;
 import greencity.repository.EventRepository;
 import lombok.RequiredArgsConstructor;
 import org.modelmapper.ModelMapper;
+import org.modelmapper.TypeToken;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 import org.springframework.web.multipart.MultipartFile;
@@ -31,6 +34,7 @@ public class EventServiceImpl implements EventService {
     private final ModelMapper modelMapper;
     private final RestClient restClient;
     private final FileService fileService;
+    private final TagsService tagsService;
 
     /**
      * {@inheritDoc}
@@ -51,8 +55,49 @@ public class EventServiceImpl implements EventService {
         updateEventDay(requestDto, eventToUpdate);
         updateAdditionalImages(requestDto, files, eventToUpdate);
 
+
+
         Event saved = eventRepo.save(eventToUpdate);
         return modelMapper.map(saved, EventResponseDto.class);
+    }
+
+    private void updateEvent(EventRequestDto requestDto, Event eventToUpdate) {
+        if (requestDto.getTitle() != null) {
+            eventToUpdate.setTitle(requestDto.getTitle());
+        }
+
+        if (requestDto.getDescription() != null) {
+            eventToUpdate.setDescription(requestDto.getDescription());
+        }
+
+        if (requestDto.getImage() == null || requestDto.getImage().isEmpty()) {
+            fileService.delete(eventToUpdate.getImage());
+        }
+
+        if (requestDto.getTags() != null) {
+            eventToUpdate.setTags(modelMapper.map(tagsService.findTagsWithAllTranslationsByNamesAndType(
+                    requestDto.getTags(), TagType.EVENT), new TypeToken<List<Tag>>(){}.getType()));
+        }
+    }
+
+    private void updateEventDay(EventRequestDto requestDto, Event eventToUpdate) {
+        if (requestDto.getEventDays() != null) {
+            List<EventDay> daysToUpdate = requestDto.getEventDays().stream()
+                    .map(eventDayDto -> {
+                        EventDay eventDay = modelMapper.map(eventDayDto, EventDay.class);
+                        eventDay.setEvent(eventToUpdate);
+                        return eventDay;
+                    })
+                    .collect(Collectors.toList());
+
+            List<EventDay> toRemove = eventToUpdate.getEventDays().stream()
+                    .filter(day -> daysToUpdate.stream()
+                            .noneMatch(newDay -> newDay.getId().equals(day.getId())))
+                    .toList();
+            toRemove.forEach(day -> eventRepo.deleteEventDayByEventId(day.getId()));
+
+            eventToUpdate.setEventDays(daysToUpdate);
+        }
     }
 
     private void updateAdditionalImages(EventRequestDto requestDto, MultipartFile[] files, Event eventToUpdate) {
@@ -73,7 +118,10 @@ public class EventServiceImpl implements EventService {
                 .collect(Collectors.toList());
 
         eventToUpdate.setAdditionalImages(imagesToKeep);
+        uploadFilesAndCreatingLinks(requestDto, files, eventToUpdate);
+    }
 
+    private void uploadFilesAndCreatingLinks(EventRequestDto requestDto, MultipartFile[] files, Event eventToUpdate) {
         if (files != null) {
             for (MultipartFile file : files) {
                 String link = fileService.upload(file);
@@ -87,40 +135,6 @@ public class EventServiceImpl implements EventService {
                             .build());
                 }
             }
-        }
-    }
-
-    private void updateEvent(EventRequestDto requestDto, Event eventToUpdate) {
-        if (requestDto.getTitle() != null) {
-            eventToUpdate.setTitle(requestDto.getTitle());
-        }
-
-        if (requestDto.getDescription() != null) {
-            eventToUpdate.setDescription(requestDto.getDescription());
-        }
-
-        if (requestDto.getImage() == null || requestDto.getImage().isEmpty()) {
-            fileService.delete(eventToUpdate.getImage());
-        }
-    }
-
-    private void updateEventDay(EventRequestDto requestDto, Event eventToUpdate) {
-        if (requestDto.getEventDays() != null) {
-            List<EventDay> daysToUpdate = requestDto.getEventDays().stream()
-                    .map(eventDayDto -> {
-                        EventDay eventDay = modelMapper.map(eventDayDto, EventDay.class);
-                        eventDay.setEvent(eventToUpdate);
-                        return eventDay;
-                    })
-                    .collect(Collectors.toList());
-
-            List<EventDay> toRemove = eventToUpdate.getEventDays().stream()
-                    .filter(day -> daysToUpdate.stream()
-                            .noneMatch(newDay -> newDay.getId().equals(day.getId())))
-                    .collect(Collectors.toList());
-            toRemove.forEach(day -> eventRepo.deleteEventDayByEventId(day.getId()));
-
-            eventToUpdate.setEventDays(daysToUpdate);
         }
     }
 }

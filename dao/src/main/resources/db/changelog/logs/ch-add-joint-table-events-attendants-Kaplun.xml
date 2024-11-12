@@ -1,0 +1,28 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<databaseChangeLog xmlns="http://www.liquibase.org/xml/ns/dbchangelog"
+                   xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+                   xsi:schemaLocation="http://www.liquibase.org/xml/ns/dbchangelog
+                   https://www.liquibase.org/xml/ns/dbchangelog/dbchangelog-latest.xsd">
+
+    <changeSet id="changeSetJointTableEventsAttendantsDmytro" author="Kaplun">
+        <preConditions onFail="MARK_RAN">
+            <not>
+                <tableExists tableName="events_attendants"/>
+            </not>
+        </preConditions>
+        <createTable tableName="events_attendants">
+            <column name="event_id" type="bigint">
+                <constraints nullable="false"/>
+            </column>
+            <column name="user_id" type="bigint">
+                <constraints nullable="false"/>
+            </column>
+        </createTable>
+        <addForeignKeyConstraint baseTableName="events_attendants" baseColumnNames="event_id" constraintName="fk_event_attendant_event"
+                                 referencedTableName="events"
+                                 referencedColumnNames="id"/>
+        <addForeignKeyConstraint baseTableName="events_attendants" baseColumnNames="user_id" constraintName="fk_event_attendant_user"
+                                 referencedTableName="users"
+                                 referencedColumnNames="id"/>
+    </changeSet>
+</databaseChangeLog>

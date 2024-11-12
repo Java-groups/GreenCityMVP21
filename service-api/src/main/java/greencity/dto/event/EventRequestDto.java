@@ -9,6 +9,8 @@ import lombok.EqualsAndHashCode;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
 import lombok.Setter;
+
+import java.util.ArrayList;
 import java.util.List;
 import io.swagger.v3.oas.annotations.media.Schema;
 
@@ -34,7 +36,7 @@ public class EventRequestDto {
 
     @Schema(description = "List of event days with start/end times and location info")
     @Size(max = 7)
-    private List<EventDayDto> eventDays;
+    private List<EventDayDto> eventDays = new ArrayList<>();
 
     @Schema(description = "Whether the event is open to the public", example = "true")
     private Boolean isOpenEvent;
@@ -50,5 +52,6 @@ public class EventRequestDto {
     @Size(max = 4)
     private List<String> additionalImages;
 
-//    private List<String> tags;
+    @Schema(example = "Environmental")
+    private List<String> tags;
 }
