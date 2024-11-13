@@ -165,14 +165,14 @@ public interface UserRepo extends JpaRepository<User, Long>, JpaSpecificationExe
      *
      * @return Long
      */
-    @Query(nativeQuery = true, value = "SELECT COUNT(*) FROM ("
+    @Query(nativeQuery = true, value = "SELECT COUNT(*) FROM (("
             + "SELECT friend_id AS id FROM users_friends WHERE user_id = :userId "
             + "UNION "
-            + "SELECT user_id AS id FROM users_friends WHERE friend_id = :userId "
-            + "INTERSECT "
+            + "SELECT user_id AS id FROM users_friends WHERE friend_id = :userId) "
+            + "INTERSECT ("
             + "SELECT friend_id AS id FROM users_friends WHERE user_id = :friendId "
             + "UNION "
-            + "SELECT user_id AS id FROM users_friends WHERE friend_id = :friendId) AS common")
+            + "SELECT user_id AS id FROM users_friends WHERE friend_id = :friendId)) AS common")
     Long getMutualFriendsCount(Long userId, Long friendId);
 
     /**
