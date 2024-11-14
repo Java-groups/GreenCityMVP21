@@ -56,9 +56,6 @@ public class FriendsServiceImpl implements FriendsService {
         if (userRepo.isFriendRequestSent(userId, friendId)) {
             userRepo.deleteFriendRequest(userId, friendId);
         }
-        if (userRepo.getAllUserFriends(userId).contains(friend)) {
-            throw new BadRequestException("Friend already accepted!");
-        }
         userRepo.addFriend(userId, friendId);
     }
 
