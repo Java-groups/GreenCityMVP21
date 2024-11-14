@@ -48,13 +48,16 @@ public class FriendsServiceImpl implements FriendsService {
     @Override
     public void acceptFriendRequest(Long userId, Long friendId) {
         userRepo.findById(userId).orElseThrow(() -> new NotFoundException("User not found!"));
-        User friend = userRepo.findById(friendId).orElseThrow(() -> new NotFoundException("Friend not found!"));
+        userRepo.findById(friendId).orElseThrow(() -> new NotFoundException("Friend not found!"));
         if (!userRepo.isFriendRequestSent(friendId, userId)) {
             throw new NotFoundException("Friend request not found!");
         }
         userRepo.deleteFriendRequest(friendId, userId);
         if (userRepo.isFriendRequestSent(userId, friendId)) {
             userRepo.deleteFriendRequest(userId, friendId);
+        }
+        if (userRepo.isUsersFriends(userId, friendId)) {
+            throw new BadRequestException("Already friends!");
         }
         userRepo.addFriend(userId, friendId);
     }
@@ -65,6 +68,9 @@ public class FriendsServiceImpl implements FriendsService {
         userRepo.findById(friendId).orElseThrow(() -> new NotFoundException("Friend not found!"));
         if (userRepo.isFriendRequestSent(userId, friendId)) {
             throw new BadRequestException("Friend request already sent!");
+        }
+        if (userRepo.isUsersFriends(userId, friendId)) {
+            throw new BadRequestException("Already friends!");
         }
         userRepo.saveFriendRequest(userId, friendId);
     }
