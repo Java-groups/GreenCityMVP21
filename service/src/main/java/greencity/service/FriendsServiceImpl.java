@@ -14,7 +14,6 @@ import org.springframework.data.domain.Pageable;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
-import java.util.HashSet;
 import java.util.List;
 
 @Service
@@ -49,47 +48,35 @@ public class FriendsServiceImpl implements FriendsService {
     @Override
     public void acceptFriendRequest(Long userId, Long friendId) {
         userRepo.findById(userId).orElseThrow(() -> new NotFoundException("User not found!"));
-        User friend = userRepo.findById(friendId).orElseThrow(() -> new NotFoundException("Friend not found!"));
-        if (userRepo.getAllUserFriends(userId).contains(friend)) {
-            throw new BadRequestException("Friend already accepted!");
-        }
-        if (userRepo.deleteFriendRequest(userId, friendId) == 0) {
+        userRepo.findById(friendId).orElseThrow(() -> new NotFoundException("Friend not found!"));
+        if (!userRepo.isFriendRequestSent(friendId, userId)) {
             throw new NotFoundException("Friend request not found!");
+        }
+        userRepo.deleteFriendRequest(friendId, userId);
+        if (userRepo.isFriendRequestSent(userId, friendId)) {
+            userRepo.deleteFriendRequest(userId, friendId);
         }
         userRepo.addFriend(userId, friendId);
     }
 
     @Override
     public void sendFriendRequest(Long userId, Long friendId) {
-        User user = userRepo.findById(userId).orElseThrow(() -> new NotFoundException("User not found!"));
-        User friend = userRepo.findById(friendId).orElseThrow(() -> new NotFoundException("Friend not found!"));
-
+        userRepo.findById(userId).orElseThrow(() -> new NotFoundException("User not found!"));
+        userRepo.findById(friendId).orElseThrow(() -> new NotFoundException("Friend not found!"));
         if (userRepo.isFriendRequestSent(userId, friendId)) {
             throw new BadRequestException("Friend request already sent!");
         }
-
         userRepo.saveFriendRequest(userId, friendId);
     }
 
     @Override
-    public void cancelFriendRequest(Long userId, Long friendId) {
-        User user = userRepo.findById(userId).orElseThrow(() -> new NotFoundException("User not found!"));
-        User friend = userRepo.findById(friendId).orElseThrow(() -> new NotFoundException("Friend not found!"));
-
-        if (!userRepo.isFriendRequestSent(userId, friendId)) {
-            throw new NotFoundException("Friend request not found!");
-        }
-
-        userRepo.deleteFriendRequest(userId, friendId);
-    }
-
-
-    @Transactional
-    @Override
     public void declineFriendRequest(Long userId, Long friendId) {
-        if (userRepo.deleteFriendRequest(userId, friendId) == 0) {
+        userRepo.findById(userId).orElseThrow(() -> new NotFoundException("User not found!"));
+        userRepo.findById(friendId).orElseThrow(() -> new NotFoundException("Friend not found!"));
+        if (!userRepo.isFriendRequestSent(friendId, userId)) {
             throw new NotFoundException("Friend request not found!");
         }
+        userRepo.deleteFriendRequest(friendId, userId);
     }
 
     private PageableAdvancedDto<UserFriendDto> getPageableAdvancedDtoOfUserFriendDto(

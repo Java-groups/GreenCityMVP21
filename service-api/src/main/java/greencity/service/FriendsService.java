@@ -20,7 +20,5 @@ public interface FriendsService {
 
     void sendFriendRequest(Long userId, Long friendId);
 
-    void cancelFriendRequest(Long userId, Long friendId);
-
     void declineFriendRequest(Long userId, Long friendId);
 }

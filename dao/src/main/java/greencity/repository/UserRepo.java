@@ -197,15 +197,15 @@ public interface UserRepo extends JpaRepository<User, Long>, JpaSpecificationExe
     /**
      * Delete friend request of sender with friendId and recipient with userId.
      *
-     * @param userId The ID of the friend request recipient.
-     * @param friendId The ID of the friend request sender.
-     * @return int count of deleted rows.
+     * @param userId The ID of the friend request sender.
+     * @param friendId The ID of the friend request recipient.
+     *
      */
     @Modifying
     @Transactional
     @Query(nativeQuery = true, value = "DELETE FROM friend_requests "
-            + "WHERE user_id = :friendId AND friend_id = :userId")
-    int deleteFriendRequest(Long userId, Long friendId);
+            + "WHERE user_id = :userId AND friend_id = :friendId")
+    void deleteFriendRequest(Long userId, Long friendId);
 
     /**
      * Add friendship between 2 users.
@@ -219,8 +219,6 @@ public interface UserRepo extends JpaRepository<User, Long>, JpaSpecificationExe
             + "(user_id, friend_id, status, created_date) "
             + "VALUES (:userId, :friendId, 'FRIEND', NOW())")
     void addFriend(Long userId, Long friendId);
-
-
 
     /**
      * Count friend request between two users.
@@ -243,6 +241,7 @@ public interface UserRepo extends JpaRepository<User, Long>, JpaSpecificationExe
     default boolean isFriendRequestSent(Long userId, Long friendId) {
         return countFriendRequest(userId, friendId) > 0;
     }
+
     /**
      * Save friend request between users.
      *
