@@ -243,29 +243,6 @@ public interface UserRepo extends JpaRepository<User, Long>, JpaSpecificationExe
     }
 
     /**
-     * Count friend links between two users.
-     *
-     * @param userId The ID of the first user.
-     * @param friendId The ID of the second user.
-     * @return int count of friend links.
-     */
-    @Query(nativeQuery = true,
-            value = "SELECT COUNT(*) FROM users_friends WHERE (user_id = :userId AND friend_id = :friendId) "
-                    + "OR (user_id = :friendId AND friend_id = :userId)")
-    int countFriendLinks(Long userId, Long friendId);
-
-    /**
-     * Check if two users are friends.
-     *
-     * @param userId The ID of the user who sends the request.
-     * @param friendId The ID of the user who receives the request.
-     * @return boolean indicating if the request is already sent.
-     */
-    default boolean isUsersFriends(Long userId, Long friendId) {
-        return countFriendLinks(userId, friendId) > 0;
-    }
-
-    /**
      * Save friend request between users.
      *
      * @param userId The ID of the user who sends the request.
