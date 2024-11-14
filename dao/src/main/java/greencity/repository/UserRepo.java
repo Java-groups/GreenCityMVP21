@@ -197,15 +197,15 @@ public interface UserRepo extends JpaRepository<User, Long>, JpaSpecificationExe
     /**
      * Delete friend request of sender with friendId and recipient with userId.
      *
-     * @param userId The ID of the friend request recipient.
-     * @param friendId The ID of the friend request sender.
-     * @return int count of deleted rows.
+     * @param userId The ID of the friend request sender.
+     * @param friendId The ID of the friend request recipient.
+     *
      */
     @Modifying
     @Transactional
     @Query(nativeQuery = true, value = "DELETE FROM friend_requests "
-            + "WHERE user_id = :friendId AND friend_id = :userId")
-    int deleteFriendRequest(Long userId, Long friendId);
+            + "WHERE user_id = :userId AND friend_id = :friendId")
+    void deleteFriendRequest(Long userId, Long friendId);
 
     /**
      * Add friendship between 2 users.

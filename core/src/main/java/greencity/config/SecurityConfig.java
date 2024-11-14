@@ -257,7 +257,8 @@ public class SecurityConfig {
                                 "/favorite_place/{placeId}",
                                 "/social-networks",
                                 USER_CUSTOM_SHOPPING_LIST_ITEMS,
-                                USER_SHOPPING_LIST + "/user-shopping-list-items")
+                                USER_SHOPPING_LIST + "/user-shopping-list-items",
+                                "/friends/{friendId}/declineFriend")
                         .hasAnyRole(USER, ADMIN, MODERATOR, UBS_EMPLOYEE)
                         .requestMatchers(HttpMethod.GET,
                                 "/newsSubscriber",
