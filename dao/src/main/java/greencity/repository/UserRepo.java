@@ -220,16 +220,7 @@ public interface UserRepo extends JpaRepository<User, Long>, JpaSpecificationExe
             + "VALUES (:userId, :friendId, 'FRIEND', NOW())")
     void addFriend(Long userId, Long friendId);
 
-    /**
-     * Add a friend request.
-     *
-     * @param userId The ID of the user who sends the request.
-     * @param friendId The ID of the user who receives the request.
-     */
-    @Modifying
-    @Transactional
-    @Query(nativeQuery = true, value = "INSERT INTO friend_requests (user_id, friend_id) VALUES (:userId, :friendId)")
-    void addFriendRequest(Long userId, Long friendId);
+
 
     /**
      * Count friend request between two users.
@@ -241,4 +232,25 @@ public interface UserRepo extends JpaRepository<User, Long>, JpaSpecificationExe
     @Query(nativeQuery = true,
             value = "SELECT COUNT(*) FROM friend_requests WHERE user_id = :userId AND friend_id = :friendId")
     int countFriendRequest(Long userId, Long friendId);
+
+    /**
+     * Check if friend request is already sent.
+     *
+     * @param userId The ID of the user who sends the request.
+     * @param friendId The ID of the user who receives the request.
+     * @return boolean indicating if the request is already sent.
+     */
+    default boolean isFriendRequestSent(Long userId, Long friendId) {
+        return countFriendRequest(userId, friendId) > 0;
+    }
+    /**
+     * Save friend request between users.
+     *
+     * @param userId The ID of the user who sends the request.
+     * @param friendId The ID of the user who receives the request.
+     */
+    @Modifying
+    @Transactional
+    @Query(nativeQuery = true, value = "INSERT INTO friend_requests (user_id, friend_id) VALUES (:userId, :friendId)")
+    void saveFriendRequest(Long userId, Long friendId);
 }

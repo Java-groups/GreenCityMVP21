@@ -13,6 +13,8 @@ import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
+
+import java.util.HashSet;
 import java.util.List;
 
 @Service
@@ -57,6 +59,31 @@ public class FriendsServiceImpl implements FriendsService {
         userRepo.addFriend(userId, friendId);
     }
 
+    @Override
+    public void sendFriendRequest(Long userId, Long friendId) {
+        User user = userRepo.findById(userId).orElseThrow(() -> new NotFoundException("User not found!"));
+        User friend = userRepo.findById(friendId).orElseThrow(() -> new NotFoundException("Friend not found!"));
+
+        if (userRepo.isFriendRequestSent(userId, friendId)) {
+            throw new BadRequestException("Friend request already sent!");
+        }
+
+        userRepo.saveFriendRequest(userId, friendId);
+    }
+
+    @Override
+    public void cancelFriendRequest(Long userId, Long friendId) {
+        User user = userRepo.findById(userId).orElseThrow(() -> new NotFoundException("User not found!"));
+        User friend = userRepo.findById(friendId).orElseThrow(() -> new NotFoundException("Friend not found!"));
+
+        if (!userRepo.isFriendRequestSent(userId, friendId)) {
+            throw new NotFoundException("Friend request not found!");
+        }
+
+        userRepo.deleteFriendRequest(userId, friendId);
+    }
+
+
     @Transactional
     @Override
     public void declineFriendRequest(Long userId, Long friendId) {
@@ -84,4 +111,5 @@ public class FriendsServiceImpl implements FriendsService {
                 friendsPage.isLast()
         );
     }
+
 }
