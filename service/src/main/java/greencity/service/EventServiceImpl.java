@@ -4,6 +4,7 @@ import greencity.client.RestClient;
 import greencity.constant.ErrorMessage;
 import greencity.dto.event.EventResponseDto;
 import greencity.dto.event.EventRequestDto;
+import greencity.dto.user.UserRoleDto;
 import greencity.entity.Event;
 import greencity.entity.EventDay;
 import greencity.entity.EventImages;
@@ -15,6 +16,7 @@ import greencity.exception.exceptions.NotFoundException;
 import greencity.exception.exceptions.UserHasNoPermissionToAccessException;
 import greencity.repository.EventImagesRepository;
 import greencity.repository.EventRepository;
+import greencity.repository.UserRepo;
 import lombok.RequiredArgsConstructor;
 import org.modelmapper.ModelMapper;
 import org.modelmapper.TypeToken;
@@ -35,6 +37,8 @@ public class EventServiceImpl implements EventService {
     private final RestClient restClient;
     private final FileService fileService;
     private final TagsService tagsService;
+    private final UserRepo userRepo;
+//    private final NotificationService notificationService;
 
     /**
      * {@inheritDoc}
@@ -136,5 +140,27 @@ public class EventServiceImpl implements EventService {
                 }
             }
         }
+    }
+
+    @Override
+    @Transactional
+    public void deleteEvent(Long eventId, Long userId) {
+        Event event = eventRepo.findById(eventId)
+                .orElseThrow(() -> new NotFoundException("Event not found with ID: " + eventId));
+        if(!event.getOrganizer().getId().equals(userId) && !isAdmin(userId)) {
+            throw new UserHasNoPermissionToAccessException("You do not have permission to delete this event.");
+        }
+
+        eventImagesRepo.deleteEventImagesByEvent_Id(eventId);
+        eventRepo.deleteEventDayByEventId(eventId);
+
+//        notificationSrvice.notifyAttendees(event.getAttendants(), "The event has been deleted");
+        eventRepo.delete(event);
+    }
+
+    private boolean isAdmin(Long userId) {
+        return userRepo.findById(userId)
+                .map(User::getRole)
+                .orElse(Role.ROLE_USER) == Role.ROLE_ADMIN;
     }
 }
