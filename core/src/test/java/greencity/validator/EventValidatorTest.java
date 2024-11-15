@@ -1,10 +1,10 @@
 package greencity.validator;
 
 import greencity.annotations.EventValidation;
-import greencity.constant.ErrorMessage;
 import greencity.dto.event.EventDayDto;
 import greencity.dto.event.EventRequestDto;
 import jakarta.validation.ConstraintValidatorContext;
+import jakarta.validation.Payload;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;
@@ -17,7 +17,8 @@ import java.time.LocalDate;
 import java.time.LocalTime;
 import java.util.List;
 
-import static org.junit.jupiter.api.Assertions.*;
+import static org.junit.jupiter.api.Assertions.assertFalse;
+import static org.junit.jupiter.api.Assertions.assertTrue;
 
 
 @ExtendWith(MockitoExtension.class)
@@ -47,10 +48,12 @@ public class EventValidatorTest {
         eventDay2.setEventDate(LocalDate.now().plusDays(2));
         eventDay2.setEventStartTime(LocalTime.now());
         eventDay2.setEventEndTime(LocalTime.now().plusHours(4));
-        validEvent.setEventDays(List.of(eventDay1,eventDay2));
+        validEvent.setEventDays(List.of(eventDay1, eventDay2));
         eventValidator.initialize(new EventValidation() {
             @Override
-            public Class<? extends Annotation> annotationType() { return EventValidation.class; }
+            public Class<? extends Annotation> annotationType() {
+                return EventValidation.class;
+            }
 
             @Override
             public String message() {
@@ -58,7 +61,19 @@ public class EventValidatorTest {
             }
 
             @Override
-            public int titleMaxSize() { return 70; }
+            public Class<?>[] groups() {
+                return new Class[0];
+            }
+
+            @Override
+            public Class<? extends Payload>[] payload() {
+                return new Class[0];
+            }
+
+            @Override
+            public int titleMaxSize() {
+                return 70;
+            }
         });
 
     }
@@ -66,48 +81,42 @@ public class EventValidatorTest {
 
     @Test
     public void validEventTest() {
-        assertTrue(eventValidator.isValid(validEvent,context));
+        assertTrue(eventValidator.isValid(validEvent, context));
     }
 
     @Test
-    public void eventTitleEmptyGetException(){
+    public void eventTitleEmptyGetFalse() {
         validEvent.setTitle("");
-        var exception = assertThrows(IllegalArgumentException.class,()->eventValidator.isValid(validEvent,context));
-        assertEquals(ErrorMessage.EMPTY_FIELD, exception.getMessage());
+        assertFalse(eventValidator.isValid(validEvent, context));
     }
 
     @Test
-    public void eventTitleLengthBiggerThenMaxSizeGetException (){
+    public void eventTitleLengthBiggerThenMaxSizeGetFalse() {
         validEvent.setTitle("A".repeat(71));
-        var exception = assertThrows(IllegalArgumentException.class,()->eventValidator.isValid(validEvent,context));
-        assertEquals(ErrorMessage.REACHED_MAX_SIZE+70,exception.getMessage());
+        assertFalse(eventValidator.isValid(validEvent, context));
     }
 
     @Test
-    public void eventDaysHaveEmptyDateFieldsGetException(){
+    public void eventDaysHaveEmptyDateFieldsGetFalse() {
         validEvent.getEventDays().get(0).setEventDate(null);
-        var exception = assertThrows(IllegalArgumentException.class,()->eventValidator.isValid(validEvent,context));
-        assertEquals(ErrorMessage.EMPTY_FIELD + "event days",exception.getMessage());
+        assertFalse(eventValidator.isValid(validEvent, context));
     }
 
     @Test
-    public void eventDaysHaveDuplicatedDates(){
+    public void eventDaysHaveDuplicatedDatesGetFalse() {
         validEvent.getEventDays().forEach(eventDayDto -> eventDayDto.setEventDate(LocalDate.now()));
-        var exception = assertThrows(IllegalArgumentException.class,()->eventValidator.isValid(validEvent,context));
-        assertEquals(ErrorMessage.DATE_EXISTS_IN_EVENTS_DATES,exception.getMessage());
+        assertFalse(eventValidator.isValid(validEvent, context));
     }
 
     @Test
-    public void eventDayHaveEmptyTimeField (){
+    public void eventDayHaveEmptyTimeFieldGetFalse() {
         validEvent.getEventDays().get(0).setEventStartTime(null);
-        var exception = assertThrows(IllegalArgumentException.class,()->eventValidator.isValid(validEvent,context));
-        assertEquals(ErrorMessage.EMPTY_FIELD + "start and end time", exception.getMessage());
+        assertFalse(eventValidator.isValid(validEvent, context));
     }
 
     @Test
-    public void eventDayHasDateInPast (){
+    public void eventDayHasDateInPastGetFalse() {
         validEvent.getEventDays().get(1).setEventDate(LocalDate.EPOCH);
-        var exception = assertThrows(IllegalArgumentException.class,()->eventValidator.isValid(validEvent,context));
-        assertEquals(ErrorMessage.EVENT_DAY_IN_PAST, exception.getMessage());
+        assertFalse(eventValidator.isValid(validEvent, context));
     }
 }
