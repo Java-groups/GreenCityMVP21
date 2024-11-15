@@ -5,9 +5,10 @@ import greencity.exception.exceptions.InvalidURLException;
 import lombok.AccessLevel;
 import lombok.NoArgsConstructor;
 import org.springframework.stereotype.Service;
+
 import java.net.MalformedURLException;
+import java.net.URI;
 import java.net.URISyntaxException;
-import java.net.URL;
 
 @Service
 @NoArgsConstructor(access = AccessLevel.PRIVATE)
@@ -18,7 +19,8 @@ public class UrlValidator {
      */
     public static boolean isUrlValid(String url) {
         try {
-            new URL(url).toURI();
+            // Since new URL(String) is deprecated, I changed old constructor to this
+            new URI(url).toURL();
             return true;
         } catch (MalformedURLException e) {
             throw new InvalidURLException(ErrorMessage.MALFORMED_URL);

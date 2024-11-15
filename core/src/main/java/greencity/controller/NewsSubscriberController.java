@@ -32,7 +32,7 @@ public class NewsSubscriberController {
 
     public NewsSubscriberController(SubscriberService subscriberService,
                                     EmailService emailService,
-                                    @Value("${econews.address}") String REDIRECT_URL) {
+                                    @Value("${unsubscribe.redirect.address}") String REDIRECT_URL) {
         this.subscriberService = subscriberService;
         this.emailService = emailService;
         this.REDIRECT_URL = REDIRECT_URL;
