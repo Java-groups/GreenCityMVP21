@@ -36,7 +36,7 @@ public class EmailServiceImpl implements EmailService {
             JavaMailSender javaMailSender,
             ITemplateEngine templateEngine,
             @Qualifier("emailServiceExecutor") Executor executor,
-            @Value("${econews.address}") String ecoNewsLink,
+            @Value("${unsubscribe.address}") String ecoNewsLink,
             @Value("${address}") String serverLink,
             @Value("${sender.email.address}") String senderEmailAddress
     ) {
