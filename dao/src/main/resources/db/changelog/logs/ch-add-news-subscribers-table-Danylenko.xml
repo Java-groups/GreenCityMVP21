@@ -1,0 +1,21 @@
+<?xml version="1.0" encoding="UTF-8" standalone="no"?>
+<databaseChangeLog
+        xmlns="http://www.liquibase.org/xml/ns/dbchangelog"
+        xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+        xsi:schemaLocation="
+        http://www.liquibase.org/xml/ns/dbchangelog
+        http://www.liquibase.org/xml/ns/dbchangelog/dbchangelog-3.4.xsd">
+    <changeSet id="Danylenko1" author="Andrii-Danylenko">
+        <createTable tableName="news_subscribers">
+            <column name="id" type="BIGINT" autoIncrement="true">
+                <constraints nullable="false" primaryKey="true" primaryKeyName="pk_news_subscribers"/>
+            </column>
+            <column name="email" type="VARCHAR">
+                <constraints nullable="false" primaryKey="false" unique="true"/>
+            </column>
+            <column name="unsubscribe_token" type="VARCHAR">
+                <constraints nullable="false" primaryKey="false" unique="true"/>
+            </column>
+        </createTable>
+    </changeSet>
+</databaseChangeLog>

@@ -133,6 +133,10 @@ public final class ErrorMessage {
     public static final String FILTER_NOT_FOUND_BY_ID = "Filter not found";
     public static final String USER_HAS_NO_FRIEND_WITH_ID = "User has no friend with this id: ";
     public static final String INVALID_DURATION = "The duration for such habit is lower than previously set";
+    public static final String SUBSCRIBER_NOT_FOUND_BY_ID = "Subscriber with such id does not exist!";
+    public static final String SUBSCRIBER_NOT_FOUND_BY_EMAIL = "Subscriber with such email does not exist!";
+    public static final String SUBSCRIBER_NOT_FOUND_BY_EMAIL_AND_TOKEN = "Subscriber with such email and token does not exist!";
+    public static final String SUBSCRIBER_ALREADY_EXISTS = "Subscriber with such email already exists!";
 
     private ErrorMessage() {
     }
