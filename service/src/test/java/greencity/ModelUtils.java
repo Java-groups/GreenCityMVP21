@@ -354,9 +354,14 @@ public class ModelUtils {
     }
 
     public static AddEcoNewsDtoRequest getAddEcoNewsDtoRequest() {
-        return new AddEcoNewsDtoRequest("title", "text",
-            Collections.singletonList("News"), "source", null, "shortInfo");
+        return new AddEcoNewsDtoRequest(
+                "title",                       // Заголовок новини
+                "This is an example text with more than 20 characters.", // Текст новини
+                Collections.singletonList("News"),  // Теги новини
+                "https://example.org/"              // Джерело новини (опціонально)
+        );
     }
+
 
     public static AddEcoNewsDtoResponse getAddEcoNewsDtoResponse() {
         return new AddEcoNewsDtoResponse(1L, "title",
