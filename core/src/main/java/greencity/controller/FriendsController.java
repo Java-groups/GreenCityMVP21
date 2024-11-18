@@ -98,7 +98,7 @@ public class FriendsController {
     })
     @GetMapping("/user/{userId}")
     public ResponseEntity<List<UserManagementDto>> findUserFriendsByUserId(
-        @RequestParam() Long userId
+        @PathVariable() Long userId
     ) {
         return ResponseEntity.status(HttpStatus.OK).body(friendsService.findFriends(userId));
     }
