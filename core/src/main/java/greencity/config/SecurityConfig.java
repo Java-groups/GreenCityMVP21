@@ -45,7 +45,7 @@ public class SecurityConfig {
     private static final String USER_CUSTOM_SHOPPING_LIST_ITEMS = "/user/{userId}/custom-shopping-list-items";
     private static final String CUSTOM_SHOPPING_LIST = "/custom/shopping-list-items/{userId}";
     private static final String CUSTOM_SHOPPING_LIST_URL = "/custom/shopping-list-items/{userId}/"
-            + "custom-shopping-list-items";
+                                                           + "custom-shopping-list-items";
     private static final String CUSTOM_SHOPPING_LIST_ITEMS = "/{userId}/custom-shopping-list-items";
     private static final String HABIT_ASSIGN_ID = "/habit/assign/{habitId}";
     private static final String USER_SHOPPING_LIST = "/user/shopping-list-items";
@@ -182,7 +182,6 @@ public class SecurityConfig {
                                 "/facts",
                                 "/facts/random/{habitId}",
                                 "/facts/dayFact/{languageId}",
-                                "/newsSubscriber/unsubscribe",
                                 "/social-networks/image",
                                 "/user",
                                 "/user/shopping-list-items/habits/{habitId}/shopping-list",
@@ -199,7 +198,11 @@ public class SecurityConfig {
                                 "/habit/assign/{habitAssignId}",
                                 "/habit/tags/search",
                                 "/habit/search",
-                                "/habit/{habitId}/friends/profile-pictures")
+                                "/habit/{habitId}/friends/profile-pictures",
+                                "/friends",
+                                "/friends/friendRequests",
+                            "/friends/not-friends-yet",
+                            "/friends/user/{userId}")
                         .hasAnyRole(USER, ADMIN, MODERATOR, UBS_EMPLOYEE)
                         .requestMatchers(HttpMethod.POST,
                                 "/category",
@@ -216,13 +219,18 @@ public class SecurityConfig {
                                 "/habit/assign/{habitAssignId}/enroll/**",
                                 "/habit/assign/{habitAssignId}/unenroll/{date}",
                                 "/habit/statistic/{habitId}",
-                                "/newsSubscriber",
                                 USER_CUSTOM_SHOPPING_LIST_ITEMS,
                                 USER_SHOPPING_LIST,
                                 "/user/{userId}/habit",
                                 "/habit/custom",
                                 "/custom/shopping-list-items/{userId}/{habitId}/custom-shopping-list-items")
                         .hasAnyRole(USER, ADMIN, MODERATOR, UBS_EMPLOYEE)
+                        .requestMatchers(HttpMethod.POST,
+                                "/newsSubscriber")
+                        .permitAll()
+                        .requestMatchers(HttpMethod.GET,
+                                "/newsSubscriber/unsubscribe")
+                        .permitAll()
                         .requestMatchers(HttpMethod.PUT,
                                 "/habit/statistic/{id}",
                                 "/events/{eventId}",
@@ -245,7 +253,8 @@ public class SecurityConfig {
                                 USER_SHOPPING_LIST + "/{shoppingListItemId}/status/{status}",
                                 USER_SHOPPING_LIST + "/{userShoppingListItemId}",
                                 "/user/profilePicture",
-                                "/user/deleteProfilePicture")
+                                "/user/deleteProfilePicture",
+                                "/friends/{friendId}/acceptFriend")
                         .hasAnyRole(USER, ADMIN, MODERATOR, UBS_EMPLOYEE)
                         .requestMatchers(HttpMethod.DELETE,
                                 ECONEWS_COMMENTS,
@@ -256,7 +265,8 @@ public class SecurityConfig {
                                 "/favorite_place/{placeId}",
                                 "/social-networks",
                                 USER_CUSTOM_SHOPPING_LIST_ITEMS,
-                                USER_SHOPPING_LIST + "/user-shopping-list-items")
+                                USER_SHOPPING_LIST + "/user-shopping-list-items",
+                                "/friends/{friendId}/declineFriend")
                         .hasAnyRole(USER, ADMIN, MODERATOR, UBS_EMPLOYEE)
                         .requestMatchers(HttpMethod.GET,
                                 "/newsSubscriber",
