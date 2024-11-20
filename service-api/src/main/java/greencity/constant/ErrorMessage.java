@@ -137,12 +137,14 @@ public final class ErrorMessage {
     public static final String EVENT_ID_IN_PATH_PARAM_AND_ENTITY_NOT_EQUAL =
             "Event id in path param and dto id not equal";
     public static final String EMPTY_FIELD = "This field can't be empty ";
-
     public static final String DATE_EXISTS_IN_EVENTS_DATES = "You can't enter the same date for two or more days of event";
-
     public static final String REACHED_MAX_SIZE = "You have reached max length of this field: ";
-
     public static final String EVENT_DAY_IN_PAST = "Event day can't be in past.";
+    public static final String SUBSCRIBER_NOT_FOUND_BY_ID = "Subscriber with such id does not exist!";
+    public static final String SUBSCRIBER_NOT_FOUND_BY_EMAIL = "Subscriber with such email does not exist!";
+    public static final String SUBSCRIBER_NOT_FOUND_BY_EMAIL_AND_TOKEN = "Subscriber with such email and token does not exist!";
+    public static final String SUBSCRIBER_ALREADY_EXISTS = "Subscriber with such email already exists!";
+
     private ErrorMessage() {
     }
 }

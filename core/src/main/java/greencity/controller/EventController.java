@@ -5,8 +5,10 @@ import greencity.constant.ErrorMessage;
 import greencity.constant.HttpStatuses;
 import greencity.dto.event.EventDetailsUpdate;
 import greencity.dto.event.EventResponseDto;
+import greencity.dto.user.UserVO;
 import greencity.exception.exceptions.WrongIdException;
 import greencity.service.EventService;
+import greencity.service.UserService;
 import io.swagger.v3.oas.annotations.Operation;
 import io.swagger.v3.oas.annotations.Parameter;
 import io.swagger.v3.oas.annotations.media.Content;
@@ -19,11 +21,7 @@ import lombok.RequiredArgsConstructor;
 import org.springframework.http.MediaType;
 import org.springframework.http.ResponseEntity;
 import org.springframework.validation.annotation.Validated;
-import org.springframework.web.bind.annotation.PathVariable;
-import org.springframework.web.bind.annotation.PutMapping;
-import org.springframework.web.bind.annotation.RequestMapping;
-import org.springframework.web.bind.annotation.RequestPart;
-import org.springframework.web.bind.annotation.RestController;
+import org.springframework.web.bind.annotation.*;
 import org.springframework.web.multipart.MultipartFile;
 import java.security.Principal;
 
@@ -33,6 +31,7 @@ import java.security.Principal;
 @Validated
 public class EventController {
     private final EventService eventService;
+    private final UserService userService;
 
     /**
      * Method for updating event
@@ -65,5 +64,37 @@ public class EventController {
         }
 
         return ResponseEntity.ok().body(eventService.update(requestDto, principal.getName(), file));
+    }
+
+    /**
+     * Method for deleting an event.
+     * This endpoint allows an Admin or the Organizer of the event to delete it.
+     *
+     * @param eventId   ID of the event to be deleted.
+     * @param principal the currently authenticated user.
+     * @return {@link ResponseEntity<Void>}
+     * @author Belchuk Stanislav
+     */
+    @Operation(summary = "Delete an event by ID")
+    @ApiResponses(value = {
+            @ApiResponse(responseCode = "200", description = HttpStatuses.OK,
+                    content = @Content),
+            @ApiResponse(responseCode = "400", description = HttpStatuses.BAD_REQUEST,
+                    content = @Content(examples = @ExampleObject(HttpStatuses.BAD_REQUEST))),
+            @ApiResponse(responseCode = "401", description = HttpStatuses.UNAUTHORIZED,
+                    content = @Content(examples = @ExampleObject(HttpStatuses.UNAUTHORIZED))),
+            @ApiResponse(responseCode = "403", description = HttpStatuses.FORBIDDEN,
+                    content = @Content(examples = @ExampleObject(HttpStatuses.FORBIDDEN))),
+            @ApiResponse(responseCode = "404", description = HttpStatuses.NOT_FOUND,
+                    content = @Content(examples = @ExampleObject(HttpStatuses.NOT_FOUND)))
+    })
+    @DeleteMapping("/{eventId}")
+    public ResponseEntity<Void> deleteEvent(
+            @PathVariable Long eventId,
+            @Parameter(hidden = true) Principal principal) {
+        UserVO currentUser = userService.findByEmail(principal.getName());
+        Long userId = currentUser.getId();
+        eventService.deleteEvent(eventId, userId);
+        return ResponseEntity.ok().build();
     }
 }

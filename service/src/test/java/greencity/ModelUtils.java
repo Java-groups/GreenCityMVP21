@@ -16,6 +16,7 @@ import greencity.dto.ownsecurity.OwnSecurityVO;
 import greencity.dto.search.SearchNewsDto;
 import greencity.dto.shoppinglistitem.CustomShoppingListItemResponseDto;
 import greencity.dto.shoppinglistitem.CustomShoppingListItemVO;
+import greencity.dto.subscriber.NewsSubscriberVO;
 import greencity.dto.tag.*;
 import greencity.dto.user.*;
 import greencity.dto.verifyemail.VerifyEmailVO;
@@ -71,6 +72,11 @@ public class ModelUtils {
                 .build(),
             TagTranslation.builder().id(2L).name("Reusable").language(Language.builder().id(1L).code("en").build())
                 .build());
+    }
+    public static NewsSubscriberVO getNewsSubscriberVO() {
+        return NewsSubscriberVO.builder().email("subscriber@gmail.com")
+                .unsubscribeToken(UUID.fromString("550e8400-e29b-41d4-a716-446655440000").toString())
+                .build();
     }
 
     public static List<TagTranslation> getEventTagTranslations() {

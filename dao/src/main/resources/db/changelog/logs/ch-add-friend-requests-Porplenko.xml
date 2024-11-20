@@ -1,0 +1,25 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<databaseChangeLog xmlns="http://www.liquibase.org/xml/ns/dbchangelog"
+                   xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+                   xsi:schemaLocation="http://www.liquibase.org/xml/ns/dbchangelog
+                   https://www.liquibase.org/xml/ns/dbchangelog/dbchangelog-latest.xsd">
+
+    <changeSet id="1731257030523-1" author="denisporplenko">
+        <createTable tableName="friend_requests">
+            <column name="friend_id" type="BIGINT">
+                <constraints nullable="false" primaryKey="true" primaryKeyName="pk_friend_requests"/>
+            </column>
+            <column name="user_id" type="BIGINT">
+                <constraints nullable="false" primaryKey="true" primaryKeyName="pk_friend_requests"/>
+            </column>
+        </createTable>
+        <addForeignKeyConstraint baseColumnNames="friend_id" baseTableName="friend_requests"
+                                 constraintName="fk_friendreq_on_friend"
+                                 referencedColumnNames="id"
+                                 referencedTableName="users"/>
+        <addForeignKeyConstraint baseColumnNames="user_id" baseTableName="friend_requests"
+                                 constraintName="fk_friendreq_on_user"
+                                 referencedColumnNames="id"
+                                 referencedTableName="users"/>
+    </changeSet>
+</databaseChangeLog>
