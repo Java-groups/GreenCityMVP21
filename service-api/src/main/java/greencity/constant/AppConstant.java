@@ -18,6 +18,8 @@ public final class AppConstant {
     public static final Integer MAX_PASSED_DAYS_OF_ABILITY_TO_ENROLL = 8;
     public static final String DEFAULT_HABIT_IMAGE =
         "https://csb10032000a548f571.blob.core.windows.net/allfiles/8f09887c-2fbf-4ee1-95fc-6763a1873b93EventDefaultImage.png";
+    public static final String DEFAULT_EVENT_IMAGE =
+            "https://csb10032000a548f571.blob.core.windows.net/allfiles/35974805-2def-489f-a1b3-b82afa9d5b6dScreenshot%202024-11-06%20at%2017.47.04.png";
 
     private AppConstant() {
     }

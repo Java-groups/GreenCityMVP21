@@ -1,6 +1,6 @@
 package greencity.dto.event;
 
-import jakarta.validation.constraints.NotEmpty;
+import jakarta.validation.constraints.NotBlank;
 import jakarta.validation.constraints.NotNull;
 import jakarta.validation.constraints.Size;
 import lombok.AllArgsConstructor;
@@ -9,7 +9,6 @@ import lombok.EqualsAndHashCode;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
 import lombok.Setter;
-
 import java.util.ArrayList;
 import java.util.List;
 import io.swagger.v3.oas.annotations.media.Schema;
@@ -20,18 +19,18 @@ import io.swagger.v3.oas.annotations.media.Schema;
 @Getter
 @Setter
 @EqualsAndHashCode
-public class EventRequestDto {
+public class EventDetailsUpdate {
     @NotNull
     @Schema(example = "1", description = "Unique identifier for the event")
     private Long id;
 
     @Schema(example = "Community Cleanup", description = "Title of the event")
-    @NotEmpty
+    @NotBlank
     private String title;
 
     @Schema(example = "Join us for a community cleanup!", description = "Description of the event")
     @Size(min = 20, max = 63206)
-    @NotEmpty
+    @NotBlank
     private String description;
 
     @Schema(description = "List of event days with start/end times and location info")

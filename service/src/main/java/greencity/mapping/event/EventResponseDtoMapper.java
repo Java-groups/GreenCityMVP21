@@ -4,12 +4,10 @@ import greencity.dto.event.EventResponseDto;
 import greencity.dto.tag.TagUaEnDto;
 import greencity.entity.Event;
 import greencity.entity.EventImages;
-import greencity.entity.Tag;
 import greencity.entity.localization.TagTranslation;
 import lombok.RequiredArgsConstructor;
 import org.modelmapper.AbstractConverter;
 import org.springframework.stereotype.Component;
-
 import java.util.ArrayList;
 import java.util.List;
 

@@ -4,6 +4,9 @@ import greencity.constant.AppConstant;
 import greencity.dto.PageableAdvancedDto;
 import greencity.dto.econews.*;
 import greencity.dto.econewscomment.*;
+import greencity.dto.event.EventDayDto;
+import greencity.dto.event.EventDetailsUpdate;
+import greencity.dto.event.EventResponseDto;
 import greencity.dto.habit.*;
 import greencity.dto.habitfact.*;
 import greencity.dto.language.LanguageDTO;
@@ -45,12 +48,12 @@ public class ModelUtils {
     public static LocalDateTime localDateTime = LocalDateTime.now();
 
     public static Tag getTag() {
-        return new Tag(1L, TagType.ECO_NEWS, getTagTranslations(), Collections.emptyList(), Collections.emptySet());
+        return new Tag(1L, TagType.ECO_NEWS, getTagTranslations(), Collections.emptyList(), Collections.emptySet(), Collections.emptySet());
     }
 
     public static Tag getHabitTag() {
         return new Tag(1L, TagType.HABIT, getHabitTagTranslations(), Collections.emptyList(),
-            Collections.emptySet());
+            Collections.emptySet(), Collections.emptySet());
     }
 
     public static List<TagTranslation> getTagTranslations() {
@@ -672,5 +675,79 @@ public class ModelUtils {
             .text("item")
             .status(ShoppingListItemStatus.INPROGRESS)
             .build();
+    }
+
+    public static EventResponseDto getEventResponseDto() {
+        return EventResponseDto.builder()
+                .id(1L)
+                .title("Lectures on garbage segregation")
+                .description("An event focused on promoting environmental awareness and sustainability practices within the community")
+                .dayList(List.of(EventDayDto.builder()
+                        .id(1L)
+                        .eventDate(LocalDate.parse("2024-12-16"))
+                        .eventStartTime(LocalTime.parse("09:00:00"))
+                        .eventEndTime(LocalTime.parse("20:00:00"))
+                        .latitude(47.985)
+                        .longitude(-122.559)
+                        .isOnline(true)
+                        .onlineLink("https://example.com/event-link")
+                        .build()))
+                .additionalImages(Collections.emptyList())
+                .image(AppConstant.DEFAULT_EVENT_IMAGE)
+                .build();
+    }
+
+    public static EventDetailsUpdate getEventDetailsUpdate() {
+        return EventDetailsUpdate.builder()
+                .id(1L)
+                .title("Lectures on garbage segregation")
+                .description("An event focused on promoting environmental awareness and sustainability practices within the community")
+                .eventDays(List.of(EventDayDto.builder()
+                        .id(1L)
+                        .eventDate(LocalDate.parse("2024-12-16"))
+                        .eventStartTime(LocalTime.parse("09:00:00"))
+                        .eventEndTime(LocalTime.parse("20:00:00"))
+                        .latitude(47.985)
+                        .longitude(-122.559)
+                        .isOnline(true)
+                        .onlineLink("https://example.com/event-link")
+                        .build()))
+                .additionalImages(Collections.emptyList())
+                .image(AppConstant.DEFAULT_EVENT_IMAGE)
+                .build();
+    }
+
+    public static Event getEvent() {
+        return Event.builder()
+                .id(1L)
+                .title("Lectures on garbage segregation")
+                .description("An event focused on promoting environmental awareness and sustainability practices within the community")
+                .organizer(getUser())
+                .eventDays(List.of(EventDay.builder()
+                        .id(1L)
+                        .eventDate(LocalDate.parse("2024-12-16"))
+                        .eventStartTime(LocalTime.parse("09:00:00"))
+                        .eventEndTime(LocalTime.parse("20:00:00"))
+                        .latitude(47.985)
+                        .longitude(-122.559)
+                        .isOnline(true)
+                        .onlineLink("https://example.com/event-link")
+                        .build()))
+                .additionalImages(Collections.emptyList())
+                .image(AppConstant.DEFAULT_EVENT_IMAGE)
+                .build();
+    }
+
+    public static EventDay getEventDay() {
+        return EventDay.builder()
+                .id(1L)
+                .eventDate(LocalDate.parse("2024-12-16"))
+                .eventStartTime(LocalTime.parse("09:00:00"))
+                .eventEndTime(LocalTime.parse("20:00:00"))
+                .latitude(47.985)
+                .longitude(-122.559)
+                .isOnline(true)
+                .onlineLink("https://example.com/event-link")
+                .build();
     }
 }

@@ -3,7 +3,7 @@ package greencity.service;
 import greencity.client.RestClient;
 import greencity.constant.ErrorMessage;
 import greencity.dto.event.EventResponseDto;
-import greencity.dto.event.EventRequestDto;
+import greencity.dto.event.EventDetailsUpdate;
 import greencity.entity.Event;
 import greencity.entity.EventDay;
 import greencity.entity.EventImages;
@@ -41,7 +41,7 @@ public class EventServiceImpl implements EventService {
      */
     @Override
     @Transactional
-    public EventResponseDto update(EventRequestDto requestDto, String email, MultipartFile[] files) {
+    public EventResponseDto update(EventDetailsUpdate requestDto, String email, MultipartFile[] files) {
         Event eventToUpdate = eventRepo.findById(requestDto.getId())
             .orElseThrow(() -> new NotFoundException(ErrorMessage.EVENT_NOT_FOUND));
         User organizer = modelMapper.map(restClient.findByEmail(email), User.class);
@@ -55,13 +55,11 @@ public class EventServiceImpl implements EventService {
         updateEventDay(requestDto, eventToUpdate);
         updateAdditionalImages(requestDto, files, eventToUpdate);
 
-
-
         Event saved = eventRepo.save(eventToUpdate);
         return modelMapper.map(saved, EventResponseDto.class);
     }
 
-    private void updateEvent(EventRequestDto requestDto, Event eventToUpdate) {
+    private void updateEvent(EventDetailsUpdate requestDto, Event eventToUpdate) {
         if (requestDto.getTitle() != null) {
             eventToUpdate.setTitle(requestDto.getTitle());
         }
@@ -80,7 +78,7 @@ public class EventServiceImpl implements EventService {
         }
     }
 
-    private void updateEventDay(EventRequestDto requestDto, Event eventToUpdate) {
+    private void updateEventDay(EventDetailsUpdate requestDto, Event eventToUpdate) {
         if (requestDto.getEventDays() != null) {
             List<EventDay> daysToUpdate = requestDto.getEventDays().stream()
                     .map(eventDayDto -> {
@@ -100,7 +98,7 @@ public class EventServiceImpl implements EventService {
         }
     }
 
-    private void updateAdditionalImages(EventRequestDto requestDto, MultipartFile[] files, Event eventToUpdate) {
+    private void updateAdditionalImages(EventDetailsUpdate requestDto, MultipartFile[] files, Event eventToUpdate) {
         Set<String> requestLinks = new HashSet<>(requestDto.getAdditionalImages());
         List<EventImages> imagesFromDb = eventToUpdate.getAdditionalImages();
 
@@ -121,7 +119,7 @@ public class EventServiceImpl implements EventService {
         uploadFilesAndCreatingLinks(requestDto, files, eventToUpdate);
     }
 
-    private void uploadFilesAndCreatingLinks(EventRequestDto requestDto, MultipartFile[] files, Event eventToUpdate) {
+    private void uploadFilesAndCreatingLinks(EventDetailsUpdate requestDto, MultipartFile[] files, Event eventToUpdate) {
         if (files != null) {
             for (MultipartFile file : files) {
                 String link = fileService.upload(file);
