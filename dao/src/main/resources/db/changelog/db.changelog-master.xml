@@ -179,5 +179,8 @@
     <include file="db/changelog/logs/ch-add-table-events-Kaplun.xml"/>
     <include file="db/changelog/logs/ch-add-joint-table-events-attendants-Kaplun.xml"/>
     <include file="db/changelog/logs/ch-add-joint-table-events-tags-Kaplun.xml"/>
+    <include file="/db/changelog/logs/ch-add-news-subscribers-table-Danylenko.xml"/>
+    <include file="db/changelog/logs/ch-add-user-friends-Porplenko.xml"/>
+    <include file="db/changelog/logs/ch-add-friend-requests-Porplenko.xml"/>
+    <include file="db/changelog/logs/ch-update-user-friends-Porplenko.xml"/>
 </databaseChangeLog>
-
