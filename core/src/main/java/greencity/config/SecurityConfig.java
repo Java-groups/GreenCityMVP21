@@ -1,6 +1,5 @@
 package greencity.config;
 
-import greencity.constant.AppConstant;
 import greencity.security.filters.AccessTokenAuthenticationFilter;
 import greencity.security.jwt.JwtTool;
 import greencity.security.providers.JwtAuthenticationProvider;
@@ -201,8 +200,8 @@ public class SecurityConfig {
                                 "/habit/{habitId}/friends/profile-pictures",
                                 "/friends",
                                 "/friends/friendRequests",
-                            "/friends/not-friends-yet",
-                            "/friends/user/{userId}")
+                                "/friends/not-friends-yet",
+                                "/friends/user/{userId}")
                         .hasAnyRole(USER, ADMIN, MODERATOR, UBS_EMPLOYEE)
                         .requestMatchers(HttpMethod.POST,
                                 "/category",
@@ -296,7 +295,7 @@ public class SecurityConfig {
                         .hasAnyRole(ADMIN)
                         .requestMatchers(HttpMethod.DELETE,
                                 "/event/{eventId}")
-                        .hasAnyRole(ADMIN, ORGANIZER)
+                        .hasAnyRole(ADMIN, USER)
                         .requestMatchers(HttpMethod.DELETE,
                                 "/facts/{factId}",
                                 "/comments")
