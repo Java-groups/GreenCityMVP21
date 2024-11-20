@@ -1,8 +1,9 @@
 package greencity.controller;
 
+import greencity.annotations.EventValidation;
 import greencity.constant.ErrorMessage;
 import greencity.constant.HttpStatuses;
-import greencity.dto.event.EventRequestDto;
+import greencity.dto.event.EventDetailsUpdate;
 import greencity.dto.event.EventResponseDto;
 import greencity.dto.user.UserVO;
 import greencity.exception.exceptions.WrongIdException;
@@ -19,14 +20,15 @@ import jakarta.annotation.Nullable;
 import lombok.RequiredArgsConstructor;
 import org.springframework.http.MediaType;
 import org.springframework.http.ResponseEntity;
+import org.springframework.validation.annotation.Validated;
 import org.springframework.web.bind.annotation.*;
 import org.springframework.web.multipart.MultipartFile;
-
 import java.security.Principal;
 
 @RestController
 @RequestMapping("/events")
 @RequiredArgsConstructor
+@Validated
 public class EventController {
     private final EventService eventService;
     private final UserService userService;
@@ -52,10 +54,10 @@ public class EventController {
     })
     @PutMapping(value = "/{eventId}", consumes = MediaType.MULTIPART_FORM_DATA_VALUE)
     public ResponseEntity<EventResponseDto> update(
-            @Parameter(required = true) @RequestPart EventRequestDto requestDto,
-            @Parameter(hidden = true) Principal principal,
-            @PathVariable Long eventId,
-            @RequestPart(required = false) @Nullable MultipartFile[] file) {
+        @Parameter(required = true) @EventValidation @RequestPart EventDetailsUpdate requestDto,
+        @Parameter(hidden = true) Principal principal,
+        @PathVariable Long eventId,
+        @RequestPart(required = false) @Nullable MultipartFile[] file) {
 
         if (!eventId.equals(requestDto.getId())) {
             throw new WrongIdException(ErrorMessage.EVENT_ID_IN_PATH_PARAM_AND_ENTITY_NOT_EQUAL);

@@ -7,7 +7,6 @@ import lombok.Builder;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
 import lombok.Setter;
-import java.time.LocalDate;
 import java.util.List;
 
 @Builder
@@ -25,5 +24,4 @@ public class EventResponseDto {
     private List<EventDayDto> dayList;
     private List<String> additionalImages;
     private List<TagUaEnDto> tags;
-
 }

@@ -1,7 +1,7 @@
 package greencity.service;
 
 import greencity.dto.event.EventResponseDto;
-import greencity.dto.event.EventRequestDto;
+import greencity.dto.event.EventDetailsUpdate;
 import greencity.exception.exceptions.NotFoundException;
 import greencity.exception.exceptions.UserHasNoPermissionToAccessException;
 import org.springframework.web.multipart.MultipartFile;
@@ -15,7 +15,7 @@ public interface EventService {
      * @param files      - new event images.
      * @return EventResponseDto.
      */
-    EventResponseDto update(EventRequestDto requestDto, String email, MultipartFile[] files);
+    EventResponseDto update(EventDetailsUpdate requestDto, String email, MultipartFile[] files);
 
     /**
      * Method for deleting an event.
