@@ -144,6 +144,8 @@ public final class ErrorMessage {
     public static final String SUBSCRIBER_NOT_FOUND_BY_EMAIL = "Subscriber with such email does not exist!";
     public static final String SUBSCRIBER_NOT_FOUND_BY_EMAIL_AND_TOKEN = "Subscriber with such email and token does not exist!";
     public static final String SUBSCRIBER_ALREADY_EXISTS = "Subscriber with such email already exists!";
+    public static final String STRING_IS_BLANK = "String could not be empty or blank!";
+    public static final String STRING_SIZE_IS_INVALID = "String size must be in between 1 and 8000!";
 
     private ErrorMessage() {
     }
