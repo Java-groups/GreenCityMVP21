@@ -119,6 +119,7 @@ public final class ErrorMessage {
             "The date format is wrong. Should matches " + AppConstant.DATE_FORMAT;
     public static final String INVALID_DATE_RANGE = "The 'From' date must be earlier than the 'To' date";
     public static final String SELECT_CORRECT_LANGUAGE = "Select correct language: 'en', 'ua' or 'ru'";
+    public static final String COMMENT_CONTAINS_BANNED_WORDS = "Comment contains slug words! Please, remove them";
     public static final String INVALID_HABIT_ID = "Invalid habit id ";
     public static final String WRONG_COUNT_OF_TAGS_EXCEPTION =
             "Count of tags should be at least one but not more three";

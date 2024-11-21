@@ -39,7 +39,7 @@ public class EventCommentServiceImpl implements EventCommentService {
         EventComment eventComment = modelMapper.map(addEventCommentDtoRequest, EventComment.class);
         eventComment.setUser(modelMapper.map(user, User.class));
         eventComment.setEvent(modelMapper.map(eventVO, Event.class));
-        if (addEventCommentDtoRequest.getParentCommentId() != 0) {
+        if (addEventCommentDtoRequest.getParentCommentId() != null && addEventCommentDtoRequest.getParentCommentId() != 0) {
             EventComment parent = eventCommentRepo.findById(
                             addEventCommentDtoRequest.getParentCommentId())
                     .orElseThrow(() -> new BadRequestException(ErrorMessage.COMMENT_NOT_FOUND_EXCEPTION));
@@ -65,13 +65,19 @@ public class EventCommentServiceImpl implements EventCommentService {
     }
 
     @Override
-    public void update(String newText, long eventId, UserVO user) {
-        EventComment eventComment = eventCommentRepo.findById(eventId).orElseThrow(
-                () -> new NotFoundException(ErrorMessage.COMMENT_NOT_FOUND_EXCEPTION)
-        );
-        if (!user.getId().equals(eventComment.getUser().getId())) {
+    public void update(String newText, long commentId, UserVO user) {
+        EventCommentVO eventCommentVO = findById(commentId);
+        if (!user.getId().equals(eventCommentVO.getUser().getId())) {
             throw new BadRequestException(ErrorMessage.NOT_A_CURRENT_USER);
         }
-        eventComment.setComment(newText);
+        eventCommentVO.setComment(newText);
+        eventCommentRepo.save(modelMapper.map(eventCommentVO, EventComment.class));
+    }
+
+    @Override
+    public EventCommentVO findById(long commentId) {
+        return modelMapper.map(eventCommentRepo.findById(commentId).orElseThrow(
+                () -> new NotFoundException(ErrorMessage.COMMENT_NOT_FOUND_EXCEPTION)
+        ), EventCommentVO.class);
     }
 }

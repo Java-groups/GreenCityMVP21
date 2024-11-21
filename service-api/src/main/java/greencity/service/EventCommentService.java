@@ -26,8 +26,10 @@ public interface EventCommentService {
      *
      * @param newText updated text of {@link EventCommentVO} to which we update
      *                comment.
-     * @param eventId id of eventId {@link EventVO}
+     * @param commentId id of eventId {@link EventCommentVO}
      * @param user    {@link UserVO} that saves the comment.
      */
-    void update(String newText, long eventId, UserVO user);
+    void update(String newText, long commentId, UserVO user);
+
+    EventCommentVO findById(long commentId);
 }

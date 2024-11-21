@@ -2,6 +2,7 @@ package greencity.service;
 
 import greencity.dto.event.EventResponseDto;
 import greencity.dto.event.EventDetailsUpdate;
+import greencity.dto.event.EventVO;
 import greencity.exception.exceptions.NotFoundException;
 import greencity.exception.exceptions.UserHasNoPermissionToAccessException;
 import org.springframework.web.multipart.MultipartFile;
@@ -31,4 +32,6 @@ public interface EventService {
      * @throws NotFoundException if the event with the specified ID is not found.
      */
     void deleteEvent(Long eventId, Long userId);
+
+    EventVO findById(long eventId);
 }
