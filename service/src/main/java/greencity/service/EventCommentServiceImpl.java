@@ -11,6 +11,7 @@ import greencity.entity.Event;
 import greencity.entity.EventComment;
 import greencity.entity.User;
 import greencity.exception.exceptions.BadRequestException;
+import greencity.exception.exceptions.NotFoundException;
 import greencity.repository.EventCommentRepo;
 import greencity.repository.EventRepository;
 import jakarta.servlet.http.HttpServletRequest;
@@ -61,5 +62,16 @@ public class EventCommentServiceImpl implements EventCommentService {
             );
         }
         return modelMapper.map(eventComment, AddEventCommentDtoResponse.class);
+    }
+
+    @Override
+    public void update(String newText, long eventId, UserVO user) {
+        EventComment eventComment = eventCommentRepo.findById(eventId).orElseThrow(
+                () -> new NotFoundException(ErrorMessage.COMMENT_NOT_FOUND_EXCEPTION)
+        );
+        if (!user.getId().equals(eventComment.getUser().getId())) {
+            throw new BadRequestException(ErrorMessage.NOT_A_CURRENT_USER);
+        }
+        eventComment.setComment(newText);
     }
 }
