@@ -51,7 +51,7 @@ public class EventCommentController {
             @ApiResponse(responseCode = "404", description = HttpStatuses.NOT_FOUND)
     })
     @PatchMapping
-    public ResponseEntity<?> update(Long id, @RequestParam @NotBlank String text,
+    public ResponseEntity<?> update(@RequestParam("id") Long id, @RequestParam("text") @NotBlank String text,
                        @Parameter(hidden = true) @CurrentUser UserVO user) {
         eventCommentService.update(text, id, user);
         return ResponseEntity.ok().build();
