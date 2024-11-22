@@ -293,9 +293,9 @@ public class SecurityConfig {
                                 "/user/role",
                                 "/user/update/role")
                         .hasAnyRole(ADMIN)
-//                        .requestMatchers(HttpMethod.DELETE,
-//                                "/event/{eventId}")
-//                        .hasAnyRole(ADMIN, ORGANIZER)
+                        .requestMatchers(HttpMethod.DELETE,
+                                "/event/{eventId}")
+                        .hasAnyRole(ADMIN, ORGANIZER)
                         .requestMatchers(HttpMethod.DELETE,
                                 "/facts/{factId}",
                                 "/comments")
