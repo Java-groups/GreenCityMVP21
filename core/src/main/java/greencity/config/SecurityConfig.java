@@ -1,6 +1,5 @@
 package greencity.config;
 
-import greencity.constant.AppConstant;
 import greencity.security.filters.AccessTokenAuthenticationFilter;
 import greencity.security.jwt.JwtTool;
 import greencity.security.providers.JwtAuthenticationProvider;
