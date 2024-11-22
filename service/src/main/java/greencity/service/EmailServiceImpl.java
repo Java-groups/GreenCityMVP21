@@ -1,7 +1,10 @@
 package greencity.service;
 
+import greencity.constant.DateParserPatterns;
 import greencity.dto.econews.AddEcoNewsDtoResponse;
+import greencity.dto.eventcomment.EventCommentVO;
 import greencity.dto.subscriber.NewsSubscriberVO;
+import greencity.dto.user.UserVO;
 import jakarta.mail.MessagingException;
 import jakarta.mail.internet.MimeMessage;
 import lombok.extern.slf4j.Slf4j;
@@ -16,8 +19,10 @@ import org.thymeleaf.context.Context;
 
 import java.net.URLEncoder;
 import java.nio.charset.StandardCharsets;
+import java.time.format.DateTimeFormatter;
 import java.util.HashMap;
 import java.util.List;
+import java.util.Locale;
 import java.util.Map;
 import java.util.concurrent.Executor;
 
@@ -73,6 +78,26 @@ public class EmailServiceImpl implements EmailService {
                                      + "&unsubscribeToken=" + subscriber.getUnsubscribeToken());
         String template = createEmailTemplate(model, "news-receive-confirmation-email-page");
         sendEmail(subscriber.getEmail(), "news receive confirmation", template);
+    }
+
+    @Override
+    public void sendEventCommentNotification(UserVO eventOwner, EventCommentVO comment) {
+        Map<String, Object> model = new HashMap<>();
+        model.put("eventOwner", eventOwner.getName());
+        model.put("eventName", comment.getEvent().getTitle());
+        model.put("commentatorName", comment.getUser().getName());
+        Locale locale;
+        try {
+            locale = Locale.of(eventOwner.getLanguageVO().getCode());
+        } catch (Exception e) {
+            locale = Locale.ENGLISH;
+        }
+        model.put("commentAdditionDate", comment.getCreatedDate().format(
+                DateTimeFormatter.ofPattern(DateParserPatterns.EVENT_COMMENT_EMAIL_NOTIFICATION_PATTERN, locale)));
+        model.put("commentText", comment.getComment());
+        model.put("eventLink", serverLink + "/event/{eventId}");
+        String template = createEmailTemplate(model, "event-comment-notification-page");
+        sendEmail(eventOwner.getEmail(), "event", template);
     }
 
     private String createEmailTemplate(Map<String, Object> vars, String templateName) {

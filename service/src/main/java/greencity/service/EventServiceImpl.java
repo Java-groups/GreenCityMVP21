@@ -2,14 +2,10 @@ package greencity.service;
 
 import greencity.client.RestClient;
 import greencity.constant.ErrorMessage;
-import greencity.dto.event.EventResponseDto;
 import greencity.dto.event.EventDetailsUpdate;
-import greencity.dto.user.UserRoleDto;
-import greencity.entity.Event;
-import greencity.entity.EventDay;
-import greencity.entity.EventImages;
-import greencity.entity.Tag;
-import greencity.entity.User;
+import greencity.dto.event.EventResponseDto;
+import greencity.dto.event.EventVO;
+import greencity.entity.*;
 import greencity.enums.Role;
 import greencity.enums.TagType;
 import greencity.exception.exceptions.NotFoundException;
@@ -23,6 +19,7 @@ import org.modelmapper.TypeToken;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 import org.springframework.web.multipart.MultipartFile;
+
 import java.util.HashSet;
 import java.util.List;
 import java.util.Set;
@@ -47,11 +44,11 @@ public class EventServiceImpl implements EventService {
     @Transactional
     public EventResponseDto update(EventDetailsUpdate requestDto, String email, MultipartFile[] files) {
         Event eventToUpdate = eventRepo.findById(requestDto.getId())
-            .orElseThrow(() -> new NotFoundException(ErrorMessage.EVENT_NOT_FOUND));
+                .orElseThrow(() -> new NotFoundException(ErrorMessage.EVENT_NOT_FOUND));
         User organizer = modelMapper.map(restClient.findByEmail(email), User.class);
 
         if (!organizer.getId().equals(eventToUpdate.getOrganizer().getId())
-                && organizer.getRole() != Role.ROLE_ADMIN) {
+            && organizer.getRole() != Role.ROLE_ADMIN) {
             throw new UserHasNoPermissionToAccessException(ErrorMessage.USER_HAS_NO_PERMISSION);
         }
 
@@ -78,7 +75,8 @@ public class EventServiceImpl implements EventService {
 
         if (requestDto.getTags() != null) {
             eventToUpdate.setTags(modelMapper.map(tagsService.findTagsWithAllTranslationsByNamesAndType(
-                    requestDto.getTags(), TagType.EVENT), new TypeToken<List<Tag>>(){}.getType()));
+                    requestDto.getTags(), TagType.EVENT), new TypeToken<List<Tag>>() {
+            }.getType()));
         }
     }
 
@@ -145,7 +143,7 @@ public class EventServiceImpl implements EventService {
     public void deleteEvent(Long eventId, Long userId) {
         Event event = eventRepo.findById(eventId)
                 .orElseThrow(() -> new NotFoundException("Event not found with ID: " + eventId));
-        if(!event.getOrganizer().getId().equals(userId) && !isAdmin(userId)) {
+        if (!event.getOrganizer().getId().equals(userId) && !isAdmin(userId)) {
             throw new UserHasNoPermissionToAccessException("You do not have permission to delete this event.");
         }
 
@@ -156,9 +154,15 @@ public class EventServiceImpl implements EventService {
         eventRepo.delete(event);
     }
 
+    @Override
+    public EventVO findById(long eventId) {
+        return modelMapper.map(eventRepo.findById(eventId).orElseThrow(
+                () -> new NotFoundException("Event not found by this id")), EventVO.class);
+    }
+
     private boolean isAdmin(Long userId) {
         return userRepo.findById(userId)
-                .map(User::getRole)
-                .orElse(Role.ROLE_USER) == Role.ROLE_ADMIN;
+                       .map(User::getRole)
+                       .orElse(Role.ROLE_USER) == Role.ROLE_ADMIN;
     }
 }
