@@ -183,4 +183,5 @@
     <include file="db/changelog/logs/ch-add-user-friends-Porplenko.xml"/>
     <include file="db/changelog/logs/ch-add-friend-requests-Porplenko.xml"/>
     <include file="db/changelog/logs/ch-update-user-friends-Porplenko.xml"/>
+    <include file="db/changelog/logs/ch-add-table-locations-Zamorii.xml"/>
 </databaseChangeLog>
