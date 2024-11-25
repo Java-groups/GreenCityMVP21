@@ -43,7 +43,7 @@ public class EventCommentServiceImpl implements EventCommentService {
             EventComment parent = eventCommentRepo.findById(
                             addEventCommentDtoRequest.getParentCommentId())
                     .orElseThrow(() -> new BadRequestException(ErrorMessage.COMMENT_NOT_FOUND_EXCEPTION));
-            if (eventComment.getParentComment() == null) {
+            if (parent.getParentComment() == null) {
                 eventComment.setParentComment(parent);
             } else {
                 throw new BadRequestException(ErrorMessage.CANNOT_REPLY_THE_REPLY);
