@@ -10,8 +10,8 @@ assignees: ''
 
 **Environment:** OS, browser, it's version, device (for mobile devices).
 **Reproducible:** always, rarely, sometimes etc.
-**Build found:** last commit from https://github.com/ita-social-projects/GreenCityClient/tree/dev
-E.g. "commit 147fa44"
+**Build found:** branch and commit where the bug appears.
+E.g. "dev, commit 147fa44"
 
 **Preconditions**
 A clear and concise description of actions to be done before the start of the bug reproducing (to make bug reproducing possible). E.g.:

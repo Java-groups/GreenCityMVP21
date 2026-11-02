@@ -17,7 +17,6 @@ import org.springframework.stereotype.Controller;
 import org.springframework.ui.Model;
 import org.springframework.validation.BindingResult;
 import org.springframework.web.bind.annotation.*;
-import springfox.documentation.annotations.ApiIgnore;
 import jakarta.validation.Valid;
 import java.util.Arrays;
 import java.util.List;
@@ -133,7 +132,7 @@ public class ManagementTagsController {
      * @return path to html view.
      */
     @PostMapping("/search")
-    public String search(Model model, @ApiIgnore Pageable pageable, TagViewDto tagViewDto) {
+    public String search(Model model, Pageable pageable, TagViewDto tagViewDto) {
         PageableAdvancedDto<TagVO> foundTags = tagsService.search(pageable, tagViewDto);
 
         model.addAttribute("tags", foundTags);

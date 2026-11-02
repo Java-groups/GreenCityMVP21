@@ -21,7 +21,6 @@ import org.springframework.web.bind.annotation.CrossOrigin;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RequestMapping;
-import springfox.documentation.annotations.ApiIgnore;
 import jakarta.servlet.http.HttpServletResponse;
 import java.io.IOException;
 import java.text.DateFormat;
@@ -57,7 +56,7 @@ public class ManagementRatingStatisticsController {
     @ApiPageable
     @Operation(summary = "Get management page with facts of the day.")
     @GetMapping("")
-    public String getUserRatingStatistics(Model model, @PageableDefault(value = 20) @ApiIgnore Pageable pageable) {
+    public String getUserRatingStatistics(Model model, @PageableDefault(value = 20) Pageable pageable) {
         Pageable paging =
             PageRequest.of(pageable.getPageNumber(), pageable.getPageSize(), Sort.by("createDate").descending());
         PageableAdvancedDto<RatingStatisticsDtoForTables> pageableDto =
@@ -120,7 +119,7 @@ public class ManagementRatingStatisticsController {
      */
     @PostMapping(value = "", consumes = MediaType.APPLICATION_FORM_URLENCODED_VALUE)
     public String filterData(Model model,
-        @PageableDefault(value = 20) @ApiIgnore Pageable pageable,
+        @PageableDefault(value = 20) Pageable pageable,
         RatingStatisticsViewDto ratingStatisticsViewDto) {
         PageableAdvancedDto<RatingStatisticsDtoForTables> pageableDto =
             ratingStatisticsService.getFilteredDataForManagementByPage(pageable,

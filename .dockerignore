@@ -1,0 +1,7 @@
+.git
+.github
+.idea
+**/*.md
+**/target
+!core/target/
+!core/target/core-1.0-SNAPSHOT.jar

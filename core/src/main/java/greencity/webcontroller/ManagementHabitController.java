@@ -24,7 +24,6 @@ import org.springframework.ui.Model;
 import org.springframework.validation.BindingResult;
 import org.springframework.web.bind.annotation.*;
 import org.springframework.web.multipart.MultipartFile;
-import springfox.documentation.annotations.ApiIgnore;
 import jakarta.validation.Valid;
 import java.util.List;
 import java.util.Locale;
@@ -50,7 +49,7 @@ public class ManagementHabitController {
 
     @GetMapping
     @ApiPageable
-    public String findAllHabits(Model model, @ApiIgnore Pageable pageable,
+    public String findAllHabits(Model model, Pageable pageable,
         @RequestParam(value = "searchReg", required = false) String searchReg,
         @RequestParam(value = "durationFrom", required = false) Integer durationFrom,
         @RequestParam(value = "durationTo", required = false) Integer durationTo,
@@ -73,7 +72,7 @@ public class ManagementHabitController {
     @Operation(summary = "Find habit by id.")
     @ApiResponses(value = {
         @ApiResponse(responseCode = "200", description = HttpStatuses.OK,
-                content = @Content(schema = @Schema(implementation = HabitManagementDto.class))),
+            content = @Content(schema = @Schema(implementation = HabitManagementDto.class))),
         @ApiResponse(responseCode = "400", description = HttpStatuses.BAD_REQUEST),
         @ApiResponse(responseCode = "403", description = HttpStatuses.FORBIDDEN)
     })
@@ -93,14 +92,14 @@ public class ManagementHabitController {
     @Operation(summary = "Find habit by id.")
     @ApiResponses(value = {
         @ApiResponse(responseCode = "200", description = HttpStatuses.OK,
-                content = @Content(schema = @Schema(implementation = HabitManagementDto.class))),
+            content = @Content(schema = @Schema(implementation = HabitManagementDto.class))),
         @ApiResponse(responseCode = "400", description = HttpStatuses.BAD_REQUEST),
         @ApiResponse(responseCode = "403", description = HttpStatuses.FORBIDDEN),
     })
     @GetMapping("/{id}")
     public String getHabitPage(@PathVariable("id") Long id,
-        @ApiIgnore Pageable pageable,
-        @ApiIgnore Locale locale, Model model) {
+        Pageable pageable,
+        Locale locale, Model model) {
         model.addAttribute("hfacts", habitFactService.getAllHabitFactsVO(pageable));
         model.addAttribute("hshops", shoppingListItemService.getShoppingListByHabitId(id));
         model.addAttribute("habit", managementHabitService.getById(id));
@@ -125,7 +124,7 @@ public class ManagementHabitController {
     @Operation(summary = "Save habit with translations.")
     @ApiResponses(value = {
         @ApiResponse(responseCode = "201", description = HttpStatuses.CREATED,
-                content = @Content(schema = @Schema(implementation = GenericResponseDto.class))),
+            content = @Content(schema = @Schema(implementation = GenericResponseDto.class))),
         @ApiResponse(responseCode = "400", description = HttpStatuses.BAD_REQUEST),
         @ApiResponse(responseCode = "403", description = HttpStatuses.FORBIDDEN)
     })
@@ -152,7 +151,7 @@ public class ManagementHabitController {
     @Operation(summary = "Update habit with translations.")
     @ApiResponses(value = {
         @ApiResponse(responseCode = "200", description = HttpStatuses.OK,
-                content = @Content(schema = @Schema(implementation = GenericResponseDto.class))),
+            content = @Content(schema = @Schema(implementation = GenericResponseDto.class))),
         @ApiResponse(responseCode = "400", description = HttpStatuses.BAD_REQUEST),
         @ApiResponse(responseCode = "403", description = HttpStatuses.FORBIDDEN)
     })

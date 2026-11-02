@@ -20,7 +20,6 @@ import org.springframework.stereotype.Controller;
 import org.springframework.ui.Model;
 import org.springframework.validation.BindingResult;
 import org.springframework.web.bind.annotation.*;
-import springfox.documentation.annotations.ApiIgnore;
 import jakarta.validation.Valid;
 import java.util.List;
 import static greencity.dto.genericresponse.GenericResponseDto.buildGenericResponseDto;
@@ -44,7 +43,7 @@ public class ManagementHabitFactsController {
     @Operation(summary = "Get habit facts by id.")
     @ApiResponses(value = {
         @ApiResponse(responseCode = "200", description = HttpStatuses.OK,
-                content = @Content(schema = @Schema(implementation = HabitFactDtoResponse.class))),
+            content = @Content(schema = @Schema(implementation = HabitFactDtoResponse.class))),
         @ApiResponse(responseCode = "403", description = HttpStatuses.FORBIDDEN)
     })
     @GetMapping("/find/{id}")
@@ -63,7 +62,7 @@ public class ManagementHabitFactsController {
     @Operation(summary = "Get management page with habit facts.")
     @GetMapping
     public String findAll(@RequestParam(required = false, name = "query") String filter,
-        Model model, @ApiIgnore Pageable pageable) {
+        Model model, Pageable pageable) {
         model.addAttribute("pageable", habitFactService.getAllHabitFactVOsWithFilter(filter, pageable));
         model.addAttribute("languages", languageService.getAllLanguages());
         return "core/management_habit_facts";
@@ -79,7 +78,7 @@ public class ManagementHabitFactsController {
     @Operation(summary = "Save habit facts")
     @ApiResponses(value = {
         @ApiResponse(responseCode = "200", description = HttpStatuses.OK,
-                content = @Content(schema = @Schema(implementation = GenericResponseDto.class))),
+            content = @Content(schema = @Schema(implementation = GenericResponseDto.class))),
         @ApiResponse(responseCode = "403", description = HttpStatuses.FORBIDDEN),
     })
     @ResponseBody
@@ -167,7 +166,7 @@ public class ManagementHabitFactsController {
     })
     @PostMapping(value = "/filter")
     public String filterData(Model model,
-        @ApiIgnore Pageable pageable,
+        Pageable pageable,
         HabitFactViewDto habitFactViewDto) {
         PageableDto<HabitFactVO> pageableDto =
             habitFactService.getFilteredDataForManagementByPage(

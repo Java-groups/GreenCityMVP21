@@ -4,6 +4,7 @@ import com.azure.storage.blob.BlobClient;
 import com.azure.storage.blob.BlobContainerClient;
 import com.azure.storage.blob.BlobServiceClient;
 import com.azure.storage.blob.BlobServiceClientBuilder;
+import com.azure.storage.blob.models.PublicAccessType;
 import greencity.constant.ErrorMessage;
 import greencity.exception.exceptions.BadRequestException;
 import greencity.exception.exceptions.ImageUrlParseException;
@@ -18,6 +19,7 @@ import java.io.IOException;
 import java.net.URI;
 import java.net.URISyntaxException;
 import java.nio.file.Paths;
+import java.util.Collections;
 import java.util.UUID;
 
 @Service
@@ -55,7 +57,10 @@ public class AzureCloudStorageService implements FileService {
     private BlobContainerClient containerClient() {
         BlobServiceClient serviceClient = new BlobServiceClientBuilder()
             .connectionString(connectionString).buildClient();
-        return serviceClient.getBlobContainerClient(containerName);
+        BlobContainerClient container = serviceClient.getBlobContainerClient(containerName);
+        container.createIfNotExists();
+        container.setAccessPolicy(PublicAccessType.BLOB, Collections.emptyList());
+        return container;
     }
 
     /**

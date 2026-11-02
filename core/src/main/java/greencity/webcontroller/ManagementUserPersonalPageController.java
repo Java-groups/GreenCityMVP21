@@ -14,7 +14,6 @@ import lombok.AllArgsConstructor;
 import org.springframework.stereotype.Controller;
 import org.springframework.ui.Model;
 import org.springframework.web.bind.annotation.*;
-import springfox.documentation.annotations.ApiIgnore;
 import java.time.LocalDate;
 import java.util.List;
 import java.util.Locale;
@@ -40,7 +39,7 @@ public class ManagementUserPersonalPageController {
     @GetMapping
     public String getUserById(@PathVariable Long id,
         @RequestParam(required = false, name = "query") String query, Model model,
-        @ApiIgnore @ValidLanguage Locale locale) {
+        @ValidLanguage Locale locale) {
         UserVO user = userService.findById(id);
 
         List<HabitAssignDto> acquiredHabits = habitAssignService

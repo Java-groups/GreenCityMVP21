@@ -20,7 +20,6 @@ import org.springframework.ui.Model;
 import org.springframework.validation.BindingResult;
 import org.springframework.validation.annotation.Validated;
 import org.springframework.web.bind.annotation.*;
-import springfox.documentation.annotations.ApiIgnore;
 import jakarta.validation.Valid;
 import jakarta.validation.constraints.NotEmpty;
 import jakarta.validation.constraints.Size;
@@ -55,7 +54,7 @@ public class ManagementUserController {
         @RequestParam(required = false, name = "role") String role,
         @RequestParam(required = false, name = "query") String query,
         @CurrentUser UserVO currentUser,
-        Model model, @ApiIgnore Pageable pageable) {
+        Model model, Pageable pageable) {
         PageableDto<UserManagementVO> found = userService.getAllUsersByCriteria(query, role, status, pageable);
         model.addAttribute("users", found);
         model.addAttribute("paging", pageable);
@@ -203,7 +202,7 @@ public class ManagementUserController {
      * @return path to html view.
      */
     @PostMapping("/search")
-    public String search(Model model, @ApiIgnore Pageable pageable, UserManagementViewDto userViewDto) {
+    public String search(Model model, Pageable pageable, UserManagementViewDto userViewDto) {
         PageableAdvancedDto<UserManagementVO> found = restClient.search(pageable, userViewDto);
         model.addAttribute("users", found);
         model.addAttribute("fields", userViewDto);

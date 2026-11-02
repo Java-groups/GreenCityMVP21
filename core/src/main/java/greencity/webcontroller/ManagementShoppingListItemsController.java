@@ -17,7 +17,6 @@ import org.springframework.stereotype.Controller;
 import org.springframework.ui.Model;
 import org.springframework.validation.BindingResult;
 import org.springframework.web.bind.annotation.*;
-import springfox.documentation.annotations.ApiIgnore;
 import jakarta.validation.Valid;
 import java.util.List;
 import static greencity.dto.genericresponse.GenericResponseDto.buildGenericResponseDto;
@@ -146,7 +145,7 @@ public class ManagementShoppingListItemsController {
      * @return View template path {@link String}.
      */
     @PostMapping(value = "/filter")
-    public String filterData(Model model, @PageableDefault(value = 20) @ApiIgnore Pageable pageable,
+    public String filterData(Model model, @PageableDefault(value = 20) Pageable pageable,
         ShoppingListItemViewDto goal) {
         PageableAdvancedDto<ShoppingListItemManagementDto> pageableDto =
             shoppingListItemService.getFilteredDataForManagementByPage(

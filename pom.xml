@@ -5,7 +5,7 @@
     <parent>
         <groupId>org.springframework.boot</groupId>
         <artifactId>spring-boot-starter-parent</artifactId>
-        <version>3.2.2</version>
+        <version>3.5.16</version>
         <relativePath/>
     </parent>
 
@@ -24,28 +24,20 @@
     </modules>
 
     <properties>
-        <spring.boot.version>3.2.2</spring.boot.version>
+        <spring.boot.version>3.5.16</spring.boot.version>
         <java.version>21</java.version>
         <maven.compiler.source>21</maven.compiler.source>
         <maven.compiler.target>21</maven.compiler.target>
-        <junit-jupiter.version>5.10.2</junit-jupiter.version>
-        <mockito-junit-jupiter.version>5.10.0</mockito-junit-jupiter.version>
-        <mockito-core.version>5.10.0</mockito-core.version>
-        <mockito-inline.version>5.2.0</mockito-inline.version>
-        <modelmapper.version>3.2.0</modelmapper.version>
+        <modelmapper.version>3.2.8</modelmapper.version>
         <checkstyle-maven-plugin.version>3.3.1</checkstyle-maven-plugin.version>
         <formatter.maven.plugin.version>2.23.0</formatter.maven.plugin.version>
-        <sonar.java.coveragePlugin>jacoco</sonar.java.coveragePlugin>
-        <sonar.dynamicAnalysis>reuseReports</sonar.dynamicAnalysis>
-        <sonar.exclusions>**/config/*</sonar.exclusions>
-        <sonar.coverage.jacoco.xmlReportPaths>${project.basedir}/target/site/jacoco/jacoco.xml
-        </sonar.coverage.jacoco.xmlReportPaths>
-        <sonar.language>java</sonar.language>
-        <test.containers.version>1.19.4</test.containers.version>
-        <maven.surefire.plugin.version>3.2.5</maven.surefire.plugin.version>
-        <jacoco.maven.plugin.version>0.8.11</jacoco.maven.plugin.version>
-        <net.java.dev.jna.version>5.14.0</net.java.dev.jna.version>
-        <jjwt.version>0.12.5</jjwt.version>
+        <test.containers.version>1.21.4</test.containers.version>
+        <jacoco.maven.plugin.version>0.8.13</jacoco.maven.plugin.version>
+        <jjwt.version>0.13.0</jjwt.version>
+        <springdoc.version>2.8.17</springdoc.version>
+        <azure.storage.blob.version>12.36.0</azure.storage.blob.version>
+        <commons-io.version>2.22.0</commons-io.version>
+        <poi.version>5.4.1</poi.version>
     </properties>
 
     <build>
@@ -81,7 +73,6 @@
             <plugin>
                 <groupId>org.apache.maven.plugins</groupId>
                 <artifactId>maven-surefire-plugin</artifactId>
-                <version>${maven.surefire.plugin.version}</version>
                 <configuration>
                     <forkedProcessExitTimeoutInSeconds>120</forkedProcessExitTimeoutInSeconds>
                 </configuration>
